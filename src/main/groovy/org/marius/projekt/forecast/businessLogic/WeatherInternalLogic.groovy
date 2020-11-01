@@ -4,7 +4,6 @@ import groovy.json.JsonSlurper
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -54,7 +53,7 @@ class WeatherInternalLogic {
         }
 
         url.append("&units=${opts.get('units')}" as String)
-        url.append("&appid=${openWeatherSecurityRepository.find {it -> it.apiKey}}" as String)
+        url.append("&appid=${openWeatherSecurityRepository.findAll().first().apiKey}" as String)
         new String (url)
     }
 

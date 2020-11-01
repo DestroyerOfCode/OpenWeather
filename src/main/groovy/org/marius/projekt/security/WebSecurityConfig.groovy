@@ -18,6 +18,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    //len pre encryption
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
@@ -27,9 +28,10 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests()
-                .antMatchers("/", "/security/b69d3f2e2da17a2e3e9f0eb44d62e390/insertKey/").permitAll()
-        .and().httpBasic();
+        http.csrf().disable()
+//                .authorizeRequests()
+//                .antMatchers("/home").authenticated()  // (1)
+//        .and().httpBasic();
 //                .anyRequest().authenticated()
 
     }

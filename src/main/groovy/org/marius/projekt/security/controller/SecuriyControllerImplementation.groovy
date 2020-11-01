@@ -1,5 +1,6 @@
 package org.marius.projekt.security.controller
 
+import org.bson.types.ObjectId
 import org.marius.projekt.Main
 import org.marius.projekt.security.encryption.EncryptionUtil
 import org.marius.projekt.security.encryption.MongoDBAfterLoadEventListener
@@ -10,13 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean
-import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoOperations
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.encrypt.Encryptors
-import org.springframework.security.crypto.encrypt.HexEncodingTextEncryptor
-import org.springframework.security.crypto.encrypt.TextEncryptor
-import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Component
 
 @Component
@@ -26,6 +22,7 @@ class SecuriyControllerImplementation implements SecurityController {
     @Autowired OpenWeatherSecurity openWeatherSecurity
     @Autowired private EncryptionUtil encryptionUtil;
     @Autowired private MongoOperations mongoOperations;
+    @Autowired private MongoTemplate mongoTemplate;
     @Override
     ApplicationContext getAppCtx() {
         return new AnnotationConfigApplicationContext(Main.class)
@@ -44,16 +41,13 @@ class SecuriyControllerImplementation implements SecurityController {
     // TODO dokoncit aby malo Ine Id lebo v tom IFe sa nemeni
     @Override
     Object insertApiKey(String key){
-        def bool
-        /*openWeatherSecurityRepository.findAll().forEach{ rawApiKey ->
-            if (rawApiKey.apiKey.equals(key))
-                bool = true
 
-        }*/
+//      this wont work because of the encrypting
+//      mongoTemplate.findOne(query(where("apiKey").is(key)), OpenWeatherSecurity.class)
         if ( !openWeatherSecurityRepository.findAll().any{
-            rawApiKey ->
-                key == rawApiKey.apiKey})
+            rawApiKey -> key == rawApiKey.apiKey})
         {
+            openWeatherSecurity.setId(new ObjectId().get() as String)
             openWeatherSecurity.setProperty('apiKey', key )
             openWeatherSecurityRepository.insert(openWeatherSecurity)
         }

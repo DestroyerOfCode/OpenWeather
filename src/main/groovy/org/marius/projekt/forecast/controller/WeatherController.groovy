@@ -1,21 +1,15 @@
 package org.marius.projekt.forecast.controller
 
-import groovy.json.JsonSlurper
 import org.marius.projekt.forecast.service.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.client.RestTemplate
 
 import java.lang.reflect.Array
 
@@ -24,7 +18,15 @@ class WeatherController {
 
     @Autowired WeatherService weatherService
 
-    @GetMapping()
+    /***
+     * example curls
+     *  curl -d 'cityName={name}' -X POST http://localhost:8080
+     *  curl -d 'cityName={name}&state={state}' -X POST http://localhost:8080
+     *  curl -d 'cityId={id}' -X POST http://localhost:8080
+     * @param opts
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     def getWeatherData(@RequestParam Map<String, Object> opts) {
         def weather = weatherService.findWeather( opts )
@@ -33,7 +35,7 @@ class WeatherController {
         return weather
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     @ResponseBody
     ArrayList getAllWeatherData(@RequestParam Map<String, Object> opts){
         ArrayList cityIds = weatherService.findCityIds()
