@@ -7,12 +7,8 @@ class WeatherMain {
 
     BigDecimal temp
     BigDecimal feels_like
-
-    def WeatherMain(){
-
-    }
-    def WeatherMain(BigDecimal temp, BigDecimal feels_like){
-        this.temp = temp
-        this.feels_like = feels_like
-    }
+    Integer humidity
+    BigDecimal temp_max
+    BigDecimal temp_min
+    Integer pressure
 }

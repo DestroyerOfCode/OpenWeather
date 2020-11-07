@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
+import java.time.LocalDateTime
+
 @Configuration
 @Document(collection = 'Weather')
 class WeatherModel {
@@ -14,7 +16,17 @@ class WeatherModel {
 
     String base
     Integer visibility
-
-    @Autowired
+    Integer timezone
+    Integer weatherId
+    Integer cod
+    BigDecimal dt
+    String name
     WeatherMain weatherMain
+    Coord coord
+    Clouds clouds
+    Sys sys
+    Wind wind
+    List<Weather> weather
+    LocalDateTime creationDate
+
 }

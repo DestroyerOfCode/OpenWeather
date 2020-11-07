@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 class MongoDBBeforeSaveEventListener extends AbstractMongoEventListener<Object> {
 
     @Autowired
@@ -21,7 +24,7 @@ class MongoDBBeforeSaveEventListener extends AbstractMongoEventListener<Object> 
                 eventObject.put(key, this.encryptionUtil.encrypt(eventObject.get(key).toString()));
             }
         }
-
+        eventObject.put('creationDate', LocalDateTime.now())
         super.onBeforeSave(event);
     }
 }

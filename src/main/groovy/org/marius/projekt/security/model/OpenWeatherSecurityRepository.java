@@ -13,7 +13,5 @@ public interface OpenWeatherSecurityRepository extends MongoRepository<OpenWeath
     OpenWeatherSecurity findByApiKey( String apiKey );
 
     OpenWeatherSecurity findByApiKeyNotNull( String apiKey );
-//    OpenWeatherSecurity findByapiKey( String apiKey );
-//    OpenWeatherSecurity findByapikey( String apiKey );
 
 }

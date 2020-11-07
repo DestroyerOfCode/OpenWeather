@@ -44,6 +44,7 @@ class SecuriyControllerImplementation implements SecurityController {
 
 //      this wont work because of the encrypting
 //      mongoTemplate.findOne(query(where("apiKey").is(key)), OpenWeatherSecurity.class)
+
         if ( !openWeatherSecurityRepository.findAll().any{
             rawApiKey -> key == rawApiKey.apiKey})
         {

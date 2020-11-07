@@ -3,15 +3,15 @@ package org.marius.projekt.forecast.model
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class Coordinations {
+class Coord {
 
     BigDecimal lon
     BigDecimal lat
 
-    Coordinations(){
+    Coord(){
     }
 
-    Coordinations(BigDecimal lat, BigDecimal lon){
+    Coord(BigDecimal lat, BigDecimal lon){
         this.lat = lat
         this.lon = lon
     }
