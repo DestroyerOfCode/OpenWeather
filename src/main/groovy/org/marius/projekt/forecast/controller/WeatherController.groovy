@@ -43,6 +43,15 @@ class WeatherController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
+
+    @RequestMapping(method = RequestMethod.POST, value = "/insert/all")
+    @ResponseBody
+    def insertAllWeatherData() {
+        if (weatherService.insertAllWeatherData() )
+            return new ResponseEntity<>(HttpStatus.CREATED)
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+
     @PostMapping("/all")
     @ResponseBody
     ArrayList getAllWeatherData(@RequestParam Map<String, Object> opts){

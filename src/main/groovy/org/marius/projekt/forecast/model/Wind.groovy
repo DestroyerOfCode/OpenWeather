@@ -7,4 +7,5 @@ class Wind {
 
     Float speed
     Integer deg
+    Integer gust
 }

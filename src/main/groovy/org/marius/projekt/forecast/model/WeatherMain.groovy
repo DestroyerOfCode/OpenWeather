@@ -11,4 +11,6 @@ class WeatherMain {
     BigDecimal temp_max
     BigDecimal temp_min
     Integer pressure
+    Integer sea_level
+    Integer grnd_level
 }

@@ -28,5 +28,7 @@ class WeatherModel {
     Wind wind
     List<Weather> weather
     LocalDateTime creationDate
+    Rain rain
+    Snow snow
 
 }
