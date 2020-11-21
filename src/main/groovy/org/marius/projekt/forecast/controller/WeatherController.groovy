@@ -1,6 +1,8 @@
 package org.marius.projekt.forecast.controller
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.marius.projekt.forecast.model.WeatherModel
+import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.forecast.service.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 class WeatherController {
 
     @Autowired WeatherService weatherService
-
+    @Autowired WeatherModelRepository weatherModelRepository
     /***
      * example curls
      *  curl -d 'cityName={name}' -X POST http://localhost:8080
@@ -32,22 +34,34 @@ class WeatherController {
         def weather = weatherService.findWeather( opts )
         if (!weather)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        return weather
+        return new ResponseEntity<WeatherModel>(weather, HttpStatus.ACCEPTED)
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/retrieve/fromDb")
+    @ResponseBody
+    def getWeatherDataFromDb(@RequestParam Map<String, Object> opts) {
+//        def weather = weatherService.findWeather( opts )
+//        if (!weather)
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT)
+//        return weather
+
+        def weathers = weatherModelRepository.findAll()
+        weathers
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    def insertWeatherData(@RequestBody JsonNode opts) {
-        if (weatherService.insertWeatherData( opts ) )
+    def saveWeatherData(@RequestBody JsonNode opts) {
+        if (weatherService.saveWeatherData( opts ) )
             return new ResponseEntity<>(HttpStatus.CREATED)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/insert/all")
+    @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @ResponseBody
-    def insertAllWeatherData() {
-        if (weatherService.insertAllWeatherData() )
+    def saveAllWeatherData() {
+        if (weatherService.saveAllWeatherData() )
             return new ResponseEntity<>(HttpStatus.CREATED)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }

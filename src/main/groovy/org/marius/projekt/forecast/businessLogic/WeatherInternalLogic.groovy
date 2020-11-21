@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 @Component
@@ -30,8 +32,12 @@ class WeatherInternalLogic {
      */
     Object parseWeatherEntityToJson(HttpEntity<String> entity, Map<String, Object> opts){
 
-        StringBuilder url = new StringBuilder(uriBase)
-        return new JsonSlurper().parseText(restTemplate.exchange(buildUrl(opts, url), HttpMethod.GET, entity, String.class).getBody().toString())
+        try {
+            StringBuilder url = new StringBuilder(uriBase)
+            return new JsonSlurper().parseText(restTemplate.exchange(buildUrl(opts, url), HttpMethod.GET, entity, String.class).getBody().toString())
+        } catch(HttpClientErrorException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.toString())
+        }
     }
 
     /***

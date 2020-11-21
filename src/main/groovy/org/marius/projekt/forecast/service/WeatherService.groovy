@@ -28,6 +28,7 @@ class WeatherService {
         Object o = weatherMap.remove('main')
         weatherMap.put('weatherMain', o)
 
+        // in the jsonnode I receive there are keys starting with a numeral so I have to change it to start with literal
         if ( weatherMap.containsKey('rain')) {
             o = weatherMap.rain.remove('1h')
             weatherMap.rain.put('oneh', o)
@@ -41,8 +42,9 @@ class WeatherService {
             o = weatherMap.snow.remove('3h')
             weatherMap.snow.put('threeh', o)
         }
+
         WeatherModel weatherModel = mapper.convertValue(weatherMap, WeatherModel.class)
-        return weatherModel as WeatherModel
+        return weatherModel
     }
 
     Integer findTemperature( Map<String, Object> opts){
@@ -55,23 +57,23 @@ class WeatherService {
 
     }
 
-    def insertWeatherData( def opts ){
-        WeatherModel weatherMap
+    def saveWeatherData( def opts ){
+        WeatherModel weatherModel
         if (opts instanceof ObjectNode ) {
             ObjectMapper objectMapper = new ObjectMapper()
-            weatherMap = objectMapper.convertValue(opts, WeatherModel.class)
+            weatherModel = objectMapper.convertValue(opts, WeatherModel.class)
         }
         else
-            weatherMap = opts
-        return weatherModelRepository.insert( weatherMap )
+            weatherModel = opts
+        return weatherModelRepository.save( weatherModel )
     }
 
-    def insertAllWeatherData(){
+    def saveAllWeatherData(){
         def cityIds = findCityIds()
         cityIds.forEach{
             cityId ->
                 def weatherMap = findWeather(['cityId' : cityId.id])
-                insertWeatherData( weatherMap )
+                saveWeatherData( weatherMap )
         }
         return new ResponseEntity<>(HttpStatus.CREATED)
     }

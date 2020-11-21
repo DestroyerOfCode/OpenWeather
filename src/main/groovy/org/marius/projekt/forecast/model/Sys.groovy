@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class Sys {
 
-    BigDecimal sunset
+    String sunset
     Integer type
     String country
     String id
-    BigDecimal sunrise
+    String sunrise
 }
