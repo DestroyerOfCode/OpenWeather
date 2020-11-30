@@ -10,10 +10,6 @@ import org.springframework.context.annotation.Description
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.client.HttpClientErrorException
 
-import static io.restassured.RestAssured.*
-import org.junit.Test;
-//import org.springframework.security.test.web.servlet.request.httpBasic
-
 class testicek {
 
     @Rule
@@ -23,7 +19,7 @@ class testicek {
     @DisplayName("get Single Weather Data")
     void getSingleWeatherData() {
         given().auth().none().and().queryParams(['cityName':'Prague', 'units': 'metric']).when().
-                get("/").
+                get("/weather").
                 then().
                 statusCode(202)
     }
@@ -31,8 +27,8 @@ class testicek {
     @Test
     @DisplayName("get Single Weather Data With City Id Random")
     void getSingleWeatherDataWithCityIdRandom() {
-        given().auth().none().and().queryParams(['cityId': '123456789', 'units': 'metric']).when().
-                get("/").
+        given().auth().none().and().queryParams(['cityId': '3067696', 'units': 'metric']).when().
+                get("/weather").
                 then().
                 statusCode(202)
     }
@@ -41,7 +37,7 @@ class testicek {
     @DisplayName("get Single Weather Data With City Id Real")
     void getSingleWeatherDataWithCityIdReal() {
         given().auth().none().and().queryParams(['cityId':'3067696', 'units': 'metric']).when().
-                get("/").
+                get("/weather").
                 then().
                 statusCode(202)
     }
@@ -52,7 +48,11 @@ class testicek {
     void getSingleWeatherDataFail() {
         Assert.assertThrows(HttpClientErrorException.class, { ->
             given().auth().none().and().params([:]).when().
-                get("/")
+                    get("/weather")
         })
     }
 }
+import static io.restassured.RestAssured.*
+//import org.springframework.security.test.web.servlet.request.httpBasic
+
+import org.junit.Test;

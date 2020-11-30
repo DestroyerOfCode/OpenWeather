@@ -22,13 +22,13 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("user1").password(passwordEncoder().encode("user1Pass"))
-                .authorities("ROLE_USER");
+//                .withUser("user1").password(passwordEncoder().encode("user1Pass"))
+//                .authorities("ROLE_USER");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf().disable().cors()
 //                .authorizeRequests()
 //                .antMatchers("/home").authenticated()  // (1)
 //        .and().httpBasic();
