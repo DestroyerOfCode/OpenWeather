@@ -1,9 +1,10 @@
 package org.marius.projekt.forecast.model
 
+import org.marius.projekt.misc.Mappable
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class Coord {
+class Coord implements Mappable {
 
     BigDecimal lon
     BigDecimal lat

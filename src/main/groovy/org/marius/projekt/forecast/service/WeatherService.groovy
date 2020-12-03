@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import groovy.json.JsonSlurper
 import org.apache.groovy.json.internal.LazyMap
+import org.marius.projekt.forecast.businessLogic.FilterOperatorOverload
 import org.marius.projekt.forecast.businessLogic.WeatherInternalLogic
 import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -18,6 +20,7 @@ class WeatherService {
 
     @Autowired WeatherInternalLogic weatherInternalLogic
     @Autowired WeatherModelRepository weatherModelRepository
+    @Autowired FilterOperatorOverload filterOperatorOverload
 
     WeatherModel findWeather( Map<String, Object> opts ){
 
@@ -76,5 +79,27 @@ class WeatherService {
                 saveWeatherData( weatherMap )
         }
         return new ResponseEntity<>(HttpStatus.CREATED)
+    }
+
+    def getWeatherDataFromDbService(String sortBy, Boolean isAscending, Map<String, Object> filters, String filterOperator, String cityId ){
+        def weathers = []
+
+        if (cityId) {
+            weathers << weatherModelRepository.findById(cityId)
+            return weathers
+        }
+
+        if (sortBy && isAscending)
+            weathers = weatherModelRepository.findAll(Sort.by(isAscending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy))
+
+        if (filters)
+            filters.forEach{mapKey, mapVal ->
+                weathers = weathers.findAll{ it ->
+                    filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
+                }
+            }
+        if (!weathers)
+            weathers = weatherModelRepository.findAll()
+        weathers
     }
 }

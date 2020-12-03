@@ -17,10 +17,9 @@ import org.springframework.web.client.RestTemplate
 class WeatherInternalLogic {
 
     def uriBase ='http://api.openweathermap.org/data/2.5/weather?'
-    def key = 'b69d3f2e2da17a2e3e9f0eb44d62e390'
 
     @Autowired RestTemplate restTemplate
-    @Autowired WeatherModelRepository weatherModelRepository
+//    @Autowired WeatherModelRepository weatherModelRepository
     @Autowired OpenWeatherSecurityRepository openWeatherSecurityRepository
 
     /***
@@ -68,5 +67,30 @@ class WeatherInternalLogic {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         return entity
+    }
+
+
+    def findNestedKey(def m, String key) {
+        if (!m)
+            return
+        if (m instanceof Collection) {
+            m.forEach { item ->
+                if (!item)
+                    return
+                if (item.asMap().containsKey(key)) return item.asMap()[key]
+                item.asMap().findResult {
+                    k, v ->
+                        v && WeatherInternalLogic.isAssignableFrom(v.getClass()) ? findNestedKey(v, key) : null
+                }
+            }
+        }
+        else {
+            if (m.containsKey(key))
+                return m[key]
+            m.findResult {
+                k, v ->
+                    v && WeatherInternalLogic.isAssignableFrom(v.getClass()) ? findNestedKey(v, key) : null
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 package org.marius.projekt.forecast.model
 
-import org.springframework.beans.factory.annotation.Autowired
+import org.marius.projekt.misc.Mappable
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 @Configuration
 @Document(collection = 'Weather')
-class WeatherModel {
+class WeatherModel implements Mappable {
 
     @Id
     String id

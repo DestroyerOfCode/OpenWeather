@@ -5,10 +5,12 @@ import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.forecast.service.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 class WeatherController {
 
     @Autowired WeatherService weatherService
-    @Autowired WeatherModelRepository weatherModelRepository
+
     /***
      * example curls
      *  curl -d 'cityName={name}' -X POST http://localhost:8080/weather
@@ -40,17 +42,18 @@ class WeatherController {
         return new ResponseEntity<WeatherModel>(weather, HttpStatus.ACCEPTED)
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/retrieve/fromDb")
+    @RequestMapping(method = RequestMethod.GET, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
     @ResponseBody
-    def getWeatherDataFromDb(@RequestParam Map<String, Object> opts) {
-//        def weather = weatherService.findWeather( opts )
-//        if (!weather)
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT)
-//        return weather
+    def getWeatherDataFromDb(@RequestParam(required = false, value = "sortBy") String sortBy , @RequestParam(required = false, value = "isAscending") Boolean isAscending,
+         @RequestBody(required = false) Map<String, Object> filters, @RequestParam(required = false, value = "filterOperator") String filterOperator, @PathVariable(required = false, value = "cityId") String cityId) {
 
-        def weathers = weatherModelRepository.findAll()
-        weathers
+        def weathers = weatherService.getWeatherDataFromDbService(sortBy, isAscending, filters, filterOperator, cityId  )
+        if (weathers)
+            return new ResponseEntity<>(weathers, HttpStatus.OK)
+
+        return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
+
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
@@ -81,5 +84,4 @@ class WeatherController {
         }
         temperaturesInCities
     }
-
 }
