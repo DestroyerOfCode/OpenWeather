@@ -5,12 +5,18 @@ const WEATHER_API_URL = `${COURSE_API_URL}/weather`
 
 class WeatherService {
 
-    retrieveAllWeathers(sortBy, isAscending) {
+    retrieveAllWeathers(sortBy, isAscending, filters, filterOperator) {
         //console.log('executed service')
-        console.log(sortBy)
-        return axios.get(`${WEATHER_API_URL}/retrieve/fromDb`, {params: {
-            sortBy, isAscending
-        }});
+        console.log("Sort: " +sortBy)
+        console.log("filter: " + filters)
+        console.log("filterOperator: " + filterOperator)
+
+        const params = {
+            sortBy, isAscending, filterOperator
+
+        }
+        
+        return axios.post(`${WEATHER_API_URL}/retrieve/fromDb`, filters,{params});
     }
 }
 export default new WeatherService()

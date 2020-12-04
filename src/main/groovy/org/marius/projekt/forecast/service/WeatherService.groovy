@@ -92,14 +92,16 @@ class WeatherService {
         if (sortBy && isAscending)
             weathers = weatherModelRepository.findAll(Sort.by(isAscending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy))
 
+        if (!weathers)
+            weathers = weatherModelRepository.findAll()
+
         if (filters)
             filters.forEach{mapKey, mapVal ->
                 weathers = weathers.findAll{ it ->
                     filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
                 }
             }
-        if (!weathers)
-            weathers = weatherModelRepository.findAll()
+
         weathers
     }
 }

@@ -14,7 +14,6 @@ class WeatherApp extends Component{
                      </Switch>
                  </>
              </Router> */}
-            <h1>Weather Application</h1>
             <WeatherListComponent/>
             </>
         )

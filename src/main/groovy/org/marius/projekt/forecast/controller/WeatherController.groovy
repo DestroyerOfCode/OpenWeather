@@ -42,7 +42,7 @@ class WeatherController {
         return new ResponseEntity<WeatherModel>(weather, HttpStatus.ACCEPTED)
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
+    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
     @ResponseBody
     def getWeatherDataFromDb(@RequestParam(required = false, value = "sortBy") String sortBy , @RequestParam(required = false, value = "isAscending") Boolean isAscending,
          @RequestBody(required = false) Map<String, Object> filters, @RequestParam(required = false, value = "filterOperator") String filterOperator, @PathVariable(required = false, value = "cityId") String cityId) {

@@ -52,10 +52,31 @@ class WeatherTest {
 //    }
 
     @Test
-    @DisplayName("Sort weather data")
+    @DisplayName("Get all weather data")
+    void getAllWeatherData(){
+        given().auth().none().contentType("application/json").when().
+                post("/weather/retrieve/fromDb").then().statusCode(200)
+    }
+
+    @Test
+    @DisplayName("Get weather data by Id")
+    void getWeatherDataById(){
+        given().auth().none().contentType("application/json").when().
+                post("/weather/retrieve/fromDb/3067696").then().statusCode(200).body("name", hasItem("Prague"))
+    }
+
+    @Test
+    @DisplayName("Sort weather data by name")
+    void sortWeatherDataByName(){
+        given().auth().none().and().contentType("application/json").queryParams("sortBy", "name", "isAscending", true).when().
+        post("/weather/retrieve/fromDb").then().statusCode(200)
+    }
+
+    @Test
+    @DisplayName("Sort weather data by Latitude")
     void sortWeatherData(){
-        given().auth().none().and().queryParams("sortBy", "name", "isAscending", true).when().
-        get("/weather/retrieve/fromDb").then().statusCode(200)
+        given().auth().none().and().contentType("application/json").queryParams("sortBy", "coord.lat", "isAscending", false).when().
+        post("/weather/retrieve/fromDb").then().statusCode(200)
     }
 
     @Test
@@ -64,20 +85,25 @@ class WeatherTest {
         Map<String, Object> filterMap = Map.of("name", "Baghdad");
         given().auth().none().contentType("application/json").queryParams( "filterOperator", "eq", "sortBy", "name", "isAscending", true).
                 body(filterMap).when().
-        get("/weather/retrieve/fromDb").then().statusCode(200).body("name", hasItem("Baghdad"))
+        post("/weather/retrieve/fromDb").then().statusCode(200).body("name", hasItem("Baghdad"))
     }
     @Test
-    @DisplayName("Get all weather data")
-    void getAllWeatherData(){
-        given().auth().none().when().
-        get("/weather/retrieve/fromDb").then().statusCode(200)
+    @DisplayName("Filter weather data with city without sorting")
+    void filterWeatherDataWithCityWithoutSort(){
+        Map<String, Object> filterMap = Map.of("name", "Baghdad");
+        given().auth().none().contentType("application/json").queryParams( "filterOperator", "eq",).
+                body(filterMap).when().
+        post("/weather/retrieve/fromDb").then().statusCode(200).body("name", hasItem("Baghdad"))
     }
 
     @Test
-    @DisplayName("Get weather data by Id")
-    void getWeatherDataById(){
-       given().auth().none().when().
-        get("/weather/retrieve/fromDb/3067696").then().statusCode(200).body("name", hasItem("Prague"))
+    @DisplayName("Filter weather data with country without sorting")
+    void filterWeatherDataWithCountryWithoutSort(){
+        Map<String, Object> filterMap = Map.of("country", "SY");
+        given().auth().none().contentType("application/json").queryParams( "filterOperator", "eq",).
+                body(filterMap).when().
+        post("/weather/retrieve/fromDb").then().statusCode(200).body("sys.country", hasItem("SY"))
     }
+
 }
 

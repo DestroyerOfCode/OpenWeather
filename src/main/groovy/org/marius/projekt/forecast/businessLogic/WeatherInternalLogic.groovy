@@ -1,6 +1,7 @@
 package org.marius.projekt.forecast.businessLogic
 
 import groovy.json.JsonSlurper
+import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -80,7 +81,7 @@ class WeatherInternalLogic {
                 if (item.asMap().containsKey(key)) return item.asMap()[key]
                 item.asMap().findResult {
                     k, v ->
-                        v && WeatherInternalLogic.isAssignableFrom(v.getClass()) ? findNestedKey(v, key) : null
+                        v && v instanceof Map ? findNestedKey(v, key) : null
                 }
             }
         }
@@ -89,7 +90,7 @@ class WeatherInternalLogic {
                 return m[key]
             m.findResult {
                 k, v ->
-                    v && WeatherInternalLogic.isAssignableFrom(v.getClass()) ? findNestedKey(v, key) : null
+                    v && (v instanceof Map || v instanceof Collection) ? findNestedKey(v, key) : null
             }
         }
     }
