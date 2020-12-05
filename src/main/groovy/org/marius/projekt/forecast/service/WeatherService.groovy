@@ -105,8 +105,6 @@ class WeatherService {
                     weathers = weathers.findAll { it ->
                         filterOperatorOverload."${opts.filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
                 }
-                else
-                    weathers = weatherModelRepository.findAll()
             }
         }
 

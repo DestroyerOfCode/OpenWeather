@@ -10,14 +10,18 @@ class WeatherService {
         console.log("Sort: " +sortBy)
         console.log("filter: " + JSON.stringify(filters))
         console.log("filterOperator: " + filterOperator)
-        console.log("weathers: " + weathers)
+        console.log("weathers : " + (weathers))
+        console.log("weathers stringified : " + JSON.stringify(weathers))
 
         if(filters)
             filters = JSON.stringify(filters)
+        if(!weathers)
+            weathers = []
+            
         const params = {
             sortBy, isAscending, filters, filterOperator
-
         }
+
         console.log("params: " + JSON.stringify(params) )
         return axios.post(`${WEATHER_API_URL}/retrieve/fromDb`, weathers,{params});
     }
