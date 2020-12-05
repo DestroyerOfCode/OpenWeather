@@ -1,12 +1,14 @@
 package org.marius.projekt.forecast.controller
 
 import com.fasterxml.jackson.databind.JsonNode
+import groovy.json.JsonSlurper
 import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.forecast.service.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -44,13 +46,12 @@ class WeatherController {
 
     @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
     @ResponseBody
-    def getWeatherDataFromDb(@RequestParam(required = false, value = "sortBy") String sortBy , @RequestParam(required = false, value = "isAscending") Boolean isAscending,
-         @RequestBody(required = false) Map<String, Object> filters, @RequestParam(required = false, value = "filterOperator") String filterOperator, @PathVariable(required = false, value = "cityId") String cityId) {
+    def getWeatherDataFromDb( @RequestBody(required = false) ArrayList<WeatherModel> weathers,
+         @RequestParam(required = false) Map<String, Object> opts, @PathVariable(required = false, value = "cityId") String cityId) {
 
-        def weathers = weatherService.getWeatherDataFromDbService(sortBy, isAscending, filters, filterOperator, cityId  )
+        weathers = weatherService.getWeatherDataFromDbService(opts, weathers, cityId )
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
-
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 

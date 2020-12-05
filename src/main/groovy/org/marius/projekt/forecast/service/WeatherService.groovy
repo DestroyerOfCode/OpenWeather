@@ -81,26 +81,34 @@ class WeatherService {
         return new ResponseEntity<>(HttpStatus.CREATED)
     }
 
-    def getWeatherDataFromDbService(String sortBy, Boolean isAscending, Map<String, Object> filters, String filterOperator, String cityId ){
-        def weathers = []
+    def getWeatherDataFromDbService(Map<String, Object> opts, ArrayList<WeatherModel> weathers, String cityId ){
 
         if (cityId) {
             weathers << weatherModelRepository.findById(cityId)
             return weathers
         }
 
-        if (sortBy && isAscending)
-            weathers = weatherModelRepository.findAll(Sort.by(isAscending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy))
-
         if (!weathers)
             weathers = weatherModelRepository.findAll()
 
-        if (filters)
-            filters.forEach{mapKey, mapVal ->
-                weathers = weathers.findAll{ it ->
-                    filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
-                }
+        if (opts.sortBy && opts.isAscending) {
+            weathers = weathers.sort() {
+                a, b -> new Boolean(opts.isAscending) ? weatherInternalLogic.findNestedKey(a.asMap(), opts.sortBy) <=> weatherInternalLogic.findNestedKey(b.asMap(),opts.sortBy) :
+                        weatherInternalLogic.findNestedKey(b.asMap(),opts.sortBy) <=> weatherInternalLogic.findNestedKey(a.asMap(), opts.sortBy)
             }
+        }
+
+        if (opts.filters) {
+            opts.filters = new JsonSlurper().parseText(opts.filters)
+            opts.filters.forEach { mapKey, mapVal ->
+                if(mapVal)
+                    weathers = weathers.findAll { it ->
+                        filterOperatorOverload."${opts.filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
+                }
+                else
+                    weathers = weatherModelRepository.findAll()
+            }
+        }
 
         weathers
     }
