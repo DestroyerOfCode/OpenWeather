@@ -61,7 +61,7 @@ class WeatherTest {
     @Test
     @DisplayName("Get weather data by Id")
     void getWeatherDataById(){
-        given().auth().none().contentType("application/json").when().
+        given().auth().none().contentType("application/json").when().body([]).
                 post("/weather/retrieve/fromDb/3067696").then().statusCode(200).body("name", hasItem("Prague"))
     }
 
@@ -82,26 +82,26 @@ class WeatherTest {
     @Test
     @DisplayName("Filter weather data")
     void filterWeatherData(){
-        Map<String, Object> filterMap = Map.of("name", "Baghdad");
-        given().auth().none().contentType("application/json").queryParams( "filterOperator", "eq", "sortBy", "name", "isAscending", true).
-                body(filterMap).when().
+        Map<String, Object> opts = Map.of("name", "Baghdad","filterOperator", "eq", "sortBy", "name", "isAscending", true);
+        given().auth().none().contentType("application/json").queryParams( opts).
+                body().when().
         post("/weather/retrieve/fromDb").then().statusCode(200).body("name", hasItem("Baghdad"))
     }
     @Test
     @DisplayName("Filter weather data with city without sorting")
     void filterWeatherDataWithCityWithoutSort(){
-        Map<String, Object> filterMap = Map.of("name", "Baghdad");
-        given().auth().none().contentType("application/json").queryParams( "filterOperator", "eq",).
-                body(filterMap).when().
+        Map<String, Object> opts = Map.of("name", "Baghdad","filterOperator", "eq",);
+        given().auth().none().contentType("application/json").queryParams( opts).
+                body().when().
         post("/weather/retrieve/fromDb").then().statusCode(200).body("name", hasItem("Baghdad"))
     }
 
     @Test
     @DisplayName("Filter weather data with country without sorting")
     void filterWeatherDataWithCountryWithoutSort(){
-        Map<String, Object> filterMap = Map.of("country", "SY");
-        given().auth().none().contentType("application/json").queryParams( "filterOperator", "eq",).
-                body(filterMap).when().
+        Map<String, Object> opts = Map.of("filter",Map.of("country", "SY"),"filterOperator", "eq",);
+        given().auth().none().contentType("application/json").queryParams( opts).
+                body().when().
         post("/weather/retrieve/fromDb").then().statusCode(200).body("sys.country", hasItem("SY"))
     }
 

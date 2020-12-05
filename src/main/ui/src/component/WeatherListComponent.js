@@ -6,7 +6,7 @@ class WeatherListComponent extends Component {
         super(props)
         this.state = {
             weathers: [],
-            message: null
+            isAscending: true
         }
         // this.deleteWeatherClicked = this.deleteWeatherClicked.bind(this)
         // this.updateWeatherClicked = this.updateWeatherClicked.bind(this)
@@ -15,7 +15,7 @@ class WeatherListComponent extends Component {
     }
 
     componentDidMount() {
-        this.refreshCourses();
+        this.refreshWeathers();
     }
 
     refreshWeathers(sortBy, isAscending, filters, filterOperator, weathers) {
@@ -28,7 +28,7 @@ class WeatherListComponent extends Component {
                     //console.log(response);
                     this.setState({ weathers: response.data })
                 }
-            )
+            ).then( response => {if (sortBy) this.setState({isAscending : !isAscending})})
     }
 
     render() {
