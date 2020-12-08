@@ -92,9 +92,12 @@ class WeatherService {
             weathers = weatherModelRepository.findAll()
 
         if (opts.sortBy && opts.isAscending) {
+            def path = opts.sortBy.split(/\./)
             weathers = weathers.sort() {
-                a, b -> new Boolean(opts.isAscending) ? weatherInternalLogic.findNestedKey(a.asMap(), opts.sortBy) <=> weatherInternalLogic.findNestedKey(b.asMap(),opts.sortBy) :
-                        weatherInternalLogic.findNestedKey(b.asMap(),opts.sortBy) <=> weatherInternalLogic.findNestedKey(a.asMap(), opts.sortBy)
+                a, b ->
+                    a = buildCompareParam(a, path)
+                    b = buildCompareParam(b, path)
+                    new Boolean(opts.isAscending) ? a <=> b : b <=> a
             }
         }
 
@@ -109,5 +112,11 @@ class WeatherService {
         }
 
         weathers
+    }
+
+    def static buildCompareParam(def paramToChange, def path){
+        paramToChange = path.inject(paramToChange){ weather, p -> weather?.getAt(p) }
+        if (paramToChange instanceof String && paramToChange.isNumber()) return new BigDecimal(paramToChange)
+        return paramToChange
     }
 }

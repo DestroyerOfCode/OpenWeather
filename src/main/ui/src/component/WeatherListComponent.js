@@ -58,14 +58,14 @@ class WeatherListComponent extends Component {
        <tr>
            <th onClick={() =>this.refreshWeathers("id", this.state.isAscending, '', '', this.state.weathers) }>cityId</th>
            <th onClick={() =>this.refreshWeathers("name", this.state.isAscending, '', '', this.state.weathers) }>city Name</th>
-           <th onClick={() =>this.refreshWeathers("lat", this.state.isAscending, '', '', this.state.weathers) }>latitude</th>
-           <th onClick={() =>this.refreshWeathers("lon", this.state.isAscending, '', '', this.state.weathers) }>longitude</th>
-           <th onClick={() =>this.refreshWeathers("country", this.state.isAscending, '', '', this.state.weathers) }>country</th>
-           <th onClick={() =>this.refreshWeathers("humidity", this.state.isAscending, '', '', this.state.weathers) }>humidity</th>
-           <th onClick={() =>this.refreshWeathers("feels_like", this.state.isAscending, '', '', this.state.weathers) }>feels like</th>
-           <th onClick={() =>this.refreshWeathers("temp", this.state.isAscending, '', '', this.state.weathers) }>temperature</th>
-           <th onClick={() =>this.refreshWeathers("temp_max", this.state.isAscending, '', '', this.state.weathers) }>maximum temperature</th>
-           <th onClick={() =>this.refreshWeathers("temp_min", this.state.isAscending, '', '', this.state.weathers) }>minimal temperature</th>
+           <th onClick={() =>this.refreshWeathers("coord.lat", this.state.isAscending, '', '', this.state.weathers) }>latitude</th>
+           <th onClick={() =>this.refreshWeathers("coord.lon", this.state.isAscending, '', '', this.state.weathers) }>longitude</th>
+           <th onClick={() =>this.refreshWeathers("sys.country", this.state.isAscending, '', '', this.state.weathers) }>country</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.humidity", this.state.isAscending, '', '', this.state.weathers) }>humidity</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.feels_like", this.state.isAscending, '', '', this.state.weathers) }>feels like</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp", this.state.isAscending, '', '', this.state.weathers) }>temperature</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp_max", this.state.isAscending, '', '', this.state.weathers) }>maximum temperature</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp_min", this.state.isAscending, '', '', this.state.weathers) }>minimal temperature</th>
            <th onClick={() =>this.refreshWeathers("description", this.state.isAscending, '', '', this.state.weathers) }>description</th>                                
        </tr>
    </thead>)
