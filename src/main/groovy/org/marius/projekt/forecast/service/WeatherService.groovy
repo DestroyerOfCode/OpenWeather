@@ -101,7 +101,7 @@ class WeatherService {
             }
         }
 
-        if (opts.filterString) {
+        if (new Boolean(opts.isFilter)) {
             def newArr= new JsonSlurper().parseText("["+opts.filterString+"]")
             weathers = weatherModelRepository.findAll()
 

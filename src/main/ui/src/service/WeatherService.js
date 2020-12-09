@@ -5,17 +5,15 @@ const WEATHER_API_URL = `${COURSE_API_URL}/weather`
 
 class WeatherService {
 
-    retrieveAllWeathers(sortBy, isAscending, filters, filterOperator, weathers) {
+    retrieveAllWeathers(sortBy, isAscending, filters, filterOperator, isFilter, weathers) {
         var filterString = this.buildFilterString(filters)
-        console.log("filters?.length: " + filters?.length)
+        // console.log("filters?.length: " + filters?.length)
        
-      
-
         if(!weathers)
             weathers = []
             
         const params = {
-            sortBy, isAscending, filterString, filterOperator
+            sortBy, isAscending, filterString, isFilter, filterOperator
         }
 
         // console.log("params: " + JSON.stringify(params) )
@@ -28,7 +26,7 @@ class WeatherService {
             filterString+= JSON.stringify(filters[i]);
             if (filters[i+1])
             filterString += ","
-            console.log("filters[i]: " + JSON.stringify(filters[i]))
+            // console.log("filters[i]: " + JSON.stringify(filters[i]))
         }
         return filterString
     }
