@@ -101,12 +101,17 @@ class WeatherService {
             }
         }
 
-        if (opts.filters) {
-            opts.filters = new JsonSlurper().parseText(opts.filters)
-            opts.filters.forEach { mapKey, mapVal ->
-                if(mapVal)
-                    weathers = weathers.findAll { it ->
-                        filterOperatorOverload."${opts.filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
+        if (opts.filterString) {
+            def newArr= new JsonSlurper().parseText("["+opts.filterString+"]")
+            weathers = weatherModelRepository.findAll()
+
+//            opts.filters = new JsonSlurper().parseText(opts.filters)
+            newArr.forEach { item ->
+                item.forEach { mapKey, mapVal ->
+                    if (mapVal)
+                        weathers = weathers.findAll { it ->
+                            filterOperatorOverload."${opts.filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
+                        }
                 }
             }
         }
