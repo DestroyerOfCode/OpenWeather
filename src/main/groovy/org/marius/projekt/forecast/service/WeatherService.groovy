@@ -101,18 +101,22 @@ class WeatherService {
             }
         }
 
+        def penis = "{\"filteringNode\" : {\"country\":\"IQ\"},\"operator\":\"eq\"},{\"filteringNode\" : {\"country\":\"IQ\"},\"operator\":\"eq\"}"
+
         if (new Boolean(opts.isFilter)) {
-            def newArr= new JsonSlurper().parseText("["+opts.filterString+"]")
+            def filterList= new JsonSlurper().parseText("["+opts.filterString+"]")
             weathers = weatherModelRepository.findAll()
 
 //            opts.filters = new JsonSlurper().parseText(opts.filters)
-            newArr.forEach { item ->
-                item.forEach { mapKey, mapVal ->
-                    if (mapVal)
-                        weathers = weathers.findAll { it ->
-                            filterOperatorOverload."${opts.filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
-                        }
-                }
+            filterList.forEach { filterItem ->
+                def mapKey = filterItem.filteringNode.iterator().next().getKey()
+                def mapVal = filterItem.filteringNode.iterator().next().getValue()
+                def filterOperator = filterItem.filterOperator
+                if (mapVal)
+                    weathers = weathers.findAll { it ->
+                        filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
+                    }
+
             }
         }
 

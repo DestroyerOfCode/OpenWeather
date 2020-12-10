@@ -28,37 +28,37 @@ class WeatherListComponent extends Component {
 
     keyExistsInArr(arr, key){
         var exists = false
-        arr.some(item => {
+        arr?.some(item => {
             // console.log("item: " + item)
             // console.log("key: " + key)
 
             // console.log("Object.prototype.hasOwnProperty.call(item, key): " + (Object.prototype.hasOwnProperty.call(item, key)).toString())
-            if(item.hasOwnProperty([key])) exists = true
+            if(item.filteringNode.hasOwnProperty([key])) exists = true
         })
         return exists
     }
 
     findIndexInFilters(arr, key){
         var indexOfKey = 0
-        arr.forEach((filterName, index, filters) => {
-            console.log("key: " + key)
-            console.log("filterName in find Index: " + JSON.stringify(filterName))
+        arr?.forEach((filterName, index, filters) => {
+            // console.log("key: " + key)
+            // console.log("filterName in find Index: " + JSON.stringify(filterName))
 
-            if(filterName.hasOwnProperty([key])){ 
-                console.log("index in findIndex: " + index)
+            if(filterName.filteringNode.hasOwnProperty([key])){ 
+                // console.log("index in findIndex: " + index)
                 indexOfKey = index
 
             }
         })
-        console.log("this.state.filters BEFORE: " + JSON.stringify(this.state.filters))
-        console.log("indexOfKey: " + indexOfKey)
+        // console.log("this.state.filters BEFORE: " + JSON.stringify(this.state.filters))
+        // console.log("indexOfKey: " + indexOfKey)
         return indexOfKey
     }
 
     onBlurEvent(event, filterName, filterOperator, isFilter){
         console.log("filterName: " + filterName)
         // console.log("event.target.value: " + event.target.value === "")
-
+            // console.log("this.state.filters.filteringNode: " + JSON.stringify(this.state.filters.filteringNode))
         if (event.target.value === "" && this.keyExistsInArr(this.state.filters,filterName))  {
             console.log("inside 1")
             // console.log("index: " + index)
@@ -66,7 +66,7 @@ class WeatherListComponent extends Component {
 
             var index = this.findIndexInFilters(this.state.filters, filterName)
             this.state.filters.splice(index, 1)
-            console.log("this.state.filters AFTER: " + JSON.stringify(this.state.filters))
+            // console.log("this.state.filters AFTER: " + JSON.stringify(this.state.filters))
 
             // this.state.filters.push({[filterName]: event.target.value})
             this.refreshWeathers(this.state.sortBy, filterOperator, isFilter, this.state.weathers)
@@ -74,16 +74,17 @@ class WeatherListComponent extends Component {
 
         else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters,filterName))){
             console.log("inside 2")
-            this.state.filters.push({[filterName]: event.target.value})
+            this.state.filters.push({"filteringNode" : {[filterName]: event.target.value}, "filterOperator" : filterOperator})
             this.refreshWeathers(this.state.sortBy, filterOperator, isFilter, this.state.weathers)
         }
 
         else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters,filterName))){
             console.log("inside 3")
             this.state.filters.forEach((item, index, filters) => {
-                if (item.hasOwnProperty([filterName])){
-                    console.log("index INSIDE 3: " + index)
-                    filters[index] = {[filterName]: event.target.value}}
+                if (item.filteringNode.hasOwnProperty([filterName])){
+                    // console.log("index INSIDE 3: " + index)
+                    console.log("value: " + event.target.value)
+                    filters[index] = {"filteringNode" : {[filterName]: event.target.value}, "filterOperator" : filterOperator}}
             })
             // this.state.filters.push({[filterName]: event.target.value})
             this.refreshWeathers(this.state.sortBy, filterOperator, isFilter, this.state.weathers)
