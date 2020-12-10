@@ -11,7 +11,7 @@ class WeatherService {
        
         if(!weathers)
             weathers = []
-            
+            console.log("weathers: " + JSON.stringify(weathers))
         const params = {
             sortBy, isAscending, filterString, isFilter, filterOperator
         }

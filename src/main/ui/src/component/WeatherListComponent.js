@@ -121,9 +121,9 @@ class WeatherListComponent extends Component {
        <tr>
            <th onClick={() =>this.refreshWeathers("id",'', false, this.state.weathers) }>cityId</th>
            <th onClick={() =>this.refreshWeathers("name",'', false, this.state.weathers) }>city Name</th>
-           <th onClick={() =>this.refreshWeathers("coord.lat",'', false, this.state.weathers) }>latitude</th>
-           <th onClick={() =>this.refreshWeathers("coord.lon",'', false, this.state.weathers) }>longitude</th>
-           <th onClick={() =>this.refreshWeathers("sys.country", '',false, '', '', this.state.weathers) }>country</th>
+           <th onClick={() =>this.refreshWeathers("coord.lat", '', false, this.state.weathers) }>latitude</th>
+           <th onClick={() =>this.refreshWeathers("coord.lon", '', false, this.state.weathers) }>longitude</th>
+           <th onClick={() =>this.refreshWeathers("sys.country", '', false, this.state.weathers) }>country</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.humidity",'', false, this.state.weathers) }>humidity</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.feels_like",'', false, this.state.weathers) }>feels like</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.temp",'', false, this.state.weathers) }>temperature</th>
