@@ -33,7 +33,7 @@ class WeatherListComponent extends Component {
             // console.log("key: " + key)
 
             // console.log("Object.prototype.hasOwnProperty.call(item, key): " + (Object.prototype.hasOwnProperty.call(item, key)).toString())
-            if(Object.prototype.hasOwnProperty.call(item, key)) exists = true
+            if(item.hasOwnProperty([key])) exists = true
         })
         return exists
     }
@@ -44,10 +44,15 @@ class WeatherListComponent extends Component {
             console.log("key: " + key)
             console.log("filterName in find Index: " + JSON.stringify(filterName))
 
-            if(filterName.hasOwnProperty.call(key)) indexOfKey= index
+            if(filterName.hasOwnProperty([key])){ 
+                console.log("index in findIndex: " + index)
+                indexOfKey = index
+
+            }
         })
         console.log("this.state.filters BEFORE: " + JSON.stringify(this.state.filters))
         console.log("indexOfKey: " + indexOfKey)
+        return indexOfKey
     }
 
     onBlurEvent(event, filterName, filterOperator, isFilter){
@@ -76,8 +81,8 @@ class WeatherListComponent extends Component {
         else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters,filterName))){
             console.log("inside 3")
             this.state.filters.forEach((item, index, filters) => {
-                if (item.hasOwnProperty.call(filterName)){
-                    // console.log("filters[index]: " + filters[index])
+                if (item.hasOwnProperty([filterName])){
+                    console.log("index INSIDE 3: " + index)
                     filters[index] = {[filterName]: event.target.value}}
             })
             // this.state.filters.push({[filterName]: event.target.value})
