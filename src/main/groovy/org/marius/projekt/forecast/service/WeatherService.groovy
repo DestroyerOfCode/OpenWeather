@@ -101,22 +101,24 @@ class WeatherService {
             }
         }
 
-        def penis = "{\"filteringNode\" : {\"country\":\"IQ\"},\"operator\":\"eq\"},{\"filteringNode\" : {\"country\":\"IQ\"},\"operator\":\"eq\"}"
+        //example query params "{\"filteringNode\" : {\"lat\":{\"gte\": \"55\", \"lte\" : \"70\"}}},{\"filteringNode\" : {\"country\":{\"eq\":\"IQ\"}}}"
 
         if (new Boolean(opts.isFilter)) {
             def filterList= new JsonSlurper().parseText("["+opts.filterString+"]")
             weathers = weatherModelRepository.findAll()
 
-//            opts.filters = new JsonSlurper().parseText(opts.filters)
             filterList.forEach { filterItem ->
-                def mapKey = filterItem.filteringNode.iterator().next().getKey()
-                def mapVal = filterItem.filteringNode.iterator().next().getValue()
-                def filterOperator = filterItem.filterOperator
-                if (mapVal)
-                    weathers = weathers.findAll { it ->
-                        filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), mapKey), mapVal)
-                    }
 
+                def filterName = filterItem.filteringNode.iterator().next().getKey()
+                def filterOperatorsMap = filterItem.filteringNode.iterator().next().getValue()
+
+                if (filterName) {
+                    filterOperatorsMap.forEach { filterOperator, filterValue ->
+                        weathers = weathers.findAll { it ->
+                            filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), filterName), filterValue)
+                        }
+                    }
+                }
             }
         }
 

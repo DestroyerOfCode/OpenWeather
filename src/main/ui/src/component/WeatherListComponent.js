@@ -15,9 +15,9 @@ class WeatherListComponent extends Component {
         this.refreshWeathers();
     }
 
-    refreshWeathers(sortBy, filterOperator, isFilter, weathers) {
+    refreshWeathers(sortBy, isFilter, weathers) {
             // console.log("filters: " + JSON.stringify(filters))
-        WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, filterOperator, isFilter, weathers)
+        WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters,  isFilter, weathers)
             .then(
                 response => {
                     this.setState({ weathers: response.data })
@@ -65,29 +65,38 @@ class WeatherListComponent extends Component {
             // console.log("filterName: " + filterName)
 
             var index = this.findIndexInFilters(this.state.filters, filterName)
-            this.state.filters.splice(index, 1)
+            console.log(delete this.state.filters[index].filteringNode[filterName][filterOperator])
+            console.log("this.state.filters[index].filteringNode.length: " + this.state.filters[index].filteringNode.length)
+            if (this.state.filters[index].filteringNode.length){
+                console.log("inside if, index: " + index)
+                this.state.filters.splice(index, 1)
+            }
             // console.log("this.state.filters AFTER: " + JSON.stringify(this.state.filters))
 
             // this.state.filters.push({[filterName]: event.target.value})
-            this.refreshWeathers(this.state.sortBy, filterOperator, isFilter, this.state.weathers)
+            this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
 
-        else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters,filterName))){
+        else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
             console.log("inside 2")
-            this.state.filters.push({"filteringNode" : {[filterName]: event.target.value}, "filterOperator" : filterOperator})
-            this.refreshWeathers(this.state.sortBy, filterOperator, isFilter, this.state.weathers)
+            this.state.filters.push({"filteringNode" : {[filterName]: {[filterOperator] : event.target.value}}})
+            this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
 
-        else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters,filterName))){
+        else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
             console.log("inside 3")
             this.state.filters.forEach((item, index, filters) => {
                 if (item.filteringNode.hasOwnProperty([filterName])){
                     // console.log("index INSIDE 3: " + index)
-                    console.log("value: " + event.target.value)
-                    filters[index] = {"filteringNode" : {[filterName]: event.target.value}, "filterOperator" : filterOperator}}
+                    console.log("filters[index].filteringNode[filterName]: " + JSON.stringify(filters[index].filteringNode[filterName]))
+                    filters[index].filteringNode[filterName][filterOperator] = event.target.value
+                }
             })
+            console.log("filters: " + JSON.stringify(this.state.filters))
+            console.log("outside 3")
+
             // this.state.filters.push({[filterName]: event.target.value})
-            this.refreshWeathers(this.state.sortBy, filterOperator, isFilter, this.state.weathers)
+            this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
         else {
             console.log("inside 4")
@@ -120,17 +129,17 @@ class WeatherListComponent extends Component {
    header(){
        return (<thead>
        <tr>
-           <th onClick={() =>this.refreshWeathers("id",'', false, this.state.weathers) }>cityId</th>
-           <th onClick={() =>this.refreshWeathers("name",'', false, this.state.weathers) }>city Name</th>
-           <th onClick={() =>this.refreshWeathers("coord.lat", '', false, this.state.weathers) }>latitude</th>
-           <th onClick={() =>this.refreshWeathers("coord.lon", '', false, this.state.weathers) }>longitude</th>
-           <th onClick={() =>this.refreshWeathers("sys.country", '', false, this.state.weathers) }>country</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.humidity",'', false, this.state.weathers) }>humidity</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.feels_like",'', false, this.state.weathers) }>feels like</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp",'', false, this.state.weathers) }>temperature</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp_max",'', false, this.state.weathers) }>maximum temperature</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp_min",'', false, this.state.weathers) }>minimal temperature</th>
-           <th onClick={() =>this.refreshWeathers("description",'', false, this.state.weathers) }>description</th>                                
+           <th onClick={() =>this.refreshWeathers("id", false, this.state.weathers) }>cityId</th>
+           <th onClick={() =>this.refreshWeathers("name", false, this.state.weathers) }>city Name</th>
+           <th onClick={() =>this.refreshWeathers("coord.lat", false, this.state.weathers) }>latitude</th>
+           <th onClick={() =>this.refreshWeathers("coord.lon", false, this.state.weathers) }>longitude</th>
+           <th onClick={() =>this.refreshWeathers("sys.country", false, this.state.weathers) }>country</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.humidity", false, this.state.weathers) }>humidity</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.feels_like", false, this.state.weathers) }>feels like</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp", false, this.state.weathers) }>temperature</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp_max", false, this.state.weathers) }>maximum temperature</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp_min", false, this.state.weathers) }>minimal temperature</th>
+           <th onClick={() =>this.refreshWeathers("description", false, this.state.weathers) }>description</th>                                
        </tr>
    </thead>)
    }
