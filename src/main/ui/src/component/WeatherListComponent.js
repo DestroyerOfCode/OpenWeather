@@ -16,7 +16,6 @@ class WeatherListComponent extends Component {
     }
 
     refreshWeathers(sortBy, isFilter, weathers) {
-            // console.log("filters: " + JSON.stringify(filters))
         WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters,  isFilter, weathers)
             .then(
                 response => {
@@ -29,77 +28,48 @@ class WeatherListComponent extends Component {
     keyExistsInArr(arr, key){
         var exists = false
         arr?.some(item => {
-            // console.log("item: " + item)
-            // console.log("key: " + key)
-
-            // console.log("Object.prototype.hasOwnProperty.call(item, key): " + (Object.prototype.hasOwnProperty.call(item, key)).toString())
-            if(item.filteringNode.hasOwnProperty([key])) exists = true
+            if(item.hasOwnProperty([key])) exists = true
         })
         return exists
     }
 
     findIndexInFilters(arr, key){
         var indexOfKey = 0
-        arr?.forEach((filterName, index, filters) => {
-            // console.log("key: " + key)
-            // console.log("filterName in find Index: " + JSON.stringify(filterName))
-
-            if(filterName.filteringNode.hasOwnProperty([key])){ 
-                // console.log("index in findIndex: " + index)
+        arr?.some((filterName, index, filters) => {
+            if(filterName.hasOwnProperty([key])){ 
                 indexOfKey = index
 
             }
         })
-        // console.log("this.state.filters BEFORE: " + JSON.stringify(this.state.filters))
-        // console.log("indexOfKey: " + indexOfKey)
         return indexOfKey
     }
 
     onBlurEvent(event, filterName, filterOperator, isFilter){
         console.log("filterName: " + filterName)
-        // console.log("event.target.value: " + event.target.value === "")
-            // console.log("this.state.filters.filteringNode: " + JSON.stringify(this.state.filters.filteringNode))
         if (event.target.value === "" && this.keyExistsInArr(this.state.filters,filterName))  {
-            console.log("inside 1")
-            // console.log("index: " + index)
-            // console.log("filterName: " + filterName)
-
             var index = this.findIndexInFilters(this.state.filters, filterName)
-            console.log(delete this.state.filters[index].filteringNode[filterName][filterOperator])
-            console.log("this.state.filters[index].filteringNode.length: " + this.state.filters[index].filteringNode.length)
-            if (this.state.filters[index].filteringNode.length){
-                console.log("inside if, index: " + index)
+            if (this.state.filters[index].length){
                 this.state.filters.splice(index, 1)
             }
-            // console.log("this.state.filters AFTER: " + JSON.stringify(this.state.filters))
-
-            // this.state.filters.push({[filterName]: event.target.value})
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
 
         else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
-            console.log("inside 2")
-            this.state.filters.push({"filteringNode" : {[filterName]: {[filterOperator] : event.target.value}}})
+            this.state.filters.push({[filterName]: {[filterOperator] : event.target.value}})
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
 
         else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
             console.log("inside 3")
             this.state.filters.forEach((item, index, filters) => {
-                if (item.filteringNode.hasOwnProperty([filterName])){
-                    // console.log("index INSIDE 3: " + index)
-                    console.log("filters[index].filteringNode[filterName]: " + JSON.stringify(filters[index].filteringNode[filterName]))
-                    filters[index].filteringNode[filterName][filterOperator] = event.target.value
+                if (item.hasOwnProperty([filterName])){
+                    filters[index][filterName][filterOperator] = event.target.value
                 }
             })
-            console.log("filters: " + JSON.stringify(this.state.filters))
-            console.log("outside 3")
 
-            // this.state.filters.push({[filterName]: event.target.value})
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
         else {
-            console.log("inside 4")
         }
     }
 

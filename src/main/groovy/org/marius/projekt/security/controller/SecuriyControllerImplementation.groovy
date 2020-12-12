@@ -46,8 +46,7 @@ class SecuriyControllerImplementation implements SecurityController {
 //      mongoTemplate.findOne(query(where("apiKey").is(key)), OpenWeatherSecurity.class)
 
         if ( !openWeatherSecurityRepository.findAll().any{
-            rawApiKey -> key == rawApiKey.apiKey})
-        {
+            rawApiKey -> key == rawApiKey.apiKey}){
             openWeatherSecurity.setId(new ObjectId().get() as String)
             openWeatherSecurity.setProperty('apiKey', key )
             openWeatherSecurityRepository.insert(openWeatherSecurity)

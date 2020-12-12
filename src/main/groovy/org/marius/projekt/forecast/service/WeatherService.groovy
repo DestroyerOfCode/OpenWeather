@@ -101,7 +101,7 @@ class WeatherService {
             }
         }
 
-        //example query params "{\"filteringNode\" : {\"lat\":{\"gte\": \"55\", \"lte\" : \"70\"}}},{\"filteringNode\" : {\"country\":{\"eq\":\"IQ\"}}}"
+        //example query params "{\"lat\":{\"gte\": \"55\", \"lte\" : \"70\"}}, {\"country\":{\"eq\":\"IQ\"}}"
 
         if (new Boolean(opts.isFilter)) {
             def filterList= new JsonSlurper().parseText("["+opts.filterString+"]")
@@ -109,8 +109,8 @@ class WeatherService {
 
             filterList.forEach { filterItem ->
 
-                def filterName = filterItem.filteringNode.iterator().next().getKey()
-                def filterOperatorsMap = filterItem.filteringNode.iterator().next().getValue()
+                def filterName = filterItem.iterator().next().getKey()
+                def filterOperatorsMap = filterItem.iterator().next().getValue()
 
                 if (filterName) {
                     filterOperatorsMap.forEach { filterOperator, filterValue ->
