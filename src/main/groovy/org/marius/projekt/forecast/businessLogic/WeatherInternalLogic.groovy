@@ -38,6 +38,7 @@ class WeatherInternalLogic {
         } catch(HttpClientErrorException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.toString())
         }
+
     }
 
     /***

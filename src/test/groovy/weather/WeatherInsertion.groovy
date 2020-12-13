@@ -41,6 +41,15 @@ class WeatherInsertion {
                 statusCode(202)
     }
 
+    @Test
+    @DisplayName("Save all weather Data from resourcs")
+    void saveAllWeatherDataFromResource() {
+        given().auth().none().when().
+                post("/weather/save/all").
+                then().
+                statusCode(201)
+    }
+
     //TODO How to Test throwing an exception????
 //    @Test
 //    @DisplayName("get Single Weather Data Fail")

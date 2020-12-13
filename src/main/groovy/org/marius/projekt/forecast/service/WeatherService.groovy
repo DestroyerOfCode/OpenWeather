@@ -71,14 +71,15 @@ class WeatherService {
         return weatherModelRepository.save( weatherModel )
     }
 
-    def saveAllWeatherData(){
+    ArrayList<WeatherModel> saveAllWeatherData(){
         def cityIds = findCityIds()
-        cityIds.forEach{
-            cityId ->
-                def weatherMap = findWeather(['cityId' : cityId.id])
-                saveWeatherData( weatherMap )
+        ArrayList<WeatherModel> weathers = new ArrayList<WeatherModel>()
+        cityIds.eachWithIndex{
+            cityId, index ->
+                weathers.add(findWeather(['cityId' : cityId.id]))
+                saveWeatherData( weathers[index] )
         }
-        return new ResponseEntity<>(HttpStatus.CREATED)
+        weathers
     }
 
     def getWeatherDataFromDbService(Map<String, Object> opts, ArrayList<WeatherModel> weathers, String cityId ){

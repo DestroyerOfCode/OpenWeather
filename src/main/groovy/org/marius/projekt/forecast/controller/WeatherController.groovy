@@ -44,18 +44,6 @@ class WeatherController {
         return new ResponseEntity<WeatherModel>(weather, HttpStatus.ACCEPTED)
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
-    @ResponseBody
-    def getWeatherDataFromDb( @RequestBody(required = false) ArrayList<WeatherModel> weathers,
-         @RequestParam(required = false) Map<String, Object> opts, @PathVariable(required = false, value = "cityId") String cityId) {
-
-        weathers = weatherService.getWeatherDataFromDbService(opts, weathers, cityId )
-        if (weathers)
-            return new ResponseEntity<>(weathers, HttpStatus.OK)
-        return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
-    }
-
-
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     def saveWeatherData(@RequestBody JsonNode opts) {
@@ -64,13 +52,24 @@ class WeatherController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
+    @ResponseBody
+    def getWeatherDataFromDb( @RequestBody(required = false) ArrayList<WeatherModel> weathers,
+                              @RequestParam(required = false) Map<String, Object> opts, @PathVariable(required = false, value = "cityId") String cityId) {
+
+        weathers = weatherService.getWeatherDataFromDbService(opts, weathers, cityId )
+        if (weathers)
+            return new ResponseEntity<>(weathers, HttpStatus.OK)
+        return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
+    }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @ResponseBody
     def saveAllWeatherData() {
-        if (weatherService.saveAllWeatherData() )
-            return new ResponseEntity<>(HttpStatus.CREATED)
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
+        def weathers = weatherService.saveAllWeatherData()
+        if ( weathers )
+            return new ResponseEntity<ArrayList<WeatherModel>>(weathers, HttpStatus.CREATED)
+        return new ResponseEntity<ArrayList<WeatherModel>>(weathers, HttpStatus.NO_CONTENT)
     }
 
     @PostMapping("/all")
