@@ -45,16 +45,22 @@ class WeatherListComponent extends Component {
     }
 
     onBlurEvent(event, filterName, filterOperator, isFilter){
-        console.log("filterName: " + filterName)
         if (event.target.value === "" && this.keyExistsInArr(this.state.filters,filterName))  {
+            console.log("inside 1")
             var index = this.findIndexInFilters(this.state.filters, filterName)
-            if (this.state.filters[index].length){
+
+            if (this.state.filters[index][filterName][filterOperator])
+                delete this.state.filters[index][filterName][filterOperator]  
+
+            if (Object.keys(this.state.filters[index][filterName]).length === 0)
                 this.state.filters.splice(index, 1)
-            }
+
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
 
         else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
+            console.log("inside 2")
+
             this.state.filters.push({[filterName]: {[filterOperator] : event.target.value}})
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
@@ -70,6 +76,8 @@ class WeatherListComponent extends Component {
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
         else {
+            console.log("inside 4")
+
         }
     }
 
@@ -77,21 +85,21 @@ class WeatherListComponent extends Component {
         return (<div className="row">
         {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event, "id", "eq", true) }}></textarea>}
         {<textarea placeholder= "City name" onBlur= {event =>{this.onBlurEvent(event, "name", "eq", true)}}></textarea>}
-        {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event, "country", "eq", true)}}></textarea>}
-        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "lat", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{this.onBlurEvent(event, "lat", "gte", true)}}></textarea>}
-        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "lon", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{this.onBlurEvent(event, "lon", "gte", true)}}></textarea>}
-        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{this.onBlurEvent(event, "humidity", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{this.onBlurEvent(event, "humidity", "gte", true)}}></textarea>}
-        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{this.onBlurEvent(event, "feels_like", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{this.onBlurEvent(event, "feels_like", "gte", true)}}></textarea>}
-        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{this.onBlurEvent(event, "temp", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{this.onBlurEvent(event, "temp", "gte", true)}}></textarea>}
-        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{this.onBlurEvent(event, "temp_max", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{this.onBlurEvent(event, "temp_max", "gte", true)}}></textarea>}
-        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{this.onBlurEvent(event, "temp_min", "lte", true)}}></textarea>}
-        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{this.onBlurEvent(event, "temp_min", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event, "sys.country", "eq", true)}}></textarea>}
+        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "coord.lat", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{this.onBlurEvent(event, "coord.lat", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "coord.lon", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{this.onBlurEvent(event, "coord.lon", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.humidity", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.humidity", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.feels_like", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.feels_like", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_max", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_max", "gte", true)}}></textarea>}
+        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_min", "lte", true)}}></textarea>}
+        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_min", "gte", true)}}></textarea>}
         {<textarea placeholder= "Description" onBlur= {event =>{this.onBlurEvent(event, "description", "eq", true)}}></textarea>}
     </div>)
    }

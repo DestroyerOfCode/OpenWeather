@@ -114,8 +114,9 @@ class WeatherService {
 
                 if (filterName) {
                     filterOperatorsMap.forEach { filterOperator, filterValue ->
+                        def path = filterName.split(/\./)
                         weathers = weathers.findAll { it ->
-                            filterOperatorOverload."${filterOperator}"(weatherInternalLogic.findNestedKey(it.asMap(), filterName), filterValue)
+                            filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
                         }
                     }
                 }
