@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
 import org.apache.groovy.json.internal.LazyMap
 import org.marius.projekt.forecast.businessLogic.FilterOperatorOverload
 import org.marius.projekt.forecast.businessLogic.WeatherInternalLogic
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
+
 class WeatherService {
 
     @Autowired WeatherInternalLogic weatherInternalLogic
@@ -71,6 +73,7 @@ class WeatherService {
         return weatherModelRepository.save( weatherModel )
     }
 
+//    @CompileStatic
     ArrayList<WeatherModel> saveAllWeatherData(){
         def cityIds = findCityIds()
         ArrayList<WeatherModel> weathers = new ArrayList<WeatherModel>()
@@ -82,7 +85,8 @@ class WeatherService {
         weathers
     }
 
-    def getWeatherDataFromDbService(Map<String, Object> opts, ArrayList<WeatherModel> weathers, String cityId ){
+//    @CompileStatic
+    ArrayList<WeatherModel> getWeatherDataFromDbService(Map<String, Object> opts, ArrayList<WeatherModel> weathers, String cityId ){
 
         if (cityId) {
             weathers << weatherModelRepository.findById(cityId)
@@ -90,33 +94,34 @@ class WeatherService {
         }
 
         if (!weathers)
-            weathers = weatherModelRepository.findAll()
+            weathers = (ArrayList<WeatherModel>) weatherModelRepository.findAll()
 
         if (opts.sortBy && opts.isAscending) {
-            def path = opts.sortBy.split(/\./)
-            weathers = weathers.sort() {
-                a, b ->
+            String sortString = opts.sortBy
+            String[] path = sortString.split(/\./)
+            weathers = (ArrayList<WeatherModel>) weathers.sort() {
+                Object a, Object b ->
                     a = buildCompareParam(a, path)
                     b = buildCompareParam(b, path)
-                    new Boolean(opts.isAscending) ? a <=> b : b <=> a
+                    new Boolean((String) opts.isAscending) ? a <=> b : b <=> a
             }
         }
 
         //example query params "{\"lat\":{\"gte\": \"55\", \"lte\" : \"70\"}}, {\"country\":{\"eq\":\"IQ\"}}"
 
-        if (new Boolean(opts.isFilter)) {
-            def filterList= new JsonSlurper().parseText("["+opts.filterString+"]")
-            weathers = weatherModelRepository.findAll()
+        if (new Boolean((String) opts.isFilter)) {
+            ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList= (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("["+opts.filterString+"]")
+            weathers = (ArrayList<WeatherModel>) weatherModelRepository.findAll()
 
             filterList.forEach { filterItem ->
 
-                def filterName = filterItem.iterator().next().getKey()
-                def filterOperatorsMap = filterItem.iterator().next().getValue()
+                String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
+                LinkedHashMap<String, String> filterOperatorsMap = (LinkedHashMap<String, String>) filterItem.entrySet().stream().findFirst().get().getValue()
 
                 if (filterName) {
                     filterOperatorsMap.forEach { filterOperator, filterValue ->
-                        def path = filterName.split(/\./)
-                        weathers = weathers.findAll { it ->
+                        String[] path = filterName.split(/\./)
+                        weathers = (ArrayList<WeatherModel>) weathers.findAll { it ->
                             filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
                         }
                     }
@@ -127,8 +132,9 @@ class WeatherService {
         weathers
     }
 
-    def static buildCompareParam(def paramToChange, def path){
-        paramToChange = path.inject(paramToChange){ weather, p -> weather?.getAt(p) }
+    @CompileStatic
+    static Object buildCompareParam(Object paramToChange, String[] path){
+        paramToChange = path.inject(paramToChange){ weather, String p -> weather?.getAt(p) }
         if (paramToChange instanceof String && paramToChange.isNumber()) return new BigDecimal(paramToChange)
         return paramToChange
     }

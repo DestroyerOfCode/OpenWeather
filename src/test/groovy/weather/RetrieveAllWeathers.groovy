@@ -72,8 +72,8 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Filter weather data and sort")
     void filterWeatherData() {
-        def lonFilterNode = Map.of("lon", Map.of("gte", new BigDecimal("5.4")))
-        def latFilterNode = Map.of("lat", Map.of("gte", "35", "lte", "55"))
+        def lonFilterNode = Map.of("coord.lon", Map.of("gte", new BigDecimal("5.4")))
+        def latFilterNode = Map.of("coord.lat", Map.of("gte", "35", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(lonFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true,"sortBy", "name", "isAscending", true)
 
@@ -86,8 +86,8 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Filter with multiple variables without sorting")
     void filterWithMultipleVariablesWithoutSort() {
-        def lonFilterNode = Map.of("lon", Map.of("gte", new BigDecimal("5.4")))
-        def latFilterNode = Map.of("lat", Map.of("gte", "35", "lte", "55"))
+        def lonFilterNode = Map.of("coord.lon", Map.of("gte", new BigDecimal("5.4")))
+        def latFilterNode = Map.of("coord.lat", Map.of("gte", "35", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(lonFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
@@ -99,8 +99,8 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Filter with multiple variables without sorting")
     void filterWeatherDataWithCountryWithoutSort() {
-        def countryFilterNode = Map.of("country", Map.of("eq","SA"))
-        def latFilterNode = Map.of("lat", Map.of("gte", "25", "lte", "55"))
+        def countryFilterNode = Map.of("sys.country", Map.of("eq","SA"))
+        def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
