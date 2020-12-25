@@ -12,7 +12,7 @@ class WeatherService {
         const params = {
             sortBy, isAscending, filterString, isFilter
         }
-
+            console.log(JSON.stringify(filters))
         return axios.post(`${WEATHER_API_URL}/retrieve/fromDb`, weathers,{params});
     }
 

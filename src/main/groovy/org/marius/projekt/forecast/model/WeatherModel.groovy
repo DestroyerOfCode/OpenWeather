@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 class WeatherModel implements Mappable {
 
     @Id
-    String id
+    String _id
 
     String base
     Integer visibility

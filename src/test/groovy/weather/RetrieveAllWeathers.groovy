@@ -9,6 +9,7 @@ import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.springframework.beans.factory.annotation.Autowired
 import static io.restassured.RestAssured.given
 import static org.hamcrest.Matchers.hasItem
+import static org.hamcrest.Matchers.lessThanOrEqualTo
 import static org.hamcrest.Matchers.not;
 import static io.restassured.path.json.JsonPath.from
 import static org.junit.Assert.assertTrue
@@ -87,7 +88,7 @@ class RetrieveAllWeathers {
     @DisplayName("Filter with multiple variables without sorting")
     void filterWithMultipleVariablesWithoutSort() {
         def lonFilterNode = Map.of("coord.lon", Map.of("gte", new BigDecimal("5.4")))
-        def latFilterNode = Map.of("coord.lat", Map.of("gte", "35", "lte", "55"))
+        def latFilterNode = Map.of("coord.lat", Map.of("gte", new BigDecimal("35"), "lte", new BigDecimal("55")))
         def resultFilterNode = (new JsonBuilder(lonFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
@@ -107,6 +108,22 @@ class RetrieveAllWeathers {
         given().auth().none().contentType("application/json").queryParams(opts).
             body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
         .assertThat().body("sys.any{ it.country != \"SA\"}", not(true))
+
+    }
+
+    @Test
+    @DisplayName("Filter with multiple variables without sorting with pagination")
+    void filterWeatherDataWithCountryWithoutSortWithPagination() {
+        def countryFilterNode = Map.of("sys.country", Map.of("eq","SA"))
+        def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
+        def pages = Map.of("page", 1)
+        def itemsPerPage = Map.of("itemsPerPage", 1000)
+        def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, "page", new Integer(0),  "itemsPerPage", new Integer(1000))
+
+        given().auth().none().contentType("application/json").queryParams(opts).
+                body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
+                .assertThat().body("sys.any{ it.country != \"SA\"}", not(true)).and().body("size()", lessThanOrEqualTo(1000))
 
     }
 

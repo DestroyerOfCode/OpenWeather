@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import org.apache.groovy.json.internal.LazyMap
+import org.bson.Document
 import org.marius.projekt.forecast.businessLogic.FilterOperatorOverload
 import org.marius.projekt.forecast.businessLogic.WeatherInternalLogic
 import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -23,6 +25,7 @@ class WeatherService {
     @Autowired WeatherInternalLogic weatherInternalLogic
     @Autowired WeatherModelRepository weatherModelRepository
     @Autowired FilterOperatorOverload filterOperatorOverload
+    @Autowired MongoTemplate mongoTemplate
 
     WeatherModel findWeather( Map<String, Object> opts ){
 
@@ -85,6 +88,52 @@ class WeatherService {
         weathers
     }
 
+    def buildAggregationQuery(def filterList, def itemsPerPage = 1000, def page = 0){
+
+        def weatherModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherModel.class));
+//        weatherModelCollection.aggregate([
+//                new Document([$match : [
+//                        $and : [
+//
+//                        ] << ["coord.lon" : [$gte : "33"]] <<  ["coord.lon" : [$lte : "55"]]
+//                ]])
+//        ]) as List
+
+        weatherModelCollection.aggregate([
+                new Document([$match : [
+                        $and : [
+
+                        ] << buildFilters.call(filterList)
+                ]]),
+                new Document([$project : [
+                        "creationDate" : 0
+                ]]),
+
+                new Document([$skip : ((isStringNumber.call(page) ? new BigDecimal(page) : page ?: 0) * (isStringNumber.call(itemsPerPage) ? new BigDecimal(itemsPerPage) : itemsPerPage ?: 0 ))]),
+                new Document([$limit : (isStringNumber.call(itemsPerPage) ? new BigDecimal(itemsPerPage) : itemsPerPage ?: 1000 )]),
+        ]) as List
+
+    }
+
+    def isStringNumber = { def object -> object instanceof String && object.isNumber()  }
+    def buildFilters = { filterList ->
+
+        def filterMap = [:]
+        filterList.each {
+
+            item ->
+                (LinkedHashMap) item.each {
+                    filter, filterOperatorAndValue ->
+                        filterOperatorAndValue.collect {
+                            filterOperator, filterValue ->
+                                if (filterMap[filter]) filterMap[filter] << [("\$" + filterOperator) : ( isStringNumber.call(filterValue) ? new BigDecimal(filterValue) : filterValue )]
+                                else filterMap << [(filter): [("\$" + filterOperator) : ( isStringNumber.call(filterValue) ? new BigDecimal(filterValue) : filterValue )]]
+                        }.first()
+//            String filterOperator, Object value -> return [(val.iterator().next().key) : [(filterOperator) : (!(value instanceof String) ? ((value.getClass())) : (value))]]
+                }
+        }
+        filterMap
+    }
 //    @CompileStatic
     ArrayList<WeatherModel> getWeatherDataFromDbService(Map<String, Object> opts, ArrayList<WeatherModel> weathers, String cityId ){
 
@@ -93,12 +142,13 @@ class WeatherService {
             return weathers
         }
 
-        if (!weathers)
+        if (!weathers && !opts.isFilter)
             weathers = (ArrayList<WeatherModel>) weatherModelRepository.findAll()
 
         if (opts.sortBy && opts.isAscending) {
             String sortString = opts.sortBy
             String[] path = sortString.split(/\./)
+            if (!weathers) weatherModelRepository.findAll()
             weathers = (ArrayList<WeatherModel>) weathers.sort() {
                 Object a, Object b ->
                     a = buildCompareParam(a, path)
@@ -111,8 +161,9 @@ class WeatherService {
 
         if (new Boolean((String) opts.isFilter)) {
             ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList= (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("["+opts.filterString+"]")
-            weathers = (ArrayList<WeatherModel>) weatherModelRepository.findAll()
-
+            weathers = buildAggregationQuery(filterList, opts.itemsPerPage, opts.page)
+            /*def aggrQuery = []
+            buildAggregationQuery(filterList)
             filterList.forEach { filterItem ->
 
                 String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
@@ -126,9 +177,9 @@ class WeatherService {
                         }
                     }
                 }
-            }
+            }*/
         }
-
+//      weathers.subList(new Integer(opts.page) * opts.itemsPerPage, weathers.size() - (new Integer(opts.page) * opts.itemsPerPage) > itemsPerPage ? (new Intger(opts.page) * itemsPerPage + itemsPerPage) : weathers.size() - (new Intger(opts.page) * itemsPerPage)
         weathers
     }
 

@@ -7,7 +7,9 @@ class WeatherListComponent extends Component {
         this.state = {
             weathers: [],
             isAscending: true,
-            filters: []
+            filters: [],
+            itemsPerPage : 1000,
+            currentPage : 0
         }
     }
 
@@ -46,7 +48,8 @@ class WeatherListComponent extends Component {
 
     onBlurEvent(event, filterName, filterOperator, isFilter){
         if (event.target.value === "" && this.keyExistsInArr(this.state.filters,filterName))  {
-            console.log("inside 1")
+            console.log("inside 1") 
+            this.stage.currentPage = 0
             var index = this.findIndexInFilters(this.state.filters, filterName)
 
             if (this.state.filters[index][filterName][filterOperator])
@@ -60,13 +63,16 @@ class WeatherListComponent extends Component {
 
         else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
             console.log("inside 2")
+            this.stage.currentPage = 0
 
             this.state.filters.push({[filterName]: {[filterOperator] : event.target.value}})
             this.refreshWeathers(this.state.sortBy, isFilter, this.state.weathers)
         }
 
         else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
-            console.log("inside 3")
+            console.log("inside 3")         
+            this.stage.currentPage = 0
+
             this.state.filters.forEach((item, index, filters) => {
                 if (item.hasOwnProperty([filterName])){
                     filters[index][filterName][filterOperator] = event.target.value
@@ -83,7 +89,7 @@ class WeatherListComponent extends Component {
 
    filters() {
         return (<div className="row">
-        {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event, "id", "eq", true) }}></textarea>}
+        {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event, "_id", "eq", true) }}></textarea>}
         {<textarea placeholder= "City name" onBlur= {event =>{this.onBlurEvent(event, "name", "eq", true)}}></textarea>}
         {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event, "sys.country", "eq", true)}}></textarea>}
         {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "coord.lat", "lte", true)}}></textarea>}
@@ -107,7 +113,7 @@ class WeatherListComponent extends Component {
    header(){
        return (<thead>
        <tr>
-           <th onClick={() =>this.refreshWeathers("id", false, this.state.weathers) }>cityId</th>
+           <th onClick={() =>this.refreshWeathers("_id", false, this.state.weathers) }>cityId</th>
            <th onClick={() =>this.refreshWeathers("name", false, this.state.weathers) }>city Name</th>
            <th onClick={() =>this.refreshWeathers("coord.lat", false, this.state.weathers) }>latitude</th>
            <th onClick={() =>this.refreshWeathers("coord.lon", false, this.state.weathers) }>longitude</th>
@@ -129,8 +135,8 @@ class WeatherListComponent extends Component {
         {
             this.state.weathers.map(
                 weather =>
-                    <tr key={weather.id}>
-                        <td>{weather.id}</td>
+                    <tr key={weather._id}>
+                        <td>{weather._id}</td>
                         <td>{weather.name}</td>
                         <td>{weather.coord.lat}</td>
                         <td>{weather.coord.lon}</td>
