@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Pagination from '../component/Pagination';
 
 const COURSE_API_URL = 'http://localhost:8080'
 const WEATHER_API_URL = `${COURSE_API_URL}/weather`

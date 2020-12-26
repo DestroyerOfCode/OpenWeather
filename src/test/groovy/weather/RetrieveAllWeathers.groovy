@@ -71,20 +71,6 @@ class RetrieveAllWeathers {
     }
 
     @Test
-    @DisplayName("Filter weather data and sort")
-    void filterWeatherData() {
-        def lonFilterNode = Map.of("coord.lon", Map.of("gte", new BigDecimal("5.4")))
-        def latFilterNode = Map.of("coord.lat", Map.of("gte", "35", "lte", "55"))
-        def resultFilterNode = (new JsonBuilder(lonFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
-        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true,"sortBy", "name", "isAscending", true)
-
-        given().auth().none().contentType("application/json").queryParams(opts).
-                body(weathers).when().post("/weather/retrieve/fromDb").then().assertThat().statusCode(200).
-                assertThat().body("coord.any{ it.lat < 55 && it.lat > 35 && it.lon > 5.4}", not(false))
-
-    }
-
-    @Test
     @DisplayName("Filter with multiple variables without sorting")
     void filterWithMultipleVariablesWithoutSort() {
         def lonFilterNode = Map.of("coord.lon", Map.of("gte", new BigDecimal("5.4")))
@@ -116,14 +102,12 @@ class RetrieveAllWeathers {
     void filterWeatherDataWithCountryWithoutSortWithPagination() {
         def countryFilterNode = Map.of("sys.country", Map.of("eq","SA"))
         def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
-        def pages = Map.of("page", 1)
-        def itemsPerPage = Map.of("itemsPerPage", 1000)
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
-        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, "page", new Integer(0),  "itemsPerPage", new Integer(1000))
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
         given().auth().none().contentType("application/json").queryParams(opts).
                 body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
-                .assertThat().body("sys.any{ it.country != \"SA\"}", not(true)).and().body("size()", lessThanOrEqualTo(1000))
+                .assertThat().body("sys.any{ it.country != \"SA\"}", not(true))
 
     }
 

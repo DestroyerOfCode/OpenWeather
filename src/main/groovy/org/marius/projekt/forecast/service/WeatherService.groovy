@@ -88,7 +88,7 @@ class WeatherService {
         weathers
     }
 
-    def buildAggregationQuery(def filterList, def itemsPerPage = 1000, def page = 0){
+    def buildAggregationQuery(def filterList){
 
         def weatherModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherModel.class));
 //        weatherModelCollection.aggregate([
@@ -108,14 +108,11 @@ class WeatherService {
                 new Document([$project : [
                         "creationDate" : 0
                 ]]),
-
-                new Document([$skip : ((isStringNumber.call(page) ? new BigDecimal(page) : page ?: 0) * (isStringNumber.call(itemsPerPage) ? new BigDecimal(itemsPerPage) : itemsPerPage ?: 0 ))]),
-                new Document([$limit : (isStringNumber.call(itemsPerPage) ? new BigDecimal(itemsPerPage) : itemsPerPage ?: 1000 )]),
         ]) as List
 
     }
 
-    def isStringNumber = { def object -> object instanceof String && object.isNumber()  }
+    def isStringNumber = { filterValue, filterOperator -> filterValue instanceof String && filterValue.isNumber() && filterOperator != "eq"  }
     def buildFilters = { filterList ->
 
         def filterMap = [:]
@@ -126,8 +123,8 @@ class WeatherService {
                     filter, filterOperatorAndValue ->
                         filterOperatorAndValue.collect {
                             filterOperator, filterValue ->
-                                if (filterMap[filter]) filterMap[filter] << [("\$" + filterOperator) : ( isStringNumber.call(filterValue) ? new BigDecimal(filterValue) : filterValue )]
-                                else filterMap << [(filter): [("\$" + filterOperator) : ( isStringNumber.call(filterValue) ? new BigDecimal(filterValue) : filterValue )]]
+                                if (filterMap[filter]) filterMap[filter] << [("\$" + filterOperator) : ( isStringNumber.call(filterValue, filterOperator) ? new BigDecimal(filterValue) : filterValue )]
+                                else filterMap << [(filter): [("\$" + filterOperator) : ( isStringNumber.call(filterValue, filterOperator) ? new BigDecimal(filterValue) : filterValue )]]
                         }.first()
 //            String filterOperator, Object value -> return [(val.iterator().next().key) : [(filterOperator) : (!(value instanceof String) ? ((value.getClass())) : (value))]]
                 }
@@ -142,7 +139,7 @@ class WeatherService {
             return weathers
         }
 
-        if (!weathers && !opts.isFilter)
+        if (!weathers && !new Boolean((String) opts.isFilter))
             weathers = (ArrayList<WeatherModel>) weatherModelRepository.findAll()
 
         if (opts.sortBy && opts.isAscending) {
@@ -159,9 +156,9 @@ class WeatherService {
 
         //example query params "{\"lat\":{\"gte\": \"55\", \"lte\" : \"70\"}}, {\"country\":{\"eq\":\"IQ\"}}"
 
-        if (new Boolean((String) opts.isFilter)) {
+        if (new Boolean((String) opts.isFilter) && !opts.sortBy) {
             ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList= (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("["+opts.filterString+"]")
-            weathers = buildAggregationQuery(filterList, opts.itemsPerPage, opts.page)
+            weathers = buildAggregationQuery(filterList)
             /*def aggrQuery = []
             buildAggregationQuery(filterList)
             filterList.forEach { filterItem ->
