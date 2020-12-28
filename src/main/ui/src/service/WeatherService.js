@@ -1,17 +1,16 @@
 import axios from 'axios'
-import Pagination from '../component/Pagination';
 
 const COURSE_API_URL = 'http://localhost:8080'
 const WEATHER_API_URL = `${COURSE_API_URL}/weather`
 
 class WeatherService {
 
-    retrieveAllWeathers(sortBy, isAscending, filters, isFilter, weathers) {
+    retrieveAllWeathers(sortBy, isAscending, filters, isFilter, isAdditionalFilter, weathers) {
         var filterString = this.buildFilterString(filters)
         if(!weathers)
             weathers = []
         const params = {
-            sortBy, isAscending, filterString, isFilter
+            sortBy, isAscending, filterString, isFilter, isAdditionalFilter
         }
             console.log(JSON.stringify(filters))
         return axios.post(`${WEATHER_API_URL}/retrieve/fromDb`, weathers,{params});

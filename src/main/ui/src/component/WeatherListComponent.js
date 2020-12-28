@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffec } from 'react'
+import React, { Component } from 'react'
 import WeatherService from '../service/WeatherService';
 import Pagination from './Pagination';
 
@@ -13,6 +13,7 @@ class WeatherListComponent extends Component {
             currentPage : 1,
             itemsPerPage : 1000,
             loading : false,
+            isAdditionalFilter : false,
             pageNumbers : []
         }
     }
@@ -23,84 +24,86 @@ class WeatherListComponent extends Component {
     }
 
     refreshWeathers(sortBy, weathers) {
-        WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, weathers)
+        WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, this.state.isAdditionalFilter, weathers)
             .then(
                 response => {
                     this.setState({ weathers: response.data })
-
                 }
             ).then( () => {if (sortBy) this.setState({isAscending : !this.state.isAscending})}
-            ).then( ()=>  {if (typeof this.state.filters !== 'undefined' && this.state.pageNumbers.filters == 0) this.setState({isFilter : false})})
+            ).then( () => {if (typeof this.state.filters !== 'undefined' && this.state.pageNumbers.filters === 0) this.setState({isFilter : false})})
     }
 
     keyExistsInArr(arr, key){
-        var exists = false
+        let exists = false
+        console.log("arr inside keyExists: " + JSON.stringify(arr))
+
         arr?.some(item => {
-            if(item.hasOwnProperty([key])) exists = true
+            if(item.hasOwnProperty([key])) {
+                exists = true;
+                return true
+            }
+            else return false
         })
         return exists
     }
 
     findIndexInFilters(arr, key){
-        var indexOfKey = 0
+        let indexOfKey = 0
         arr?.some((filterName, index, filters) => {
             if(filterName.hasOwnProperty([key])){ 
                 indexOfKey = index
-
+                return indexOfKey
             }
+            else return false
         })
         return indexOfKey
     }
 
+    changeFilters(index, filterName, filterOperator) {
+        let arr = this.state.filters
+        console.log("arr inside changefilters: " + JSON.stringify(arr))
+
+        if (arr[index][filterName][filterOperator])
+            delete arr[index][filterName][filterOperator]  
+        if (Object.keys(arr[index][filterName]).length === 0)
+            arr.splice(index, 1)
+        return arr
+    }
+
+    addFilterOperatorToExistingFilterName = (event, filterName, filterOperator) => {
+        const arr = this.state.filters
+        arr.forEach((item, index, filters) => {
+            if (item.hasOwnProperty([filterName])){
+                filters[index][filterName][filterOperator] = event.target.value
+            }
+        })
+        return arr
+    }
+
     onBlurEvent(event, filterName, filterOperator){
+
         if (event.target.value === "" && this.keyExistsInArr(this.state.filters,filterName))  {
-            this.setState({currentPage : 1})
-
-            console.log("inside 1") 
-            this.state.isFilter = true
-            // this.state.currentPage = 0
             var index = this.findIndexInFilters(this.state.filters, filterName)
-
-            if (this.state.filters[index][filterName][filterOperator])
-                delete this.state.filters[index][filterName][filterOperator]  
-
-                console.log("filters is: " + JSON.stringify(this.state.filters))
-                console.log("filters length: " + this.state.filters.length)
-
-            if (Object.keys(this.state.filters[index][filterName]).length === 0)
-                this.state.filters.splice(index, 1)
-                console.log("filters is: " + JSON.stringify(this.state.filters))
-                console.log("filters length: " + this.state.filters.length)
-                console.log("typeof this.state.filters !== 'undefined' && this.state.filters.length === 0" + typeof this.state.filters !== 'undefined' && this.state.filters.length === 0)
-            if (typeof this.state.filters !== 'undefined' && this.state.filters.length === 0) this.setState({isFilter : false})
-
-            this.refreshWeathers(this.state.sortBy, this.state.weathers)
+            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : false, filters : this.changeFilters(index, filterName, filterOperator)}, function () {
+                this.refreshWeathers(this.state.sortBy, this.state.weathers)
+            })
         }
 
         else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
-            this.setState({currentPage : 1})
+            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true,
+                 filters: this.state.filters.concat([{[filterName]: {[filterOperator] : event.target.value}}])}, function () {
+                console.log("filters inside: " + this.state.filters)
+                this.refreshWeathers(this.state.sortBy, this.state.weathers)
+            })
 
-            console.log("inside 2")
-            this.state.isFilter = true
-            // this.state.currentPage = 0
-
-            this.state.filters.push({[filterName]: {[filterOperator] : event.target.value}})
-            this.refreshWeathers(this.state.sortBy, this.state.weathers)
         }
 
         else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
-            this.setState({currentPage : 1})
-
-            console.log("inside 3")        
-            this.state.isFilter = true 
-            // this.state.currentPage = 0
-
-            this.state.filters.forEach((item, index, filters) => {
-                if (item.hasOwnProperty([filterName])){
-                    filters[index][filterName][filterOperator] = event.target.value
-                }
+            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true, 
+                filters : this.addFilterOperatorToExistingFilterName(event, filterName, filterOperator)}, function() {
+                    this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
-            this.refreshWeathers(this.state.sortBy, this.state.weathers)
+           
         }
         else {
             console.log("inside 4")
@@ -168,7 +171,6 @@ class WeatherListComponent extends Component {
                         <td>{weather.weatherMain.temp_max}</td>
                         <td>{weather.weatherMain.temp_min}</td>
                         <td>{weather.weather[0].description}</td>
-
                     </tr>
             )
         }
@@ -176,20 +178,14 @@ class WeatherListComponent extends Component {
     )
    }
 
-    paginate(currentPage){
+    paginate = (currentPage) => {
        this.setState({currentPage : currentPage})
     }
 
     render() {
         console.log("som v render")
 
-        //to set page
-        const paginate = (currentPage) => this.setState({currentPage : currentPage})
-
-        const pagination = (
-            <Pagination itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} currentPage = {1} paginate={paginate}/>
-        )
-
+        const pagination = <Pagination itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate.bind()}/>
         const indexOfLastPost = this.state.currentPage * this.state.itemsPerPage;
         const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
         const currentWeathers = this.state.weathers.slice(indexOfFirstPost, indexOfLastPost);
@@ -202,10 +198,6 @@ class WeatherListComponent extends Component {
                 {this.mainBody(currentWeathers)}
             </table>)
 
-        console.log("items per page: " + this.state.itemsPerPage)
-
-        console.log("currentPage: " + this.state.currentPage)
-       
         return (
             <div className="container">
              {container}

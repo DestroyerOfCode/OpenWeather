@@ -1,42 +1,22 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react'
 
 class Pagination extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            itemsPerPage : 0,
-            totalItems : 0,
-            currentPage : 0,
-            paginate : 0,
-            pageNumbers :[],
-        }
-    }
+  render(){
+    const { itemsPerPage, totalItems } = this.props;
 
-  
- fillPageNumber() { 
-   this.state.pageNumbers = []
-    for (let i = 1; i <= Math.ceil(this.props.totalItems / this.props.itemsPerPage); i++) {
-        this.state.pageNumbers.push(i);
-      }
-    }
- render(){
-    this.fillPageNumber()
-      console.log("currentPage: " + this.props.currentPage)
-
-  return (
-    <nav>
-      <ul className='pagination'>
-        {this.state.pageNumbers.map(number => (
-            console.log("number:" + number),
-          <li key={number} className='page-item'>
-            <a onClick={() => {this.props.paginate(number)}} href='!#' className='page-link'>
-              {number}
+    return (
+      <nav>
+        <ul className='pagination'>
+          {[...new Array(Math.ceil(totalItems / itemsPerPage)).keys()].map(number => (
+            <li key={number} className='page-item'>
+                <a onClick={() => {this.props.paginate(number+1)}} href='!#' className='page-link'>
+              {number+1}
             </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-        }
+            </li>
+          ))}
+        </ul>
+      </nav>
+    );
+  }
 }
-export default Pagination;
+export default Pagination

@@ -157,24 +157,25 @@ class WeatherService {
         //example query params "{\"lat\":{\"gte\": \"55\", \"lte\" : \"70\"}}, {\"country\":{\"eq\":\"IQ\"}}"
 
         if (new Boolean((String) opts.isFilter) && !opts.sortBy) {
-            ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList= (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("["+opts.filterString+"]")
-            weathers = buildAggregationQuery(filterList)
-            /*def aggrQuery = []
-            buildAggregationQuery(filterList)
-            filterList.forEach { filterItem ->
+            ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList = (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("[" + opts.filterString + "]")
+            if (!new Boolean((String) opts.isAdditionalFilter))
+                weathers = buildAggregationQuery(filterList)
+            else {
+                filterList.forEach { filterItem ->
 
-                String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
-                LinkedHashMap<String, String> filterOperatorsMap = (LinkedHashMap<String, String>) filterItem.entrySet().stream().findFirst().get().getValue()
+                    String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
+                    LinkedHashMap<String, String> filterOperatorsMap = (LinkedHashMap<String, String>) filterItem.entrySet().stream().findFirst().get().getValue()
 
-                if (filterName) {
-                    filterOperatorsMap.forEach { filterOperator, filterValue ->
-                        String[] path = filterName.split(/\./)
-                        weathers = (ArrayList<WeatherModel>) weathers.findAll { it ->
-                            filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
+                    if (filterName) {
+                        filterOperatorsMap.forEach { filterOperator, filterValue ->
+                            String[] path = filterName.split(/\./)
+                            weathers = (ArrayList<WeatherModel>) weathers.findAll { it ->
+                                filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
+                            }
                         }
                     }
                 }
-            }*/
+            }
         }
 //      weathers.subList(new Integer(opts.page) * opts.itemsPerPage, weathers.size() - (new Integer(opts.page) * opts.itemsPerPage) > itemsPerPage ? (new Intger(opts.page) * itemsPerPage + itemsPerPage) : weathers.size() - (new Intger(opts.page) * itemsPerPage)
         weathers
