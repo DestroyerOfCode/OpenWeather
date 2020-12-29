@@ -7,11 +7,13 @@ import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.forecast.service.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 class WeatherController {
 
     @Autowired WeatherService weatherService
+    @Autowired MongoTemplate mongoTemplate
 
     /***
      * example curls
@@ -83,5 +86,13 @@ class WeatherController {
             temperaturesInCities.add(weatherService.findTemperature(opts))
         }
         temperaturesInCities
+    }
+
+    @GetMapping("/countries")
+    @ResponseBody
+    ResponseEntity<ArrayList<WeatherModel>> getCountries(){
+        Query query = new Query();
+        query.fields().include("sys.country").exclude("_id");
+        return new ResponseEntity<ArrayList<WeatherModel>>((ArrayList<WeatherModel>) mongoTemplate.find(query, WeatherModel.class), HttpStatus.OK)
     }
 }

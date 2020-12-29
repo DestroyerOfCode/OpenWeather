@@ -91,13 +91,6 @@ class WeatherService {
     def buildAggregationQuery(def filterList){
 
         def weatherModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherModel.class));
-//        weatherModelCollection.aggregate([
-//                new Document([$match : [
-//                        $and : [
-//
-//                        ] << ["coord.lon" : [$gte : "33"]] <<  ["coord.lon" : [$lte : "55"]]
-//                ]])
-//        ]) as List
 
         weatherModelCollection.aggregate([
                 new Document([$match : [
@@ -170,7 +163,7 @@ class WeatherService {
                         filterOperatorsMap.forEach { filterOperator, filterValue ->
                             String[] path = filterName.split(/\./)
                             weathers = (ArrayList<WeatherModel>) weathers.findAll { it ->
-                                filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
+                                filterOperatorOverload."${getCorrectFilterOperator(filterOperator)(buildCompareParam(it.asMap(), path), filterValue)}"
                             }
                         }
                     }
@@ -179,6 +172,10 @@ class WeatherService {
         }
 //      weathers.subList(new Integer(opts.page) * opts.itemsPerPage, weathers.size() - (new Integer(opts.page) * opts.itemsPerPage) > itemsPerPage ? (new Intger(opts.page) * itemsPerPage + itemsPerPage) : weathers.size() - (new Intger(opts.page) * itemsPerPage)
         weathers
+    }
+
+    def getCorrectFilterOperator( filterOperator) {
+        filterOperator == 'in' ? 'contains' : filterOperator
     }
 
     @CompileStatic

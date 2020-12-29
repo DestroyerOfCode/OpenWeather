@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface WeatherModelRepository extends WeatherAppRepository<WeatherModel, String>, MongoRepository<WeatherModel, String>  {
 
+
 }

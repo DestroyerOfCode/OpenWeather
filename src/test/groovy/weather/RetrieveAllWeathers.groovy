@@ -19,6 +19,7 @@ class RetrieveAllWeathers {
     @Autowired
     WeatherModelRepository weatherModelRepository
 
+    @Autowired
     ArrayList<WeatherModel> weathers = weatherModelRepository.findAll()
 
     static Boolean isSortedAscending(list) {
@@ -46,6 +47,7 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Sort weather data by name")
     void sortWeatherDataByName() {
+        this.weathers
         String response = given().auth().none().and().contentType("application/json").queryParams("sortBy", "name", "isAscending", true).when().body(weathers).
                 post("/weather/retrieve/fromDb").asString()
         def res = from(response).getList("name")
@@ -97,13 +99,14 @@ class RetrieveAllWeathers {
 
     }
 
+
     @Test
-    @DisplayName("Filter with multiple variables without sorting with pagination")
-    void filterWeatherDataWithCountryWithoutSortWithPagination() {
+    @DisplayName("Filter with multiple variables without sorting with no additional filters")
+    void filterWeatherDataWithCountryWithoutSortWithNoAdditionalFilter() {
         def countryFilterNode = Map.of("sys.country", Map.of("eq","SA"))
         def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
-        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, 'isAdditionalFilter', true)
 
         given().auth().none().contentType("application/json").queryParams(opts).
                 body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
@@ -111,5 +114,23 @@ class RetrieveAllWeathers {
 
     }
 
+    @Test
+    @DisplayName("Filter with multiple Countries")
+    void filterWithMultipleCountries() {
+        def countryFilterNode = Map.of("sys.country", Map.of("in",["SA", "IR", "RU"]))
+        def resultFilterNode = (new JsonBuilder(countryFilterNode).toString())
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
+
+        given().auth().none().contentType("application/json").queryParams(opts).when().
+                body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and()
+                .assertThat().body("sys.any{ it.country != \"SA\" && it.country != \"IR\" && it.country != \"RU\"}", not(true))
+
+    }
+
+    @Test
+    @DisplayName("get all Countries")
+    void getAllCountries() {
+        given().auth().none().when().get("/weather/countries").then().and().statusCode(200)
+    }
 }
 

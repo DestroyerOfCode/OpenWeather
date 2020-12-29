@@ -24,7 +24,6 @@ class FilterOperatorOverload {
     def lt(def entity, def value){
         entity < new BigDecimal(value)
     }
-
     //TODO urobit to pre nested
     def contains(def entity, def value){
         value in entity
