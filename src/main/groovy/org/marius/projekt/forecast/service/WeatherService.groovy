@@ -161,11 +161,6 @@ class WeatherService {
             if (!new Boolean((String) opts.isAdditionalFilter))
                 weathers = buildAggregationQuery(filterList)
             else {
-                // because
-                if (filterList['sys.country']) {
-//                    filterList['sys.country'].remove('in')
-
-                }
                 filterList.forEach { filterItem ->
 
                     String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
