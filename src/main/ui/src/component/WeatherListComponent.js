@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import WeatherService from '../service/WeatherService';
 import Pagination from './Pagination';
+import { Multiselect } from 'multiselect-react-dropdown';
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -14,16 +15,20 @@ class WeatherListComponent extends Component {
             itemsPerPage : 1000,
             loading : false,
             isAdditionalFilter : false,
-            pageNumbers : []
+            pageNumbers : [],
+            options : [],
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         console.log("som v componentDidMOunt")
-        this.refreshWeathers();
+        const countries = await WeatherService.retrieveAllCountries()
+        this.setState({options : countries.data}, function() {this.refreshWeathers();})
+        
     }
 
     refreshWeathers(sortBy, weathers) {
+
         WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, this.state.isAdditionalFilter, weathers)
             .then(
                 response => {
@@ -36,14 +41,25 @@ class WeatherListComponent extends Component {
     keyExistsInArr(arr, key){
         let exists = false
         console.log("arr inside keyExists: " + JSON.stringify(arr))
-
-        arr?.some(item => {
-            if(item.hasOwnProperty([key])) {
-                exists = true;
-                return true
-            }
-            else return false
-        })
+        if (!Array.isArray(key)){
+            arr?.some(item => {
+                if(item.hasOwnProperty([key])) {
+                    exists = true;
+                    return true
+                }
+                else return false
+            })
+        }
+        //since countries is a multicheckbox, it has multiple keys and must check not with equals
+        else{
+            arr?.some(item => {
+                if(item.includes([key])) {
+                    exists = true;
+                    return true
+                }
+                else return false
+            })
+        }
         return exists
     }
 
@@ -74,32 +90,38 @@ class WeatherListComponent extends Component {
         const arr = this.state.filters
         arr.forEach((item, index, filters) => {
             if (item.hasOwnProperty([filterName])){
-                filters[index][filterName][filterOperator] = event.target.value
+                filters[index][filterName][filterOperator] = event
             }
         })
         return arr
     }
 
     onBlurEvent(event, filterName, filterOperator){
+        console.log("event: " + JSON.stringify(event))
+        console.log("filters: " + JSON.stringify(this.state.filters))
 
-        if (event.target.value === "" && this.keyExistsInArr(this.state.filters,filterName))  {
+        if (event === "" && this.keyExistsInArr(this.state.filters,filterName))  {
             var index = this.findIndexInFilters(this.state.filters, filterName)
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : false, filters : this.changeFilters(index, filterName, filterOperator)}, function () {
                 this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
         }
 
-        else if (event.target.value !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
+        else if (event !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true,
-                 filters: this.state.filters.concat([{[filterName]: {[filterOperator] : event.target.value}}])}, function () {
+                 filters: this.state.filters.concat([{[filterName]: {[filterOperator] : event}}])}, function () {
                 console.log("filters inside: " + this.state.filters)
                 this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
 
         }
 
-        else if (event.target.value !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
-            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true, 
+        else if (event !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
+            //if there are multiple countries, backend must make a new query
+            //since no additional filter is added, only value
+            const isAdditionalFilterWithContains = event.includes(",") ? false : true
+            
+            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : isAdditionalFilterWithContains, 
                 filters : this.addFilterOperatorToExistingFilterName(event, filterName, filterOperator)}, function() {
                     this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
@@ -111,26 +133,36 @@ class WeatherListComponent extends Component {
         }
     }
 
+   makeStringFromSelectedCountries = (countries) => {
+        var selectedCountriesIntoString = (prevVal, currVal, idx) => {
+            return idx === 0 ? currVal.name : prevVal +", " + currVal.name
+        }
+        return countries.reduce(selectedCountriesIntoString, '')
+   }
+
    filters() {
+    //    console.log("coutnries: " + JSON.stringify(this.state.options))
         return (<div className="row">
-        {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event, "_id", "eq")}}></textarea>}
-        {<textarea placeholder= "City name" onBlur= {event =>{this.onBlurEvent(event, "name", "eq")}}></textarea>}
-        {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event, "sys.country", "eq")}}></textarea>}
-        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "coord.lat", "lte")}}></textarea>}
-        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{this.onBlurEvent(event, "coord.lat", "gte")}}></textarea>}
-        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{this.onBlurEvent(event, "coord.lon", "lte")}}></textarea>}
-        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{this.onBlurEvent(event, "coord.lon", "gte")}}></textarea>}
-        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.humidity", "lte")}}></textarea>}
-        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.humidity", "gte")}}></textarea>}
-        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.feels_like", "lte")}}></textarea>}
-        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.feels_like", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_max", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_max", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_min", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{this.onBlurEvent(event, "weatherMain.temp_min", "gte")}}></textarea>}
-        {<textarea placeholder= "Description" onBlur= {event =>{this.onBlurEvent(event, "description", "eq")}}></textarea>}
+        {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event.target.value, "_id", "eq")}}></textarea>}
+        {<textarea placeholder= "City   name" onBlur= {event =>{this.onBlurEvent(event.target.value, "name", "eq")}}></textarea>}
+        {<Multiselect options={this.state.options} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedCountries(event), "sys.country", "in")}}
+        onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedCountries(event), "sys.country", "in")}}/>}
+        {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event.target.value, "sys.country", "eq")}}></textarea>}
+        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lat", "lte")}}></textarea>}
+        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lat", "gte")}}></textarea>}
+        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lon", "lte")}}></textarea>}
+        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lon", "gte")}}></textarea>}
+        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
+        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
+        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.feels_like", "lte")}}></textarea>}
+        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.feels_like", "gte")}}></textarea>}
+        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp", "lte")}}></textarea>}
+        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp", "gte")}}></textarea>}
+        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_max", "lte")}}></textarea>}
+        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_max", "gte")}}></textarea>}
+        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_min", "lte")}}></textarea>}
+        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_min", "gte")}}></textarea>}
+        {<textarea placeholder= "Description" onBlur= {event =>{this.onBlurEvent(event.target.value, "description", "eq")}}></textarea>}
     </div>)
    }
 
@@ -152,14 +184,26 @@ class WeatherListComponent extends Component {
    </thead>)
    }
 
+    getWeatherDescription = (weather) => {
+        var weaterDescriptionReduce = (prevVal, currVal, idx) => {
+            return idx === 0 ? currVal.description : prevVal + ", " + currVal.description;
+        }
+
+        return weather.weather.reduce(weaterDescriptionReduce, '')
+    }
+
+
+
    mainBody(currentPosts){
     return (
 
     <tbody>
         {
             currentPosts.map(
-                weather =>
-                    <tr key={weather._id}>
+                weather =>{
+                    // console.log(JSON.stringify(weather.weather))
+                // let description = 
+                    return (<tr key={weather._id}>
                         <td>{weather._id}</td>
                         <td>{weather.name}</td>
                         <td>{weather.coord.lat}</td>
@@ -170,8 +214,8 @@ class WeatherListComponent extends Component {
                         <td>{weather.weatherMain.temp}</td>
                         <td>{weather.weatherMain.temp_max}</td>
                         <td>{weather.weatherMain.temp_min}</td>
-                        <td>{weather.weather[0].description}</td>
-                    </tr>
+                        <td>{this.getWeatherDescription(weather)}</td>
+                    </tr>)}
             )
         }
         </tbody>

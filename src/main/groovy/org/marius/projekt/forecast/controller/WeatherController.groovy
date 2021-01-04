@@ -90,9 +90,10 @@ class WeatherController {
 
     @GetMapping("/countries")
     @ResponseBody
-    ResponseEntity<ArrayList<WeatherModel>> getCountries(){
-        Query query = new Query();
-        query.fields().include("sys.country").exclude("_id");
-        return new ResponseEntity<ArrayList<WeatherModel>>((ArrayList<WeatherModel>) mongoTemplate.find(query, WeatherModel.class), HttpStatus.OK)
+    def getCountries(){
+//        Query query = new Query();
+//        query.fields().include("sys.country").exclude("_id");
+        mongoTemplate.query(WeatherModel.class).distinct("sys.country").as(String.class).all().
+                withIndex().collect{ country, index -> ['name': country, 'id': index]}
     }
 }

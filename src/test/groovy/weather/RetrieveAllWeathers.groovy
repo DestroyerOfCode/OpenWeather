@@ -88,7 +88,7 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Filter with multiple variables without sorting")
     void filterWeatherDataWithCountryWithoutSort() {
-        def countryFilterNode = Map.of("sys.country", Map.of("eq","SA"))
+        def countryFilterNode = Map.of("sys.country", Map.of("in", "SA"))
         def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
@@ -103,10 +103,10 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Filter with multiple variables without sorting with no additional filters")
     void filterWeatherDataWithCountryWithoutSortWithNoAdditionalFilter() {
-        def countryFilterNode = Map.of("sys.country", Map.of("eq","SA"))
+        def countryFilterNode = Map.of("sys.country", Map.of("in", "SA"))
         def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
-        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, 'isAdditionalFilter', true)
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, 'isAdditionalFilter', false)
 
         given().auth().none().contentType("application/json").queryParams(opts).
                 body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
@@ -117,7 +117,7 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("Filter with multiple Countries")
     void filterWithMultipleCountries() {
-        def countryFilterNode = Map.of("sys.country", Map.of("in",["SA", "IR", "RU"]))
+        def countryFilterNode = Map.of("sys.country", Map.of("in","SA, IR, RU"))
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString())
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 

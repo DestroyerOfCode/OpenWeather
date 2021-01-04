@@ -116,10 +116,10 @@ class WeatherService {
                     filter, filterOperatorAndValue ->
                         filterOperatorAndValue.collect {
                             filterOperator, filterValue ->
+                                //this if is here because some nodes are the same and I only need to append a new filter operator (like Gte and lte)
                                 if (filterMap[filter]) filterMap[filter] << [("\$" + filterOperator) : ( isStringNumber.call(filterValue, filterOperator) ? new BigDecimal(filterValue) : filterValue )]
                                 else filterMap << [(filter): [("\$" + filterOperator) : ( isStringNumber.call(filterValue, filterOperator) ? new BigDecimal(filterValue) : filterValue )]]
                         }.first()
-//            String filterOperator, Object value -> return [(val.iterator().next().key) : [(filterOperator) : (!(value instanceof String) ? ((value.getClass())) : (value))]]
                 }
         }
         filterMap
@@ -151,9 +151,21 @@ class WeatherService {
 
         if (new Boolean((String) opts.isFilter) && !opts.sortBy) {
             ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList = (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("[" + opts.filterString + "]")
+
+            // I need index because I cant get map element of array without one
+            // I need to change it from string to array of strings because in query parameters of URI it
+            // is impossible to send arrays
+            def indexOfCountry =  filterList.findIndexOf {it.containsKey('sys.country')}
+            if (indexOfCountry >= 0)
+                filterList[indexOfCountry]['sys.country']['in'] =  filterList[indexOfCountry]['sys.country']['in'].tokenize(', ')
             if (!new Boolean((String) opts.isAdditionalFilter))
                 weathers = buildAggregationQuery(filterList)
             else {
+                // because
+                if (filterList['sys.country']) {
+//                    filterList['sys.country'].remove('in')
+
+                }
                 filterList.forEach { filterItem ->
 
                     String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
@@ -163,7 +175,9 @@ class WeatherService {
                         filterOperatorsMap.forEach { filterOperator, filterValue ->
                             String[] path = filterName.split(/\./)
                             weathers = (ArrayList<WeatherModel>) weathers.findAll { it ->
-                                filterOperatorOverload."${getCorrectFilterOperator(filterOperator)(buildCompareParam(it.asMap(), path), filterValue)}"
+//                                filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
+                                def OverloadedFilterOperator = getCorrectFilterOperator(filterOperator)
+                                filterOperatorOverload."${OverloadedFilterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
                             }
                         }
                     }

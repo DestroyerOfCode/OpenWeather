@@ -26,5 +26,11 @@ class WeatherService {
         }
         return filterString
     }
+
+    retrieveAllCountries = () =>  axios.get(`${WEATHER_API_URL}/countries`)
+        // console.log("countries: " + JSON.stringify(countries))
+        // return countries
+    
+
 }
 export default new WeatherService()

@@ -26,6 +26,6 @@ class FilterOperatorOverload {
     }
     //TODO urobit to pre nested
     def contains(def entity, def value){
-        value in entity
+        entity in value
     }
 }
