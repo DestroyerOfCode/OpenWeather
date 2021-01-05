@@ -154,10 +154,12 @@ class WeatherService {
 
             // I need index because I cant get map element of array without one
             // I need to change it from string to array of strings because in query parameters of URI it
-            // is impossible to send arrays
-            def indexOfCountry =  filterList.findIndexOf {it.containsKey('sys.country')}
-            if (indexOfCountry >= 0)
-                filterList[indexOfCountry]['sys.country']['in'] =  filterList[indexOfCountry]['sys.country']['in'].tokenize(', ')
+            // is impossible to send arrays and I am sending it as string in format 'in=AO, AE, RU'
+            def indexOfCountry =  filterList.findIndexOf {it.containsKey('sys.country') || it.containsKey('weather.description')}
+            if (indexOfCountry >= 0) {
+                def key = filterList[indexOfCountry].iterator().next().getKey()
+                filterList[indexOfCountry][key]['in'] = filterList[indexOfCountry][key]['in'].tokenize(',')
+            }
             if (!new Boolean((String) opts.isAdditionalFilter))
                 weathers = buildAggregationQuery(filterList)
             else {
@@ -191,6 +193,7 @@ class WeatherService {
     static Object buildCompareParam(Object paramToChange, String[] path){
         paramToChange = path.inject(paramToChange){ weather, String p -> weather?.getAt(p) }
         if (paramToChange instanceof String && paramToChange.isNumber()) return new BigDecimal(paramToChange)
+        else if (paramToChange instanceof Collection) return paramToChange.join(', ')
         return paramToChange
     }
 }

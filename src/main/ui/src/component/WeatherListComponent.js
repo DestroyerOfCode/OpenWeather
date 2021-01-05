@@ -16,14 +16,16 @@ class WeatherListComponent extends Component {
             loading : false,
             isAdditionalFilter : false,
             pageNumbers : [],
-            options : [],
+            countries : [],
+            descriptions: []
         }
     }
 
     async componentDidMount() {
         console.log("som v componentDidMOunt")
         const countries = await WeatherService.retrieveAllCountries()
-        this.setState({options : countries.data}, function() {this.refreshWeathers();})
+        const descriptions = await WeatherService.retrieveAllDescriptions()
+        this.setState({countries : countries.data, descriptions : descriptions.data}, function() {this.refreshWeathers();})
         
     }
 
@@ -50,7 +52,7 @@ class WeatherListComponent extends Component {
                 else return false
             })
         }
-        //since countries is a multicheckbox, it has multiple keys and must check not with equals
+        //since countries and descriptions is a multicheckbox, they are arrays and it has multiple keys and must check not with equals
         else{
             arr?.some(item => {
                 if(item.includes([key])) {
@@ -117,8 +119,9 @@ class WeatherListComponent extends Component {
         }
 
         else if (event !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
-            //if there are multiple countries, backend must make a new query
-            //since no additional filter is added, only value
+            //if there are multiple countries and descriptions, backend must make a new query
+            //since no additional filter is added, only value. I am unable to send query request
+            //with an array element
             const isAdditionalFilterWithContains = event.includes(",") ? false : true
             
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : isAdditionalFilterWithContains, 
@@ -133,20 +136,22 @@ class WeatherListComponent extends Component {
         }
     }
 
-   makeStringFromSelectedCountries = (countries) => {
-        var selectedCountriesIntoString = (prevVal, currVal, idx) => {
-            return idx === 0 ? currVal.name : prevVal +", " + currVal.name
+    // this closure's purpose is to create strings to be sent to query params, as no 
+    // other way to send arrays exists
+   makeStringFromSelectedItems = (items) => {
+        var selectedItemsIntoString = (prevVal, currVal, idx) => {
+            return idx === 0 ? currVal.name : prevVal + "," + currVal.name
         }
-        return countries.reduce(selectedCountriesIntoString, '')
+        return items.reduce(selectedItemsIntoString, '')
    }
 
    filters() {
-    //    console.log("coutnries: " + JSON.stringify(this.state.options))
+    //    console.log("coutnries: " + JSON.stringify(this.state.countries))
         return (<div className="row">
         {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event.target.value, "_id", "eq")}}></textarea>}
         {<textarea placeholder= "City   name" onBlur= {event =>{this.onBlurEvent(event.target.value, "name", "eq")}}></textarea>}
-        {<Multiselect options={this.state.options} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedCountries(event), "sys.country", "in")}}
-        onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedCountries(event), "sys.country", "in")}}/>}
+        {<Multiselect options ={this.state.countries} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "sys.country", "in")}}
+        onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "sys.country", "in")}}/>}
         {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event.target.value, "sys.country", "eq")}}></textarea>}
         {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lat", "lte")}}></textarea>}
         {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lat", "gte")}}></textarea>}
@@ -162,7 +167,9 @@ class WeatherListComponent extends Component {
         {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_max", "gte")}}></textarea>}
         {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_min", "lte")}}></textarea>}
         {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_min", "gte")}}></textarea>}
-        {<textarea placeholder= "Description" onBlur= {event =>{this.onBlurEvent(event.target.value, "description", "eq")}}></textarea>}
+        {<Multiselect options ={this.state.descriptions} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "weather.description", "in")}}
+        onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
+
     </div>)
    }
 
@@ -179,17 +186,18 @@ class WeatherListComponent extends Component {
            <th onClick={() =>this.refreshWeathers("weatherMain.temp", this.state.weathers) }>temperature</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.temp_max", this.state.weathers) }>maximum temperature</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.temp_min", this.state.weathers) }>minimal temperature</th>
-           <th onClick={() =>this.refreshWeathers("description", this.state.weathers) }>description</th>                                
+           <th onClick={() =>this.refreshWeathers("weather.description", this.state.weathers) }>description</th>                                
        </tr>
    </thead>)
    }
 
+   // descriptions can be multiple per row, to display it I changed its elements to string delimetered by ','
     getWeatherDescription = (weather) => {
-        var weaterDescriptionReduce = (prevVal, currVal, idx) => {
+        var weatherItemReduce = (prevVal, currVal, idx) => {
             return idx === 0 ? currVal.description : prevVal + ", " + currVal.description;
         }
 
-        return weather.weather.reduce(weaterDescriptionReduce, '')
+        return weather.weather.reduce(weatherItemReduce, '')
     }
 
 
@@ -201,8 +209,6 @@ class WeatherListComponent extends Component {
         {
             currentPosts.map(
                 weather =>{
-                    // console.log(JSON.stringify(weather.weather))
-                // let description = 
                     return (<tr key={weather._id}>
                         <td>{weather._id}</td>
                         <td>{weather.name}</td>

@@ -90,10 +90,18 @@ class WeatherController {
 
     @GetMapping("/countries")
     @ResponseBody
-    def getCountries(){
+    def getDistinctCountries(){
 //        Query query = new Query();
 //        query.fields().include("sys.country").exclude("_id");
         mongoTemplate.query(WeatherModel.class).distinct("sys.country").as(String.class).all().
+                withIndex().collect{ country, index -> ['name': country, 'id': index]}
+    }
+    @GetMapping("/descriptions")
+    @ResponseBody
+    def getDistinctDescriptions(){
+//        Query query = new Query();
+//        query.fields().include("sys.country").exclude("_id");
+        mongoTemplate.query(WeatherModel.class).distinct("weather.description").as(String.class).all().
                 withIndex().collect{ country, index -> ['name': country, 'id': index]}
     }
 }

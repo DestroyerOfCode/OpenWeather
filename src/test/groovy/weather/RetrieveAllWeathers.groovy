@@ -127,10 +127,31 @@ class RetrieveAllWeathers {
 
     }
 
+    //I dont know why the second any must be there. it['description'] should be not an arraylist, but a string
+    @Test
+    @DisplayName("Filter with multiple Descriptions")
+    void filterWithMultipleDescriptions() {
+        def countryFilterNode = Map.of("weather.description", Map.of("in", "clear sky,thunderstorm,mist"))
+        def resultFilterNode = (new JsonBuilder(countryFilterNode).toString())
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, 'isAdditionalFilter', false)
+
+        given().auth().none().contentType("application/json").queryParams(opts).when().
+                body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and()
+                .assertThat().body("weather.any{ !(it['description'].any{ item -> item in [\"clear sky\", \"thunderstorm\", \"mist\"]})}", not(true))
+
+    }
+
     @Test
     @DisplayName("get all Countries")
     void getAllCountries() {
         given().auth().none().when().get("/weather/countries").then().and().statusCode(200)
     }
+
+    @Test
+    @DisplayName("get all Descriptions")
+    void getAllDescriptions() {
+        given().auth().none().when().get("/weather/descriptions").then().and().statusCode(200)
+    }
+
 }
 
