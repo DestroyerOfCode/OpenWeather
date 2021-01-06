@@ -22,7 +22,7 @@ class WeatherListComponent extends Component {
     }
 
     async componentDidMount() {
-        console.log("som v componentDidMOunt")
+        console.log("som v componentDidMOunt weather list")
         const countries = await WeatherService.retrieveAllCountries()
         const descriptions = await WeatherService.retrieveAllDescriptions()
         this.setState({countries : countries.data, descriptions : descriptions.data}, function() {this.refreshWeathers();})
@@ -37,7 +37,7 @@ class WeatherListComponent extends Component {
                     this.setState({ weathers: response.data })
                 }
             ).then( () => {if (sortBy) this.setState({isAscending : !this.state.isAscending})}
-            ).then( () => {if (typeof this.state.filters !== 'undefined' && this.state.pageNumbers.filters === 0) this.setState({isFilter : false})})
+            ).then( () => {if (typeof this.state.filters !== 'undefined' && this.state.filters === 0) this.setState({isFilter : false})})
     }
 
     keyExistsInArr(arr, key){
@@ -145,28 +145,36 @@ class WeatherListComponent extends Component {
         return items.reduce(selectedItemsIntoString, '')
    }
 
+   isNumber = (item) => {
+    console.log("typeof: " + typeof item)
+    console.log("isNan: " + !isNaN(item))
+        var isNumber = !isNaN(item)
+        if (!isNumber) alert('You must pick a number in this field')
+    return isNumber
+   }
+
    filters() {
     //    console.log("coutnries: " + JSON.stringify(this.state.countries))
         return (<div className="row">
-        {<textarea placeholder= "Id" onBlur= {event => {this.onBlurEvent(event.target.value, "_id", "eq")}}></textarea>}
-        {<textarea placeholder= "City   name" onBlur= {event =>{this.onBlurEvent(event.target.value, "name", "eq")}}></textarea>}
+        {<input placeholder= "Id" onBlur= {event => {this.onBlurEvent(event.target.value, "_id", "eq")}}></input>}
+        {<textarea placeholder= "City name" onBlur= {event =>{this.onBlurEvent(event.target.value, "name", "eq")}}></textarea>}
         {<Multiselect options ={this.state.countries} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "sys.country", "in")}}
         onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "sys.country", "in")}}/>}
         {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event.target.value, "sys.country", "eq")}}></textarea>}
-        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lat", "lte")}}></textarea>}
-        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lat", "gte")}}></textarea>}
-        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lon", "lte")}}></textarea>}
-        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "coord.lon", "gte")}}></textarea>}
-        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
-        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.feels_like", "lte")}}></textarea>}
-        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.feels_like", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_max", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_max", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_min", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{this.onBlurEvent(event.target.value, "weatherMain.temp_min", "gte")}}></textarea>}
+        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lat", "lte")}}></textarea>}
+        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lat", "gte")}}></textarea>}
+        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lon", "lte")}}></textarea>}
+        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lon", "gte")}}></textarea>}
+        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
+        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
+        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.feels_like", "lte")}}></textarea>}
+        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.feels_like", "gte")}}></textarea>}
+        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp", "lte")}}></textarea>}
+        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp", "gte")}}></textarea>}
+        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_max", "lte")}}></textarea>}
+        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_max", "gte")}}></textarea>}
+        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_min", "lte")}}></textarea>}
+        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_min", "gte")}}></textarea>}
         {<Multiselect options ={this.state.descriptions} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "weather.description", "in")}}
         onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
 
@@ -229,13 +237,17 @@ class WeatherListComponent extends Component {
    }
 
     paginate = (currentPage) => {
-       this.setState({currentPage : currentPage})
+       this.setState({currentPage : currentPage}, function(){
+           console.log("currPage: " + this.state.currentPage)
+       })
+
     }
 
     render() {
-        console.log("som v render")
+        console.log("som v render weather list")
 
         const pagination = <Pagination itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate.bind()}/>
+        console.log('after pagination creation')
         const indexOfLastPost = this.state.currentPage * this.state.itemsPerPage;
         const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
         const currentWeathers = this.state.weathers.slice(indexOfFirstPost, indexOfLastPost);

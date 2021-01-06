@@ -95,4 +95,20 @@ class WeatherInternalLogic {
             }
         }
     }
+
+
+    void findIndicesOfArrayFilters(ArrayList indicesOfArrayFilters, ArrayList<Map> filterList){
+        filterList.eachWithIndex { it, index ->
+
+            if (it.containsKey('sys.country') || it.containsKey('weather.description'))
+                indicesOfArrayFilters.add(index)
+        }
+
+        if (indicesOfArrayFilters.size() > 0) {
+            indicesOfArrayFilters.forEach {
+                def key = filterList[it].iterator().next().getKey()
+                filterList[it][key]['in'] = filterList[it][key]['in'].tokenize(',')
+            }
+        }
+    }
 }
