@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import WeatherService from '../service/WeatherService';
 import Pagination from './Pagination';
+import FiltersComponent from './FiltersComponent'
 import { Multiselect } from 'multiselect-react-dropdown';
 
 class WeatherListComponent extends Component {
@@ -98,11 +99,13 @@ class WeatherListComponent extends Component {
         return arr
     }
 
-    onBlurEvent(event, filterName, filterOperator){
-        console.log("event: " + JSON.stringify(event))
-        console.log("filters: " + JSON.stringify(this.state.filters))
+    onChangeFilter = (event, filterName, filterOperator) => {
+        // console.log("event: " + JSON.stringify(event))
+        // console.log("filters: " + JSON.stringify(this.state.filters))
 
         if (event === "" && this.keyExistsInArr(this.state.filters,filterName))  {
+            console.log("inside 1")
+
             var index = this.findIndexInFilters(this.state.filters, filterName)
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : false, filters : this.changeFilters(index, filterName, filterOperator)}, function () {
                 this.refreshWeathers(this.state.sortBy, this.state.weathers)
@@ -110,21 +113,23 @@ class WeatherListComponent extends Component {
         }
 
         else if (event !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
+            console.log("inside 2")
+
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true,
                  filters: this.state.filters.concat([{[filterName]: {[filterOperator] : event}}])}, function () {
-                console.log("filters inside: " + this.state.filters)
+                // console.log("filters inside: " + this.state.filters)
                 this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
 
         }
 
         else if (event !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
-            //if there are multiple countries and descriptions, backend must make a new query
-            //since no additional filter is added, only value. I am unable to send query request
-            //with an array element
-            const isAdditionalFilterWithContains = event.includes(",") ? false : true
+           
+            console.log("inside 3")
+            var index = this.findIndexInFilters(this.state.filters, filterName)
+
             
-            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : isAdditionalFilterWithContains, 
+            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : this.isAdditionalFilterCheck(event, index, filterName, filterOperator), 
                 filters : this.addFilterOperatorToExistingFilterName(event, filterName, filterOperator)}, function() {
                     this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
@@ -136,52 +141,32 @@ class WeatherListComponent extends Component {
         }
     }
 
-    // this closure's purpose is to create strings to be sent to query params, as no 
-    // other way to send arrays exists
-   makeStringFromSelectedItems = (items) => {
-        var selectedItemsIntoString = (prevVal, currVal, idx) => {
-            return idx === 0 ? currVal.name : prevVal + "," + currVal.name
-        }
-        return items.reduce(selectedItemsIntoString, '')
-   }
+    isAdditionalFilterCheck(event, index, filterName, filterOperator){
+        if (this.isNotAdditionalFilterWithContains(event) === false)
+            return false
+        console.log("this.state.filters[index][filterName][filterOperator]: " + this.state.filters[index][filterName][filterOperator])
+        if (this.isSameFilterChanged(event, index, filterName, filterOperator) === false)
+            return false
+        return true
+                
+    }   
 
-   isNumber = (item) => {
-    console.log("typeof: " + typeof item)
-    console.log("isNan: " + !isNaN(item))
-        var isNumber = !isNaN(item)
-        if (!isNumber) alert('You must pick a number in this field')
-    return isNumber
-   }
-
-   filters() {
-    //    console.log("coutnries: " + JSON.stringify(this.state.countries))
-        return (<div className="row">
-        {<input placeholder= "Id" onBlur= {event => {this.onBlurEvent(event.target.value, "_id", "eq")}}></input>}
-        {<textarea placeholder= "City name" onBlur= {event =>{this.onBlurEvent(event.target.value, "name", "eq")}}></textarea>}
-        {<Multiselect options ={this.state.countries} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "sys.country", "in")}}
-        onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "sys.country", "in")}}/>}
-        {<textarea placeholder= "Country" onBlur= {event =>{this.onBlurEvent(event.target.value, "sys.country", "eq")}}></textarea>}
-        {<textarea placeholder= "Latitude smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lat", "lte")}}></textarea>}
-        {<textarea placeholder= "Latitude bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lat", "gte")}}></textarea>}
-        {<textarea placeholder= "Longitude smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lon", "lte")}}></textarea>}
-        {<textarea placeholder= "Longitude bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "coord.lon", "gte")}}></textarea>}
-        {<textarea placeholder= "Humidity smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
-        {<textarea placeholder= "Humidity bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-        {<textarea placeholder= "Feel temperature smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.feels_like", "lte")}}></textarea>}
-        {<textarea placeholder= "Feel temperature bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.feels_like", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature max smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_max", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature max bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_max", "gte")}}></textarea>}
-        {<textarea placeholder= "Temperature min smaller than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_min", "lte")}}></textarea>}
-        {<textarea placeholder= "Temperature min bigger than" onBlur= {event =>{if (this.isNumber(event.target.value)) this.onBlurEvent(event.target.value, "weatherMain.temp_min", "gte")}}></textarea>}
-        {<Multiselect options ={this.state.descriptions} displayValue='name'  onSelect={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "weather.description", "in")}}
-        onRemove={event =>{this.onBlurEvent(this.makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
-
-    </div>)
-   }
-
-   header(){
+    //if there are multiple countries and descriptions, backend must make a new query
+    //since no additional filter is added, only value. I am unable to send query request
+    //with an array element
+    isNotAdditionalFilterWithContains(event){
+       return event.includes(",") ? false : true
+    }
+    
+    // this check is here for times when I change the same filter multiple
+    // times in a row and the filter is same. If it is the same I cant filter
+    // from memory because I could not load some weathers
+    isSameFilterChanged(event, index, filterName, filterOperator){
+        console.log("event: " + event)
+        console.log("this.state.filters[index][filterName][filterOperator]: " + this.state.filters[index][filterName][filterOperator])
+       return filterName === this.state.filters[index][filterName]
+    }
+    header(){
        return (<thead>
        <tr>
            <th onClick={() =>this.refreshWeathers("_id", this.state.weathers) }>cityId</th>
@@ -243,16 +228,21 @@ class WeatherListComponent extends Component {
 
     }
 
+    getWeathersOnSpecificPage = () => {
+        console.log('after pagination creation')
+        const indexOfLastPost = this.state.currentPage * this.state.itemsPerPage;
+        const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
+        return this.state.weathers.slice(indexOfFirstPost, indexOfLastPost);
+    }
+
     render() {
         console.log("som v render weather list")
 
         const pagination = <Pagination itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate.bind()}/>
-        console.log('after pagination creation')
-        const indexOfLastPost = this.state.currentPage * this.state.itemsPerPage;
-        const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
-        const currentWeathers = this.state.weathers.slice(indexOfFirstPost, indexOfLastPost);
 
-        let container= [this.filters(), pagination]
+        const currentWeathers = this.getWeathersOnSpecificPage()
+        const filters = <FiltersComponent countries = {this.state.countries} descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
+        let container= [filters, pagination]
 
         if (this.state.weathers)
             container.push(<table className="table">
