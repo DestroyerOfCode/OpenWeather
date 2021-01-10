@@ -28,13 +28,13 @@ function FiltersComponent(props) {
             {<textarea placeholder= "Longitude bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "gte")}}></textarea>}
             {<textarea placeholder= "Humidity smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
             {<textarea placeholder= "Humidity bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-            {<textarea placeholder= "Feel temperature smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
+            {<textarea placeholder= "Feel temperature smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
             {<textarea placeholder= "Feel temperature bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-            {<textarea placeholder= "Temperature smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
+            {<textarea placeholder= "Temperature smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
             {<textarea placeholder= "Temperature bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-            {<textarea placeholder= "Temperature max smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
+            {<textarea placeholder= "Temperature max smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
             {<textarea placeholder= "Temperature max bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-            {<textarea placeholder= "Temperature min smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
+            {<textarea placeholder= "Temperature min smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
             {<textarea placeholder= "Temperature min bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
             {<Multiselect options ={props.descriptions} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}
             onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
