@@ -6,6 +6,7 @@ import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.marius.projekt.forecast.service.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.http.HttpStatus
@@ -66,6 +67,12 @@ class WeatherController {
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/current/bulk_file")
+    @ResponseBody
+    def getWeatherCurrentBulkFile() {
+
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @ResponseBody
     def saveAllWeatherData() {
@@ -88,6 +95,7 @@ class WeatherController {
         temperaturesInCities
     }
 
+    @Cacheable(value = "countries")
     @GetMapping("/countries")
     @ResponseBody
     def getDistinctCountries(){
@@ -96,6 +104,8 @@ class WeatherController {
         mongoTemplate.query(WeatherModel.class).distinct("sys.country").as(String.class).all().
                 withIndex().collect{ country, index -> ['name': country, 'id': index]}
     }
+
+    @Cacheable(value = "descriptions")
     @GetMapping("/descriptions")
     @ResponseBody
     def getDistinctDescriptions(){

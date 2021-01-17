@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OpenWeatherSecurityRepository extends MongoRepository<OpenWeatherSecurity, String> {
 
-    @Aggregation("{$match : { apiKey : ?0}}")
     OpenWeatherSecurity findByApiKey( String apiKey );
 
     OpenWeatherSecurity findByApiKeyNotNull( String apiKey );

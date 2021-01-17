@@ -15,8 +15,6 @@ class EncryptionUtil{
 
     EncryptionUtil() {
         textEncryptor = Encryptors.delux('password', "e1b7ad44a2435e74")
-
-//        textEncryptor = new HexEncodingTextEncryptor(new AesBytesEncryptor('passwordpassword', 'AE12EAF1AE12'))
     }
 
     String encrypt(String textToEncrypt) {

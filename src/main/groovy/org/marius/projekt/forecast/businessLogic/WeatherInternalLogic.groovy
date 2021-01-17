@@ -60,7 +60,7 @@ class WeatherInternalLogic {
         }
 
         url.append("&units=${opts.get('units')}" as String)
-        url.append("&appid=${openWeatherSecurityRepository.findAll().first().apiKey}" as String)
+        url.append("&appid=${openWeatherSecurityRepository.findAll().last().apiKey}" as String)
         new String (url)
     }
 

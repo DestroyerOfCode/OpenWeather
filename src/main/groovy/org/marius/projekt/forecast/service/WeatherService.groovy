@@ -12,11 +12,13 @@ import org.marius.projekt.forecast.businessLogic.WeatherInternalLogic
 import org.marius.projekt.forecast.model.WeatherModel
 import org.marius.projekt.forecast.model.WeatherModelRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.cache.Cache;
 
 @Service
 
@@ -60,7 +62,7 @@ class WeatherService {
     }
 
     ArrayList findCityIds(){
-        BufferedReader idStream = new BufferedReader(new InputStreamReader(new FileInputStream('src/main/resources/cityList.json'), 'UTF-8'))
+        BufferedReader idStream = new BufferedReader(new InputStreamReader(new FileInputStream('src/main/resources/current.json'), 'UTF-8'))
         new JsonSlurper().parse(idStream) as ArrayList ?: null
 
     }
@@ -127,6 +129,7 @@ class WeatherService {
         filterMap
     }
 //    @CompileStatic
+    @Cacheable(value = "weathers")
     ArrayList<WeatherModel> getWeatherDataFromDbService(Map<String, Object> opts, ArrayList<WeatherModel> weathers, String cityId ){
 
         if (cityId) {
@@ -174,7 +177,6 @@ class WeatherService {
                         filterOperatorsMap.forEach { filterOperator, filterValue ->
                             String[] path = filterName.split(/\./)
                             weathers = (ArrayList<WeatherModel>) weathers.findAll { it ->
-//                                filterOperatorOverload."${filterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
                                 def OverloadedFilterOperator = getCorrectFilterOperator(filterOperator)
                                 filterOperatorOverload."${OverloadedFilterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
                             }
@@ -183,7 +185,6 @@ class WeatherService {
                 }
             }
         }
-//      weathers.subList(new Integer(opts.page) * opts.itemsPerPage, weathers.size() - (new Integer(opts.page) * opts.itemsPerPage) > itemsPerPage ? (new Intger(opts.page) * itemsPerPage + itemsPerPage) : weathers.size() - (new Intger(opts.page) * itemsPerPage)
         weathers
     }
 

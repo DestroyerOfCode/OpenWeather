@@ -17,10 +17,11 @@ class MongoDBAfterLoadEventListener extends AbstractMongoEventListener<Object> {
 
         List<String> keysToDecrypt = Arrays.asList("apiKey");
 
-        eventObject.keySet().forEach{key ->
-            if (keysToDecrypt.contains(key)) {
-                eventObject.put(key, this.encryptionUtil.decrypt(eventObject.get(key).toString()));
-            }
+        eventObject.keySet().any{key ->
+            if (!keysToDecrypt.contains(key))
+                return false
+            eventObject.put(key, this.encryptionUtil.decrypt(eventObject.get(key).toString()));
+            return true
         }
 
         super.onAfterLoad(event);
