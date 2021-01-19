@@ -1,26 +1,21 @@
 package org.marius.projekt.app.model
 
-import org.marius.projekt.forecast.model.WeatherModel
+import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Component
 
 @Component
-class WeatherAppRepositoryImpl implements WeatherAppRepository<WeatherModel, String> {
+class WeatherAppRepositoryImpl implements WeatherAppRepository<WeatherCurrentModel, String> {
 
     @Autowired MongoTemplate mongoTemplate
 
-//    @Override
-//    WeatherModel find(Closure closure) {
-//       mongoTemplate.findById()
-//    }
-
     @Override
-    WeatherModel findById(String id) {
+    WeatherCurrentModel findById(String id) {
        findById(id, null)
     }
     @Override
-    WeatherModel findById(String id, Closure closure) {
-       mongoTemplate.findById(id, WeatherModel.class)
+    WeatherCurrentModel findById(String id, Closure closure) {
+       mongoTemplate.findById(id, WeatherCurrentModel.class)
     }
 }

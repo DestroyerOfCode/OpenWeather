@@ -23,12 +23,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation "org.springframework.boot:spring-boot-starter-security"
+    testCompile("org.springframework.boot:spring-boot-starter-test")
     implementation 'org.codehaus.groovy:groovy-all:3.0.4'
 // https://mvnrepository.com/artifact/org.springframework/spring-context
     implementation 'org.springframework.boot:spring-boot-starter-cache:2.3.3.RELEASE'
 // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.5.2'
-//    testCompile "org.junit.jupiter:junit-jupiter:5.6.2"
+    testCompile "org.junit.jupiter:junit-jupiter:5.6.2"
     testImplementation 'junit:junit:4.13.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.3'
 //    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

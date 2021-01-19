@@ -1,26 +1,43 @@
-package weather
+package weather.current
 
 import groovy.json.JsonBuilder
-import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
-import org.marius.projekt.forecast.model.WeatherModel
-import org.marius.projekt.forecast.model.WeatherModelRepository
+import org.junit.runner.RunWith
+import org.marius.projekt.Main
+import org.marius.projekt.weather.model.current.WeatherCurrentModel
+import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit4.SpringRunner
 import static io.restassured.RestAssured.given
 import static org.hamcrest.Matchers.hasItem
-import static org.hamcrest.Matchers.lessThanOrEqualTo
 import static org.hamcrest.Matchers.not;
 import static io.restassured.path.json.JsonPath.from
 import static org.junit.Assert.assertTrue
 
-class RetrieveAllWeathers {
+@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+@RunWith(SpringRunner.class)
+class WeatherCurrent {
 
     @Autowired
-    WeatherModelRepository weatherModelRepository
+    WeatherCurrentModelRepository weatherCurrentModelRepository
 
-    @Autowired
-    ArrayList<WeatherModel> weathers = weatherModelRepository.findAll()
+    private List<WeatherCurrentModel> weathers
+
+    @Before
+    void initWeathers() {
+        weathers = (ArrayList<WeatherCurrentModel>) weatherCurrentModelRepository.findAll()
+    }
+
+    @AfterEach
+    void clearWeather() {
+        weathers.clear()
+    }
 
     static Boolean isSortedAscending(list) {
         list.size() < 2 || (1..<list.size()).every { list[it - 1] <= list[it] }
@@ -34,22 +51,21 @@ class RetrieveAllWeathers {
     @DisplayName("Get all weather data")
     void getAllWeatherData() {
         given().auth().none().contentType("application/json").when().body(weathers).
-                post("/weather/retrieve/fromDb").then().statusCode(200)
+                post("/weather/current/retrieve/fromDb").then().statusCode(200)
     }
 
     @Test
     @DisplayName("Get weather data by Id")
     void getWeatherDataById() {
-        given().auth().none().contentType("application/json").pathParam("cityId", 3067696).when().body(weathers).
-                post("/weather/retrieve/fromDb/{cityId}").then().statusCode(200).body("name",  hasItem("Prague"))
+        given().auth().none().contentType("application/json").pathParam("cityId", 3067696).when().body([]).
+                post("/weather/current/retrieve/fromDb/{cityId}").then().statusCode(200).body("name",  hasItem("Prague"))
     }
 
     @Test
     @DisplayName("Sort weather data by name")
     void sortWeatherDataByName() {
-        this.weathers
         String response = given().auth().none().and().contentType("application/json").queryParams("sortBy", "name", "isAscending", true).when().body(weathers).
-                post("/weather/retrieve/fromDb").asString()
+                post("/weather/current/retrieve/fromDb").asString()
         def res = from(response).getList("name")
         assertTrue( isSortedAscending(res))
 
@@ -59,16 +75,15 @@ class RetrieveAllWeathers {
     @DisplayName("Sort weather data by Latitude descending")
     void sortWeatherDataByLatitudeDescending() {
         String response = given().auth().none().and().contentType("application/json").queryParams("sortBy", "coord.lat", "isAscending", false).when().body(weathers).
-                post("/weather/retrieve/fromDb").asString()
+                post("/weather/current/retrieve/fromDb").asString()
         assertTrue( isSortedDescending(from(response).getList("coord.lat")))
     }
-
 
     @Test
     @DisplayName("Sort weather data by temperature ascending")
     void sortWeatherDataByTemperatureAscending() {
         String response = given().auth().none().and().contentType("application/json").queryParams("sortBy", "weatherMain.temp", "isAscending", true).when().body(weathers).
-                post("/weather/retrieve/fromDb").asString()
+                post("/weather/current/retrieve/fromDb").asString()
         assertTrue( isSortedAscending(from(response).getList("weatherMain.temp")))
     }
 
@@ -81,7 +96,7 @@ class RetrieveAllWeathers {
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
         given().auth().none().contentType("application/json").queryParams(opts).
-            body(weathers).when().post("/weather/retrieve/fromDb").then().assertThat().statusCode(200).assertThat().body("coord.any{ it.lat < 55 && it.lat > 35 && it.lon > 5.4}", not(false))
+            body(weathers).when().post("/weather/current/retrieve/fromDb").then().assertThat().statusCode(200).assertThat().body("coord.any{ it.lat < 55 && it.lat > 35 && it.lon > 5.4}", not(false))
 
     }
 
@@ -94,7 +109,7 @@ class RetrieveAllWeathers {
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
         given().auth().none().contentType("application/json").queryParams(opts).
-            body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
+            body(weathers).when().post("/weather/current/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
         .assertThat().body("sys.any{ it.country != \"SA\"}", not(true))
 
     }
@@ -109,7 +124,7 @@ class RetrieveAllWeathers {
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, 'isAdditionalFilter', false)
 
         given().auth().none().contentType("application/json").queryParams(opts).
-                body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
+                body(weathers).when().post("/weather/current/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))
                 .assertThat().body("sys.any{ it.country != \"SA\"}", not(true))
 
     }
@@ -122,7 +137,7 @@ class RetrieveAllWeathers {
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
 
         given().auth().none().contentType("application/json").queryParams(opts).when().
-                body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and()
+                body(weathers).when().post("/weather/current/retrieve/fromDb").then().and().statusCode(200).and()
                 .assertThat().body("sys.any{ it.country != \"SA\" && it.country != \"IR\" && it.country != \"RU\"}", not(true))
 
     }
@@ -136,7 +151,7 @@ class RetrieveAllWeathers {
         Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true, 'isAdditionalFilter', false)
 
         given().auth().none().contentType("application/json").queryParams(opts).when().
-                body(weathers).when().post("/weather/retrieve/fromDb").then().and().statusCode(200).and()
+                body(weathers).when().post("/weather/current/retrieve/fromDb").then().and().statusCode(200).and()
                 .assertThat().body("weather.any{ !(it['description'].any{ item -> item in [\"clear sky\", \"thunderstorm\", \"mist\"]})}", not(true))
 
     }
@@ -144,13 +159,13 @@ class RetrieveAllWeathers {
     @Test
     @DisplayName("get all Countries")
     void getAllCountries() {
-        given().auth().none().when().get("/weather/countries").then().and().statusCode(200)
+        given().auth().none().when().get("/weather/current/countries").then().and().statusCode(200)
     }
 
     @Test
     @DisplayName("get all Descriptions")
     void getAllDescriptions() {
-        given().auth().none().when().get("/weather/descriptions").then().and().statusCode(200)
+        given().auth().none().when().get("/weather/current/descriptions").then().and().statusCode(200)
     }
 
 }

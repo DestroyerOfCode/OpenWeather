@@ -1,16 +1,15 @@
-package org.marius.projekt.forecast.controller
+package org.marius.projekt.weather.controller.current
 
 import com.fasterxml.jackson.databind.JsonNode
-import groovy.json.JsonSlurper
-import org.marius.projekt.forecast.model.WeatherModel
-import org.marius.projekt.forecast.model.WeatherModelRepository
-import org.marius.projekt.forecast.service.WeatherService
+import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
+import org.marius.projekt.weather.model.current.WeatherCurrentModel
+import org.marius.projekt.weather.service.current.WeatherService
+import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.query.Query
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -22,11 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.client.RestTemplate
 
 @Controller
 @CrossOrigin(origins = ["http://localhost:3000"])
-@RequestMapping("weather")
-class WeatherController {
+@RequestMapping("weather/current")
+class WeatherCurrentController {
 
     @Autowired WeatherService weatherService
     @Autowired MongoTemplate mongoTemplate
@@ -45,41 +45,35 @@ class WeatherController {
         def weather = weatherService.findWeather( opts )
         if (!weather)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        return new ResponseEntity<WeatherModel>(weather, HttpStatus.ACCEPTED)
+        return new ResponseEntity<WeatherCurrentModel>(weather, HttpStatus.ACCEPTED)
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    def saveWeatherData(@RequestBody JsonNode opts) {
-        if (weatherService.saveWeatherData( opts ) )
+    def saveWeatherCurrent(@RequestBody JsonNode opts) {
+        if (weatherService.saveWeatherCurrent( opts ) )
             return new ResponseEntity<>(HttpStatus.CREATED)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
     @ResponseBody
-    def getWeatherDataFromDb( @RequestBody(required = false) ArrayList<WeatherModel> weathers,
-                              @RequestParam(required = false) Map<String, Object> opts, @PathVariable(required = false, value = "cityId") String cityId) {
+    def getWeatherCurrent(@RequestBody(required = false) ArrayList<WeatherCurrentModel> weathers,
+                             @RequestParam(required = false) Map<String, Object> opts, @PathVariable(required = false, value = "cityId") String cityId) {
 
-        weathers = weatherService.getWeatherDataFromDbService(opts, weathers, cityId )
+        weathers = weatherService.getWeatherCurrentService(opts, weathers, cityId )
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/current/bulk_file")
-    @ResponseBody
-    def getWeatherCurrentBulkFile() {
-
-    }
-
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @ResponseBody
-    def saveAllWeatherData() {
-        def weathers = weatherService.saveAllWeatherData()
+    def saveAllWeatherCurrentData() {
+        def weathers = weatherService.saveAllWeatherCurrentData()
         if ( weathers )
-            return new ResponseEntity<ArrayList<WeatherModel>>(weathers, HttpStatus.CREATED)
-        return new ResponseEntity<ArrayList<WeatherModel>>(weathers, HttpStatus.NO_CONTENT)
+            return new ResponseEntity<ArrayList<WeatherCurrentModel>>(weathers, HttpStatus.CREATED)
+        return new ResponseEntity<ArrayList<WeatherCurrentModel>>(weathers, HttpStatus.NO_CONTENT)
     }
 
     @PostMapping("/all")
@@ -101,7 +95,7 @@ class WeatherController {
     def getDistinctCountries(){
 //        Query query = new Query();
 //        query.fields().include("sys.country").exclude("_id");
-        mongoTemplate.query(WeatherModel.class).distinct("sys.country").as(String.class).all().
+        mongoTemplate.query(WeatherCurrentModel.class).distinct("sys.country").as(String.class).all().
                 withIndex().collect{ country, index -> ['name': country, 'id': index]}
     }
 
@@ -111,7 +105,7 @@ class WeatherController {
     def getDistinctDescriptions(){
 //        Query query = new Query();
 //        query.fields().include("sys.country").exclude("_id");
-        mongoTemplate.query(WeatherModel.class).distinct("weather.description").as(String.class).all().
+        mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
                 withIndex().collect{ country, index -> ['name': country, 'id': index]}
     }
 }

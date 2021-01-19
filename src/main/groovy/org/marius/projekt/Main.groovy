@@ -3,7 +3,7 @@ package org.marius.projekt
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import org.marius.projekt.app.model.WeatherAppRepository
-import org.marius.projekt.forecast.model.WeatherModelRepository
+import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -17,19 +17,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @EnableTransactionManagement
 @EnableAutoConfiguration
 @SpringBootApplication
-@EnableMongoRepositories(basePackageClasses =[ WeatherModelRepository.class, OpenWeatherSecurityRepository.class, WeatherAppRepository/*, org.marius.projekt.app.model.WeatherAppRepository.class*/])
+@EnableMongoRepositories(basePackageClasses =[ WeatherCurrentModelRepository.class, OpenWeatherSecurityRepository.class, WeatherAppRepository/*, org.marius.projekt.app.model.WeatherAppRepository.class*/])
 @ComponentScan('org.marius.projekt')
 class Main {
 
-    public static void main(String[] args){
+    static void main(String[] args){
         SpringApplication.run(Main.class, args);
 
     }
-    public @Bean MongoClient mongoClient() {
+    @Bean MongoClient mongoClient() {
         return MongoClients.create("mongodb://localhost:27017");
     }
 
-    public @Bean MongoTemplate mongoTemplate() {
+    @Bean MongoTemplate mongoTemplate() {
         return new MongoTemplate(mongoClient(), "weatherManager");
     }
 }

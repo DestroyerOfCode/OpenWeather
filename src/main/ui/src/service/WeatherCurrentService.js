@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const COURSE_API_URL = 'http://localhost:8080'
-const WEATHER_API_URL = `${COURSE_API_URL}/weather`
+const WEATHER_API_URL = `${COURSE_API_URL}/weather/current`
 
 class WeatherService {
 

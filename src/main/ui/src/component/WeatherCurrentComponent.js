@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import WeatherService from '../service/WeatherService';
+import WeatherCurrentService from '../service/WeatherCurrentService';
 import Pagination from './Pagination';
 import FiltersComponent from './FiltersComponent'
-import { Multiselect } from 'multiselect-react-dropdown';
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -24,15 +23,15 @@ class WeatherListComponent extends Component {
 
     async componentDidMount() {
         console.log("som v componentDidMOunt weather list")
-        const countries = await WeatherService.retrieveAllCountries()
-        const descriptions = await WeatherService.retrieveAllDescriptions()
+        const countries = await WeatherCurrentService.retrieveAllCountries()
+        const descriptions = await WeatherCurrentService.retrieveAllDescriptions()
         this.setState({countries : countries.data, descriptions : descriptions.data}, function() {this.refreshWeathers();})
         
     }
 
     refreshWeathers(sortBy, weathers) {
 
-        WeatherService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, this.state.isAdditionalFilter, weathers)
+        WeatherCurrentService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, this.state.isAdditionalFilter, weathers)
             .then(
                 response => {
                     this.setState({ weathers: response.data })

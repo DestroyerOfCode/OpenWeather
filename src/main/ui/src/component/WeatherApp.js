@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import WeatherListComponent from './WeatherListComponent';
+import WeatherCurrentComponent from './WeatherCurrentComponent';
 
 class WeatherApp extends Component{
     render() {
-        return  <WeatherListComponent/>
+        return  <WeatherCurrentComponent/>
     }
 }
 export default WeatherApp
