@@ -49,6 +49,15 @@ class WeatherForecastModel implements Mappable {
         Double wind_deg
         ArrayList<Weather> weather
         Double pop
+        Rain rain
+        Snow snow
+
+        static class Rain{
+            Double _1h
+        }
+        static class Snow{
+            Double _1h
+        }
     }
 
     static class Daily{
@@ -66,6 +75,8 @@ class WeatherForecastModel implements Mappable {
         Integer clouds
         Double pop
         Double uvi
+        Double rain
+        Double snow
 
         static class Feels_Like{
             Double day

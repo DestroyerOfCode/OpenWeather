@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import WeatherCurrentService from '../service/WeatherCurrentService';
 import Pagination from './Pagination';
 import FiltersComponent from './FiltersComponent'
+import WeatherForecastService from '../service/WeatherForecastService.js';
+import WeatherForecastComponent from './WeatherForecastComponent.js'
+import { Redirect } from 'react-router';
+import { Link } from "react-router-dom";
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -192,7 +196,13 @@ class WeatherListComponent extends Component {
         return weather.weather.reduce(weatherItemReduce, '')
     }
 
-
+createForecast = ()=>{
+    console.log("dfs")
+    return (
+        <div>
+        <Link  to={{pathname: '/WeatherForecastComponent'}}>NavigateNow</Link>
+        </div>
+       );}
 
    mainBody(currentPosts){
     return (
@@ -203,7 +213,7 @@ class WeatherListComponent extends Component {
                 weather =>{
                     return (<tr key={weather._id}>
                         <td>{weather._id}</td>
-                        <td>{weather.name}</td>
+                        <td onClick={() => this.createForecast()}>{weather.name}</td>
                         <td>{weather.coord.lat}</td>
                         <td>{weather.coord.lon}</td>
                         <td>{weather.sys.country}</td>

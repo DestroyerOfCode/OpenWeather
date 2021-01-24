@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.ResourceAccessException;
 
 @Service
-
 class WeatherService {
 
     @Autowired WeatherInternalLogic weatherInternalLogic

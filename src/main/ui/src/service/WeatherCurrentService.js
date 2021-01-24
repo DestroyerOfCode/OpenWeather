@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const COURSE_API_URL = 'http://localhost:8080'
-const WEATHER_API_URL = `${COURSE_API_URL}/weather/current`
+const WEATHER_CURRENT_API_URL = `${COURSE_API_URL}/weather/current`
 
 class WeatherService {
 
@@ -13,7 +13,7 @@ class WeatherService {
             sortBy, isAscending, filterString, isFilter, isAdditionalFilter
         }
             console.log(JSON.stringify(filters))
-        return axios.post(`${WEATHER_API_URL}/retrieve/fromDb`, weathers,{params});
+        return axios.post(`${WEATHER_CURRENT_API_URL}/retrieve/fromDb`, weathers,{params});
     }
 
     buildFilterString(filters){
@@ -27,11 +27,11 @@ class WeatherService {
         return filterString
     }
 
-    retrieveAllCountries = () =>  axios.get(`${WEATHER_API_URL}/countries`)
-    retrieveAllDescriptions = () => axios.get(`${WEATHER_API_URL}/descriptions`)
+    retrieveAllCountries = () =>  axios.get(`${WEATHER_CURRENT_API_URL}/countries`)
+    retrieveAllDescriptions = () => axios.get(`${WEATHER_CURRENT_API_URL}/descriptions`)
         // console.log("countries: " + JSON.stringify(countries))
         // return countries
-    
+
 
 }
 export default new WeatherService()
