@@ -9,6 +9,7 @@ import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.forecast.WeatherForecastModel
 import org.marius.projekt.weather.service.forecast.WeatherForecastService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -27,6 +28,7 @@ class WeatherForecastController {
 
     @Autowired WeatherForecastService weatherForecastService
 
+    @Cacheable(value = "daily")
     @CompileStatic
     @RequestMapping(method = RequestMethod.GET, value = "/daily")
     @ResponseBody

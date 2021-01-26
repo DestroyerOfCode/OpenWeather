@@ -6,6 +6,7 @@ import WeatherForecastService from '../service/WeatherForecastService.js';
 import WeatherForecastComponent from './WeatherForecastComponent.js'
 import { Redirect } from 'react-router';
 import { Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -199,10 +200,9 @@ class WeatherListComponent extends Component {
 createForecast = ()=>{
     console.log("dfs")
     return (
-        <div>
-        <Link  to={{pathname: '/WeatherForecastComponent'}}>NavigateNow</Link>
-        </div>
-       );}
+        <Link  to= '/forecast'></Link>
+    );
+}
 
    mainBody(currentPosts){
     return (
@@ -213,7 +213,7 @@ createForecast = ()=>{
                 weather =>{
                     return (<tr key={weather._id}>
                         <td>{weather._id}</td>
-                        <td onClick={() => this.createForecast()}>{weather.name}</td>
+                        <td> <Link to={{pathname: "/forecast", state: {"lat": weather.coord.lat, "lon": weather.coord.lon} }}>{weather.name}</Link></td>
                         <td>{weather.coord.lat}</td>
                         <td>{weather.coord.lon}</td>
                         <td>{weather.sys.country}</td>

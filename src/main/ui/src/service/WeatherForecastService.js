@@ -1,18 +1,29 @@
 import axios from 'axios'
+import React, { Component } from 'react'
+
 const COURSE_API_URL = 'http://localhost:8080'
 
-const WEATHER_FORECAST_API_URL = `${COURSE_API_URL}/weather/foreacast`
+const WEATHER_FORECAST_API_URL = `${COURSE_API_URL}/weather/forecast`
 
-function WeatherForecastService(props){
+class WeatherForecastService{
+    
+     getDailyForecastByCityName = async (lat, lon, excludedForecasts) => {
 
-    return 
-}
-const getDailyForecastByCityName = (lat, lon, excludedWeathers) => {
+        console.log("som v forecast")
+        const coordinates = `{"lat":${lat},"lon":${lon}}`
 
-    console.log("som v forecast")
-    const params = {
-        lat, lon, excludedWeathers
+        const params = {
+            coordinates, "excludedForecasts" : excludedForecasts
+        }
+        console.log("Forecast params: " + JSON.stringify(params))
+        console.log(`${WEATHER_FORECAST_API_URL}/daily`)
+        var res = (await axios.get(`${WEATHER_FORECAST_API_URL}/daily`, {params}))
+        console.log("res service: " + JSON.stringify(res))
+        return res
+
     }
-    return axios.get(`${WEATHER_FORECAST_API_URL}/daily`, params)
+    
 }
-export default WeatherForecastService
+
+
+export default new WeatherForecastService()

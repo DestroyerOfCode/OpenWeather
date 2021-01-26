@@ -51,7 +51,7 @@ const isNumber = (item) => {
 
 // this closure's purpose is to create strings to be sent to query params, as no 
 // other way to send arrays exists
-function makeStringFromSelectedItems (items) {
+const makeStringFromSelectedItems= (items) => {
     var selectedItemsIntoString = (prevVal, currVal, idx) => {
         return idx === 0 ? currVal.name : prevVal + "," + currVal.name
     }
