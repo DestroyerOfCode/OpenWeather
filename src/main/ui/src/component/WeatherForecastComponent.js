@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from "react";
 import WeatherForecastService from '../service/WeatherForecastService';
-import {getWeatherDescription, convertTemperature} from '../businessLogic/WeatherBusinessLogic';
-import Dropdown from 'react-bootstrap/Dropdown'
+import {getWeatherDescription, displayDateTime, convertTemperature} from '../businessLogic/WeatherBusinessLogic';
+import {temperatureDropdownList} from '../buildingBlocks/commonBuildingBlocks.js'
 
  function WeatherForecastComponent(props){
 
@@ -9,44 +9,31 @@ import Dropdown from 'react-bootstrap/Dropdown'
     console.log("props: " + JSON.stringify(props.history.location.state))
 
     const [dailyWeatherForecast, setDailyWeatherForecast] = useState({} )
-    const [temperatureUnits, setTemperatureUnits] = useState("")
+    const [temperature, setTemperature] = useState({units : "celsius", abbreviation : "°C"})
     
     useEffect(() =>{
        
-            console.log("som v useEffect forecast component")
-           console.log("func: " )
-           WeatherForecastService.getDailyForecastByCityName(props.history.location.state.lat,props.history.location.state.lon, "Current,Hourly,Minutely").
-           then( response => setDailyWeatherForecast(response.data)) 
-        //    console.log("res: " + JSON.stringify(res))
-        //    setDailyWeatherForecast(res);
-         }, [props.history.location.state.lat, props.history.location.state.lon])
+        console.log("som v useEffect forecast component")
+        WeatherForecastService.getDailyForecastByCityName(props.history.location.state.lat,props.history.location.state.lon, "Current,Hourly,Minutely").
+        then( response => setDailyWeatherForecast(response.data)) 
+        }, [props.history.location.state.lat, props.history.location.state.lon])
 
-    // setDailyWeatherForecast(getDailyWeatherForecast(props.history.location.state.lat, props.history.location.state.lon).data)
-    console.log("dailyWeatherForecast: " + JSON.stringify(dailyWeatherForecast))
     return (
     <div>
-
         <tbody>
-        <Dropdown>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-            Temperature units converter
-            </Dropdown.Toggle>
+            {temperatureDropdownList( (units, abbreviation ) => {
+                setTemperature({"units" : units, "abbreviation" : abbreviation})})
+                }
 
-            <Dropdown.Menu>
-                <Dropdown.Item onClick={() => convertTemperature("kelvin", "celsius")}>Kelvin</Dropdown.Item>
-                <Dropdown.Item onClick={() => convertTemperature("kelvin", "celsius")}>Cslsius</Dropdown.Item>
-                <Dropdown.Item onClick={() => convertTemperature("kelvin", "celsius")}>Fahrenheit</Dropdown.Item>
-            </Dropdown.Menu>
-        </Dropdown>
             <table className="table">
                 {createHeader.call()}
-                {createMainBody(dailyWeatherForecast)}
+                {createMainBody(dailyWeatherForecast,  temperature)}
             </table>
         </tbody>
     </div>)
 }
 
-const createMainBody = (dailyWeatherForecast) => {
+const createMainBody = (dailyWeatherForecast, temperature) => {
     return (
         dailyWeatherForecast?.daily?.map(dailyWeather =>{
             return( 
@@ -54,16 +41,16 @@ const createMainBody = (dailyWeatherForecast) => {
                     <td>{displayDateTime(new Date(dailyWeather.dt * 1000))}</td>
                     <td>{displayDateTime(new Date(dailyWeather.sunrise * 1000))}</td>
                     <td>{displayDateTime(new Date(dailyWeather.sunset * 1000))}</td>
-                    <td>{dailyWeather.temp.day}</td>
-                    <td>{dailyWeather.temp.min}</td>
-                    <td>{dailyWeather.temp.max}</td>
-                    <td>{dailyWeather.temp.night}</td>
-                    <td>{dailyWeather.temp.eve}</td>
-                    <td>{dailyWeather.temp.morn}</td>
-                    <td>{dailyWeather.feels_like.day}</td>
-                    <td>{dailyWeather.feels_like.night}</td>
-                    <td>{dailyWeather.feels_like.eve}</td>
-                    <td>{dailyWeather.feels_like.morn}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.temp.day).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.temp.min).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.temp.max).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.temp.night).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.temp.eve).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.temp.morn).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.day).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.night).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.eve).toFixed(2)}${temperature.abbreviation}`}</td>
+                    <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.morn).toFixed(2)}${temperature.abbreviation}`}</td>
                     <td>{dailyWeather.dew_point}</td>
                     <td>{dailyWeather.wind_speed}</td>
                     <td>{dailyWeather.wind_deg}</td>
@@ -79,10 +66,6 @@ const createMainBody = (dailyWeatherForecast) => {
                 </tr>)
         })
     )
-}
-
-const displayDateTime = (dateTime) => {
-    return dateTime.toLocaleString("sk-SK")
 }
 
 const createHeader = () => {

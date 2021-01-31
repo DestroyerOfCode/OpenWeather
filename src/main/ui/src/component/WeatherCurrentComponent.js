@@ -2,11 +2,9 @@ import React, { Component } from 'react'
 import WeatherCurrentService from '../service/WeatherCurrentService';
 import Pagination from './Pagination';
 import FiltersComponent from './FiltersComponent'
-import WeatherForecastService from '../service/WeatherForecastService.js';
-import WeatherForecastComponent from './WeatherForecastComponent.js'
-import { Redirect } from 'react-router';
 import { Link } from "react-router-dom";
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {getWeatherDescription, displayDateTime, convertTemperature} from '../businessLogic/WeatherBusinessLogic';
+import {temperatureDropdownList} from '../buildingBlocks/commonBuildingBlocks'
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -22,7 +20,8 @@ class WeatherListComponent extends Component {
             isAdditionalFilter : false,
             pageNumbers : [],
             countries : [],
-            descriptions: []
+            descriptions: [],
+            temperature: {units: 'celsius', abbreviation: '°C'},            
         }
     }
 
@@ -204,7 +203,7 @@ createForecast = ()=>{
     );
 }
 
-   mainBody(currentPosts){
+   mainBody(currentPosts, temperature){
     return (
 
     <tbody>
@@ -218,10 +217,10 @@ createForecast = ()=>{
                         <td>{weather.coord.lon}</td>
                         <td>{weather.sys.country}</td>
                         <td>{weather.weatherMain.humidity}</td>
-                        <td>{weather.weatherMain.feels_like}</td>
-                        <td>{weather.weatherMain.temp}</td>
-                        <td>{weather.weatherMain.temp_max}</td>
-                        <td>{weather.weatherMain.temp_min}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.feels_like).toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp).toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_max).toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_min).toFixed(2)}${temperature.abbreviation}`}</td>
                         <td>{this.getWeatherDescription(weather)}</td>
                     </tr>)}
             )
@@ -251,12 +250,15 @@ createForecast = ()=>{
 
         const currentWeathers = this.getWeathersOnSpecificPage()
         const filters = <FiltersComponent countries = {this.state.countries} descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
-        let container= [filters, pagination]
+        const temperatureDropdown = temperatureDropdownList( (units, abbreviation ) => {
+            this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})})
+
+        let container= [temperatureDropdown, filters, pagination]
 
         if (this.state.weathers)
             container.push(<table className="table">
                 {this.header()}
-                {this.mainBody(currentWeathers)}
+                {this.mainBody(currentWeathers, this.state.temperature)}
             </table>)
 
         return (
