@@ -1,8 +1,8 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom'
-import WeatherCurrentComponent from './WeatherCurrentComponent';
+import WeatherCurrentComponent from './current/WeatherCurrent';
 
-import WeatherForecastComponent from './WeatherForecastComponent';
+import WeatherForecastComponent from './forecast/daily/WeatherForecast';
 
 const WeatherApp = () =>(
     <main>    

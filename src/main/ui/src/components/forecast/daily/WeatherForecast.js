@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from "react";
-import WeatherForecastService from '../service/WeatherForecastService';
-import {getWeatherDescription, displayDateTime, convertTemperature} from '../businessLogic/WeatherBusinessLogic';
-import {temperatureDropdownList} from '../buildingBlocks/commonBuildingBlocks.js'
+import WeatherForecastService from '../../../adapters/WeatherForecastService';
+import {getWeatherDescription, displayDateTime, convertTemperature} from '../../../businessLogic/WeatherBusinessLogic';
+import {temperatureDropdownList} from '../../../buildingBlocks/commonBuildingBlocks.js'
 
  function WeatherForecastComponent(props){
 

@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import WeatherCurrentService from '../service/WeatherCurrentService';
+import WeatherCurrentService from '../../adapters/WeatherCurrentService';
 import Pagination from './Pagination';
-import FiltersComponent from './FiltersComponent'
+import FiltersComponent from './Filters'
 import { Link } from "react-router-dom";
-import {getWeatherDescription, displayDateTime, convertTemperature} from '../businessLogic/WeatherBusinessLogic';
-import {temperatureDropdownList} from '../buildingBlocks/commonBuildingBlocks'
+import {getWeatherDescription, convertTemperature} from '../../businessLogic/WeatherBusinessLogic';
+import {temperatureDropdownList} from '../../buildingBlocks/commonBuildingBlocks'
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -29,7 +29,7 @@ class WeatherListComponent extends Component {
         console.log("som v componentDidMOunt weather list")
         const countries = await WeatherCurrentService.retrieveAllCountries()
         const descriptions = await WeatherCurrentService.retrieveAllDescriptions()
-        this.setState({countries : countries.data, descriptions : descriptions.data}, function() {this.refreshWeathers();})
+        this.setState({countries : countries.data, descriptions : descriptions.data}, function() {this.refreshWeathers()})
         
     }
 
@@ -106,7 +106,7 @@ class WeatherListComponent extends Component {
         // console.log("event: " + JSON.stringify(event))
         // console.log("filters: " + JSON.stringify(this.state.filters))
         var index;
-        
+
         if (event === "" && this.keyExistsInArr(this.state.filters,filterName))  {
             console.log("inside 1")
 
@@ -188,15 +188,6 @@ class WeatherListComponent extends Component {
    </thead>)
    }
 
-   // descriptions can be multiple per row, to display it I changed its elements to string delimetered by ','
-    getWeatherDescription = (weather) => {
-        var weatherItemReduce = (prevVal, currVal, idx) => {
-            return idx === 0 ? currVal.description : prevVal + ", " + currVal.description;
-        }
-
-        return weather.weather.reduce(weatherItemReduce, '')
-    }
-
 createForecast = ()=>{
     console.log("dfs")
     return (
@@ -222,7 +213,7 @@ createForecast = ()=>{
                         <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp).toFixed(2)}${temperature.abbreviation}`}</td>
                         <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_max).toFixed(2)}${temperature.abbreviation}`}</td>
                         <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_min).toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{this.getWeatherDescription(weather)}</td>
+                        <td>{getWeatherDescription(weather)}</td>
                     </tr>)}
             )
         }
@@ -250,7 +241,7 @@ createForecast = ()=>{
         const pagination = <Pagination itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate.bind()}/>
 
         const currentWeathers = this.getWeathersOnSpecificPage()
-        const filters = <FiltersComponent countries = {this.state.countries} descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
+        const filters = <FiltersComponent temperatureUnits = {this.state.temperature.units} countries = {this.state.countries} descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
         const temperatureDropdown = temperatureDropdownList( (units, abbreviation ) => {
             this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})})
 

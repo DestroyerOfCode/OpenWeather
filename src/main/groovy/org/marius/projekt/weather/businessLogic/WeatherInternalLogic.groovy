@@ -192,7 +192,6 @@ class WeatherInternalLogic {
 
     }
 
-
     //It must be changed to a Number otherwise I would be comparing strings and it works improperly wit decimal because it takes length of string into account
     def isStringNumber = { filterValue, filterOperator -> filterValue instanceof String && filterValue.isNumber() && filterOperator != "eq"  }
 
