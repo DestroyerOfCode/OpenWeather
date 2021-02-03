@@ -14,8 +14,8 @@ import {temperatureDropdownList} from '../buildingBlocks/commonBuildingBlocks.js
     useEffect(() =>{
        
         console.log("som v useEffect forecast component")
-        WeatherForecastService.getDailyForecastByCityName(props.history.location.state.lat,props.history.location.state.lon, "Current,Hourly,Minutely").
-        then( response => setDailyWeatherForecast(response.data)) 
+        WeatherForecastService.getDailyForecastByCityName(props.history.location.state.lat,props.history.location.state.lon, "Current,Hourly,Minutely")
+        .then( response => setDailyWeatherForecast(response.data)) 
         }, [props.history.location.state.lat, props.history.location.state.lon])
 
     return (

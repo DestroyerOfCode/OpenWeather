@@ -105,11 +105,12 @@ class WeatherListComponent extends Component {
     onChangeFilter = (event, filterName, filterOperator) => {
         // console.log("event: " + JSON.stringify(event))
         // console.log("filters: " + JSON.stringify(this.state.filters))
-
+        var index;
+        
         if (event === "" && this.keyExistsInArr(this.state.filters,filterName))  {
             console.log("inside 1")
 
-            var index = this.findIndexInFilters(this.state.filters, filterName)
+            index = this.findIndexInFilters(this.state.filters, filterName)
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : false, filters : this.changeFilters(index, filterName, filterOperator)}, function () {
                 this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
@@ -129,7 +130,7 @@ class WeatherListComponent extends Component {
         else if (event !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
            
             console.log("inside 3")
-            var index = this.findIndexInFilters(this.state.filters, filterName)
+            index = this.findIndexInFilters(this.state.filters, filterName)
 
             
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : this.isAdditionalFilterCheck(event, index, filterName, filterOperator), 

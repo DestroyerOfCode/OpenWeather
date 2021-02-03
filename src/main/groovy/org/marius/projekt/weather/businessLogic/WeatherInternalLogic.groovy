@@ -102,7 +102,6 @@ class WeatherInternalLogic {
         }
     }
 
-
     void findIndicesOfArrayFilters(ArrayList indicesOfArrayFilters, ArrayList<Map> filterList){
         filterList.eachWithIndex { it, index ->
 
@@ -164,15 +163,16 @@ class WeatherInternalLogic {
         weathers
     }
     @CompileStatic
-    static Object buildCompareParam(Object paramToChange, String[] path){
+    private static Object buildCompareParam(Object paramToChange, String[] path){
         paramToChange = path.inject(paramToChange){ weather, String p -> weather?.getAt(p) }
         if (paramToChange instanceof String && paramToChange.isNumber()) return new Double(paramToChange)
         else if (paramToChange instanceof Collection) return paramToChange.join(', ')
         return paramToChange
     }
 
-    def getCorrectFilterOperator( filterOperator) {
-        filterOperator == 'in' ? 'contains' : filterOperator
+    @CompileStatic
+    private static String getCorrectFilterOperator(String filterOperator) {
+        return filterOperator == 'in' ? 'contains' : filterOperator
     }
 
     def buildAggregationQuery(def filterList){
@@ -191,6 +191,7 @@ class WeatherInternalLogic {
         ]) as List
 
     }
+
 
     //It must be changed to a Number otherwise I would be comparing strings and it works improperly wit decimal because it takes length of string into account
     def isStringNumber = { filterValue, filterOperator -> filterValue instanceof String && filterValue.isNumber() && filterOperator != "eq"  }

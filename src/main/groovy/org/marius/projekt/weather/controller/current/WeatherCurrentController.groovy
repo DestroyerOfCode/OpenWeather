@@ -60,13 +60,24 @@ class WeatherCurrentController {
     @ResponseBody
     def getWeatherCurrent(@RequestBody(required = false) ArrayList<WeatherCurrentModel> weathers,
                              @RequestParam(required = false) Map<String, Object> opts, @PathVariable(required = false, value = "cityId") String cityId) {
+        long startT = System.nanoTime();
 
         weathers = weatherService.getWeatherCurrentService(opts, weathers, cityId )
+//Code you want to measure
+        long endT = System.nanoTime();
+
+        long executionTime = (endT - startT);
+        writeToFile(executionTime)
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 
+    private static void writeToFile(def executionTime){
+        BufferedWriter writer = new BufferedWriter(new FileWriter("file.txt", true));
+        writer.append((executionTime/1_000_000).toString() + "\n");
+        writer.close()
+    }
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @ResponseBody
     def saveAllWeatherCurrentData() {

@@ -1,10 +1,13 @@
 package weather.current
 
 import groovy.json.JsonBuilder
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.runner.RunWith
 import org.marius.projekt.Main
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
@@ -29,15 +32,19 @@ class WeatherCurrent {
 
     private List<WeatherCurrentModel> weathers
 
+    @BeforeEach
+    void initWeathersAfterTest() {
+        weathers = (ArrayList<WeatherCurrentModel>) weatherCurrentModelRepository.findAll()
+    }
     @Before
     void initWeathers() {
         weathers = (ArrayList<WeatherCurrentModel>) weatherCurrentModelRepository.findAll()
     }
 
-    @AfterEach
-    void clearWeather() {
-        weathers.clear()
-    }
+//    @After
+//    void clearWeather() {
+//        weathers.clear()
+//    }
 
     static Boolean isSortedAscending(list) {
         list.size() < 2 || (1..<list.size()).every { list[it - 1] <= list[it] }
@@ -101,12 +108,13 @@ class WeatherCurrent {
     }
 
     @Test
+//    @RepeatedTest(103)
     @DisplayName("Filter with multiple variables without sorting")
     void filterWeatherDataWithCountryWithoutSort() {
         def countryFilterNode = Map.of("sys.country", Map.of("in", "SA"))
         def latFilterNode = Map.of("coord.lat", Map.of("gte", "25", "lte", "55"))
         def resultFilterNode = (new JsonBuilder(countryFilterNode).toString() + "," + new JsonBuilder(latFilterNode).toString())
-        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true)
+        Map<String, Object> opts = Map.of("filterString", resultFilterNode, "isFilter", true,'isAdditionalFilter', false)
 
         given().auth().none().contentType("application/json").queryParams(opts).
             body(weathers).when().post("/weather/current/retrieve/fromDb").then().and().statusCode(200).and().body("coord.any{ it.lat < 55 && it.lat > 25}", not(false))

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import React, { Component } from 'react'
 
 const COURSE_API_URL = 'http://localhost:8080'
 
