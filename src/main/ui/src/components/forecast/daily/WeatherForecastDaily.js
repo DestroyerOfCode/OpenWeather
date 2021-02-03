@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react";
 import WeatherForecastService from '../../../adapters/WeatherForecastService';
 import {getWeatherDescription, displayDateTime, convertTemperature} from '../../../businessLogic/WeatherBusinessLogic';
 import {temperatureDropdownList} from '../../../buildingBlocks/commonBuildingBlocks.js'
-
+import {getWeatherMain, getWeatherId, getWeatherIcon} from '../../../businessLogic/forecast/WeatherForecastLogic'
  function WeatherForecastComponent(props){
 
     console.log("som vo forecast component")
@@ -54,10 +54,10 @@ const createMainBody = (dailyWeatherForecast, temperature) => {
                     <td>{dailyWeather.dew_point}</td>
                     <td>{dailyWeather.wind_speed}</td>
                     <td>{dailyWeather.wind_deg}</td>
-                    <td>{dailyWeather.weather[0].icon}</td>
-                    <td>{dailyWeather.weather[0].id}</td>
+                    <td>{getWeatherMain(dailyWeather)}</td>
+                    <td>{getWeatherId(dailyWeather)}</td>
                     <td>{getWeatherDescription(dailyWeather)}</td>
-                    <td>{dailyWeather.weather[0].main}</td>
+                    <td>{getWeatherIcon(dailyWeather)}</td>
                     <td>{dailyWeather.clouds}</td>
                     <td>{dailyWeather.pop}</td>
                     <td>{dailyWeather.uvi}</td>

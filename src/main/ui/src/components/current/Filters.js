@@ -42,6 +42,8 @@ function FiltersComponent(props) {
         </div>)
 }
 
+// In db values are in kelvin. The user can change it on the UI.
+// I must convert to same units
 const calculateKelvins = (temperatureUnits, temperatureValue) => {
     if(temperatureValue === "")
         return ""
