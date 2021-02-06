@@ -21,14 +21,17 @@ import {getWeatherMain, getWeatherId, getWeatherIcon} from '../../../businessLog
     return (
     <div>
         <tbody>
-            {temperatureDropdownList( (units, abbreviation ) => {
-                setTemperature({"units" : units, "abbreviation" : abbreviation})})
-                }
-
-            <table className="table">
-                {createHeader.call()}
-                {createMainBody(dailyWeatherForecast,  temperature)}
-            </table>
+            <div>
+                {temperatureDropdownList( (units, abbreviation ) => {
+                    setTemperature({"units" : units, "abbreviation" : abbreviation})})
+                    }
+            </div>
+            <div>
+                <table className="table">
+                    {createHeader.call()}
+                    {createMainBody(dailyWeatherForecast,  temperature)}
+                </table>
+            </div>
         </tbody>
     </div>)
 }
@@ -38,7 +41,6 @@ const createMainBody = (dailyWeatherForecast, temperature) => {
         dailyWeatherForecast?.daily?.map(dailyWeather =>{
             return( 
                 <tr key ={ dailyWeather.dt}>
-                    <td>{displayDateTime(new Date(dailyWeather.dt * 1000))}</td>
                     <td>{displayDateTime(new Date(dailyWeather.sunrise * 1000))}</td>
                     <td>{displayDateTime(new Date(dailyWeather.sunset * 1000))}</td>
                     <td>{`${convertTemperature(temperature.units, dailyWeather.temp.day).toFixed(2)}${temperature.abbreviation}`}</td>
@@ -51,18 +53,9 @@ const createMainBody = (dailyWeatherForecast, temperature) => {
                     <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.night).toFixed(2)}${temperature.abbreviation}`}</td>
                     <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.eve).toFixed(2)}${temperature.abbreviation}`}</td>
                     <td>{`${convertTemperature(temperature.units, dailyWeather.feels_like.morn).toFixed(2)}${temperature.abbreviation}`}</td>
-                    <td>{dailyWeather.dew_point}</td>
                     <td>{dailyWeather.wind_speed}</td>
                     <td>{dailyWeather.wind_deg}</td>
-                    <td>{getWeatherMain(dailyWeather)}</td>
-                    <td>{getWeatherId(dailyWeather)}</td>
                     <td>{getWeatherDescription(dailyWeather)}</td>
-                    <td>{getWeatherIcon(dailyWeather)}</td>
-                    <td>{dailyWeather.clouds}</td>
-                    <td>{dailyWeather.pop}</td>
-                    <td>{dailyWeather.uvi}</td>
-                    <td>{dailyWeather.rain}</td>
-                    <td>{dailyWeather.snow}</td>
                 </tr>)
         })
     )
@@ -72,7 +65,6 @@ const createHeader = () => {
     return ( 
     <thead>
         <tr>
-            <th>dt</th>
             <th>sunrise</th>
             <th>sunset</th>
             <th>temp</th>
@@ -85,18 +77,9 @@ const createHeader = () => {
             <th>feels like night</th>
             <th>feels like evening</th>
             <th>feels like morning</th>
-            <th>dew point</th>
             <th>wind speed</th>
             <th>wind deg</th>
-            <th>icon</th>
-            <th>id</th>
             <th>description</th>
-            <th>main</th>
-            <th>clouds</th>
-            <th>pop</th>
-            <th>uvi</th>
-            <th>rain</th>
-            <th>snow</th>
         </tr>
     </thead>)
 }

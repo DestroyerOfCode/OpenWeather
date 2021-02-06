@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Multiselect } from 'multiselect-react-dropdown';
-import {convertTemperature} from '../../businessLogic/WeatherBusinessLogic'
+import '../../styles/current/Filters.scss'
 function FiltersComponent(props) {
    
     //TODO find out how to call setMethod in buildFilter function
@@ -18,28 +18,32 @@ function FiltersComponent(props) {
     }
 
     return (
-        <div className="row">
-            {<input placeholder= "Id" onChange= {event => {buildFilter(event.target.value, "_id", "eq")}}></input>}
-            {<textarea placeholder= "City name" onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}></textarea>}
-            {<Multiselect options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "sys.country", "in")}}
-            onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "sys.country", "in")}}/>}
-            {<textarea placeholder= "Latitude smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "lte")}}></textarea>}
-            {<textarea placeholder= "Latitude bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "gte")}}></textarea>}
-            {<textarea placeholder= "Longitude smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "lte")}}></textarea>}
-            {<textarea placeholder= "Longitude bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "gte")}}></textarea>}
-            {<textarea placeholder= "Humidity smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></textarea>}
-            {<textarea placeholder= "Humidity bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></textarea>}
-            {<textarea placeholder= "Feel temperature smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "lte")}}></textarea>}
-            {<textarea placeholder= "Feel temperature bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "gte")}}></textarea>}
-            {<textarea placeholder= "Temperature smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "lte")}}></textarea>}
-            {<textarea placeholder= "Temperature bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "gte")}}></textarea>}
-            {<textarea placeholder= "Temperature max smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "lte")}}></textarea>}
-            {<textarea placeholder= "Temperature max bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "gte")}}></textarea>}
-            {<textarea placeholder= "Temperature min smaller than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "lte")}}></textarea>}
-            {<textarea placeholder= "Temperature min bigger than" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "gte")}}></textarea>}
-            {<Multiselect options ={props.descriptions} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}
-            onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
-        </div>)
+        <form class="currentFiltersWrappes">
+
+                {/* <p>Latitude</p> */}
+                {<input placeholder= "City" onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}></input>}
+
+                {<input placeholder= "Latitude from" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "gte")}}></input>}
+                {<input placeholder= "Latitude to" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "lte")}}></input>}
+                {<input placeholder= "Longitude from" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "gte")}}></input>}
+                {<input placeholder= "Longitude to" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "lte")}}></input>}
+                {<input placeholder= "Humidity from" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></input>}
+                {<input placeholder= "Humidity to" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></input>}
+                {<input placeholder= "Feel temperature from" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "gte")}}></input>}
+                {<input placeholder= "Feel temperature to" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "lte")}}></input>}
+                {<input placeholder= "Temperature from"  onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "gte")}}></input>}
+                {<input placeholder= "Temperature to"  onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "lte")}}></input>}
+                {<input placeholder= "Temperature max from" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "gte")}}></input>}
+                {<input placeholder= "Temperature max to" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "lte")}}></input>}
+                {<input placeholder= "Temperature min from" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "gte")}}></input>}
+                {<input placeholder= "Temperature min to" onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "lte")}}></input>}
+                <br></br>
+                {<Multiselect placeholder="Pick Descriptions" options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}
+                onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
+                    {<Multiselect placeholder="Pick Countries" options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "sys.country", "in")}}
+                onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "sys.country", "in")}}/>}
+        </form>
+        )
 }
 
 // In db values are in kelvin. The user can change it on the UI.

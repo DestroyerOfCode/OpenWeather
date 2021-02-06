@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import WeatherCurrentService from '../../adapters/WeatherCurrentService';
-import Pagination from './Pagination';
+import Pagination from '../current/Pagination'
 import FiltersComponent from './Filters'
 import { Link } from "react-router-dom";
 import {getWeatherDescription, convertTemperature} from '../../businessLogic/WeatherBusinessLogic';
 import {temperatureDropdownList} from '../../buildingBlocks/commonBuildingBlocks'
+import '../../styles/common/Header.scss';
+import '../../styles/current/Filters.scss'
 
 class WeatherListComponent extends Component {
     constructor(props) {
@@ -21,6 +23,7 @@ class WeatherListComponent extends Component {
             pageNumbers : [],
             countries : [],
             descriptions: [],
+            showPages: 5,
             temperature: {units: 'celsius', abbreviation: '°C'},            
         }
     }
@@ -171,7 +174,7 @@ class WeatherListComponent extends Component {
        return filterName === this.state.filters[index][filterName]
     }
     header(){
-       return (<thead>
+       return (<thead className="header">
        <tr>
            <th onClick={() =>this.refreshWeathers("_id", this.state.weathers) }>cityId</th>
            <th onClick={() =>this.refreshWeathers("name", this.state.weathers) }>city Name</th>
@@ -221,8 +224,9 @@ createForecast = ()=>{
     )
    }
 
-    paginate = (currentPage) => {
-       this.setState({currentPage : currentPage}, function(){
+    paginate = (page) => {
+        // if(currentPage !== 0 && currentPage <= lastPage)
+       this.setState({currentPage : page}, function(){
            console.log("currPage: " + this.state.currentPage)
        })
 
@@ -238,20 +242,26 @@ createForecast = ()=>{
     render() {
         console.log("som v render weather list")
 
-        const pagination = <Pagination itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate.bind()}/>
 
         const currentWeathers = this.getWeathersOnSpecificPage()
-        const filters = <FiltersComponent temperatureUnits = {this.state.temperature.units} countries = {this.state.countries} descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
+        const filters = <FiltersComponent temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
+        descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
+
+        const pagination = <Pagination currentPage={this.state.currentPage} showPages={this.state.showPages}
+        itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate}/>
+
         const temperatureDropdown = temperatureDropdownList( (units, abbreviation ) => {
-            this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})})
+            this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
+        })
 
         let container= [temperatureDropdown, filters, pagination]
 
         if (this.state.weathers)
-            container.push(<table className="table">
+            container.push(<table className="weatherTable">
                 {this.header()}
                 {this.mainBody(currentWeathers, this.state.temperature)}
-            </table>)
+            </table>
+            )
 
         return (
             <div className="container">
