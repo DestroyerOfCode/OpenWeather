@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from "react";
 import { Multiselect } from 'multiselect-react-dropdown';
 import '../../styles/current/Filters.scss'
+
 function FiltersComponent(props) {
    
     //TODO find out how to call setMethod in buildFilter function
@@ -18,7 +19,7 @@ function FiltersComponent(props) {
     }
 
     return (
-        <form class="currentFiltersWrappes">
+        <form className="currentFiltersWrappes">
 
                 {/* <p>Latitude</p> */}
                 {<input placeholder= "City" onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}></input>}

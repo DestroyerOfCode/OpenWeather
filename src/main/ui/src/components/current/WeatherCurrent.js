@@ -7,8 +7,9 @@ import {getWeatherDescription, convertTemperature} from '../../businessLogic/Wea
 import {temperatureDropdownList} from '../../buildingBlocks/commonBuildingBlocks'
 import '../../styles/common/Header.scss';
 import '../../styles/current/Filters.scss'
+import { nanoid } from "nanoid";
 
-class WeatherListComponent extends Component {
+class WeatherCurrent extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -205,7 +206,7 @@ createForecast = ()=>{
         {
             currentPosts.map(
                 weather =>{
-                    return (<tr key={weather._id}>
+                    return (<tr key={nanoid()}>
                         <td>{weather._id}</td>
                         <td> <Link to={{pathname: "/forecast", state: {"lat": weather.coord.lat, "lon": weather.coord.lon} }}>{weather.name}</Link></td>
                         <td>{weather.coord.lat}</td>
@@ -244,10 +245,10 @@ createForecast = ()=>{
 
 
         const currentWeathers = this.getWeathersOnSpecificPage()
-        const filters = <FiltersComponent temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
+        const filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
         descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
 
-        const pagination = <Pagination currentPage={this.state.currentPage} showPages={this.state.showPages}
+        const pagination = <Pagination key={nanoid()} currentPage={this.state.currentPage} showPages={this.state.showPages}
         itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate}/>
 
         const temperatureDropdown = temperatureDropdownList( (units, abbreviation ) => {
@@ -257,7 +258,7 @@ createForecast = ()=>{
         let container= [temperatureDropdown, filters, pagination]
 
         if (this.state.weathers)
-            container.push(<table className="weatherTable">
+            container.push(<table key={nanoid()} className="weatherTable">
                 {this.header()}
                 {this.mainBody(currentWeathers, this.state.temperature)}
             </table>
@@ -271,4 +272,4 @@ createForecast = ()=>{
          
     }
 }
-export default WeatherListComponent
+export default WeatherCurrent

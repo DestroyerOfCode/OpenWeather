@@ -1,8 +1,9 @@
 import Dropdown from 'react-bootstrap/Dropdown'
+import {nanoid} from 'nanoid'
 
 export const temperatureDropdownList =(changeTemperatureUnitsState) => {
     return (
-    <div className="temperatureDropdown">
+    <div key={nanoid()} className="temperatureDropdown">
         <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">Change Temperature Units</Dropdown.Toggle>
             <Dropdown.Menu>
