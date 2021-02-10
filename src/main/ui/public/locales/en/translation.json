@@ -1,0 +1,77 @@
+{
+    "common": {
+        "description": {
+            "broken clouds": "broken clouds",
+            "clear sky": "clear sky",
+            "few clouds": "few clouds",
+            "fog": "fog",
+            "haze": "haze",
+            "heavy intensity rain": "heavy intensity rain",
+            "heavy snow": "heavy snow",
+            "light intensity drizzle": "light intensity drizzle",
+            "light rain": "light rain",
+            "light rain and snow": "light rain and snow",
+            "light shower snow": "light shower snow",
+            "light snow": "light snow",
+            "mist": "mist",
+            "moderate rain": "moderate rain",
+            "overcast clouds": "overcast clouds",
+            "scattered clouds": "scattered clouds",
+            "smoke": "smoke",
+            "snow": "snow"
+        }
+    },
+    "current": {
+        "header": {
+            "cityName": "City Name",
+            "cityId": "City Id",
+            "latitude": "Latitude",
+            "longitude": "Longitude",
+            "country": "Country",
+            "humidity": "humidity",
+            "feelsLike": "Feels like",
+            "temperature": "Temperature",
+            "maximumTemperature": "Maximum temperature",
+            "minimalTemperature": "Minimal temperature",
+            "description": "Description"
+        },
+        "filters": {
+            "cityName": "city Name",
+            "latitudeFrom": "latitude From",
+            "latitudeTo": "Latitude To",
+            "longitudeFrom": "Longitude From",
+            "longitudeTo": "Longitude To",
+            "humidityFrom": "Humidity From",
+            "humidityTo": "Humidity to",
+            "feelTemperatureFrom": "Feel Temperature From",
+            "feelTemperatureTo": "Feel Temperature To",
+            "temperatureFrom": "Temperature From",
+            "temperatureTo": "Temperature To",
+            "temperatureMaxFrom": "Temperature Max From",
+            "temperatureMaxTo": "Temperature Max To",
+            "temperatureMinFrom": "Temperature Min From",
+            "temperatureMinTo": "Temperature Min To",
+            "pickDescriptions": "Pick Descriptions",
+            "pickCountries": "Pick Countries"
+        }
+    },
+    "forecast": {
+        "header": {
+            "sunrise": "Sunrise",
+            "sunset": "Sunset",
+            "temp": "temp",
+            "min": "Min",
+            "max": "Max",
+            "night": "Night",
+            "evening": "Evening",
+            "morning": "Morning",
+            "feelsLikeDay": "Feels like day",
+            "feelsLikeNight": "Feels like night",
+            "feelsLikeEvening": "Feels like evening",
+            "feelsLikeMorning": "Feels like morning",
+            "windSpeed": "Wind speed",
+            "windDeg": "Wind deg",
+            "description": "Description"
+        }
+    }
+}

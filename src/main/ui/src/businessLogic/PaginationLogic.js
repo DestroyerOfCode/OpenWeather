@@ -1,5 +1,7 @@
 import { nanoid } from "nanoid";
 
+//at this moment middle and last work for only 5 range
+//I dont know now how to fix it but it isnt so important now
 export const getFirstAndPrevious = (
   currentPage,
   lastPage,
@@ -8,7 +10,7 @@ export const getFirstAndPrevious = (
 ) => {
   pageArray.push(
     <li key={nanoid()} className="page-item">
-      <a
+      <a href="/#"
         onClick={() => {
           props.paginate(1, lastPage);
         }}
@@ -20,7 +22,7 @@ export const getFirstAndPrevious = (
   );
   pageArray.push(
     <li key={nanoid()} className="page-item">
-      <a
+      <a href="/#"
         onClick={() => {
           if (currentPage - 1 !== 0)
             return props.paginate(currentPage - 1, lastPage);
@@ -36,7 +38,7 @@ export const getFirstAndPrevious = (
 export const getLastAndNext = (currentPage, lastPage, pageArray, props) => {
   pageArray.push(
     <li key={nanoid()} className="page-item">
-      <a
+      <a href="/#"
         onClick={() => {
           if (currentPage !== lastPage) {
             props.paginate(currentPage + 1, lastPage);
@@ -51,7 +53,7 @@ export const getLastAndNext = (currentPage, lastPage, pageArray, props) => {
 
   pageArray.push(
     <li key={nanoid()} className="page-item">
-      <a
+      <a href="/#"
         onClick={() => {
           props.paginate(lastPage, lastPage);
         }}
@@ -66,18 +68,19 @@ export const getLastAndNext = (currentPage, lastPage, pageArray, props) => {
 export const getPageNumbers = (
   currentPage,
   lastPage,
-  showPages,
+  range,
   pageArray,
   props
 ) => {
   //only when there are more than 10 pages do I want dots
-  if (lastPage <= 10) getPagesWithFewerThan10Pages(lastPage, pageArray, props);
+  if (lastPage <= 10) 
+    getPagesWithFewerThan10Pages(lastPage, pageArray, props);
 
   //this is for when current page is in middle
   // 2 is for dots
-  else if (currentPage - showPages + 3 > 1 && currentPage + 2 < lastPage)
+  else if (currentPage - range + 3 > 1 && currentPage + 2 < lastPage)
     getPagesWhenCurrentIsInMiddle(
-      showPages,
+      range,
       currentPage,
       lastPage,
       pageArray,
@@ -85,9 +88,9 @@ export const getPageNumbers = (
     );
 
   //this is for when current page is in the beginning
-  else if (currentPage + showPages + 1 < lastPage && currentPage + 2 >= 1)
+  else if (currentPage + range + 1 < lastPage && currentPage + 2 >= 1)
     getPagesWhenCurrentIsInStart(
-      showPages,
+      range,
       currentPage,
       lastPage,
       pageArray,
@@ -95,9 +98,9 @@ export const getPageNumbers = (
     );
 
   //this is for when current page is in the end
-  else if (currentPage + showPages + 1 > 1 && currentPage + 2 >= lastPage)
+  else if (currentPage + range + 1 > 1 && currentPage + 2 >= lastPage)
     getPagesWhenCurrentIsInEnd(
-      showPages,
+      range,
       currentPage,
       lastPage,
       pageArray,
@@ -116,28 +119,16 @@ const getPagesWhenCurrentIsInStart = (
   pageArray,
   props
 ) => {
-  [...new Array(showPages).keys()].map((number, idx, elements) => {
-    console.log(
-      "3. showPages: " +
-        showPages +
-        " currentPage: " +
-        currentPage +
-        " lastPage: " +
-        lastPage +
-        " idx: " +
-        idx +
-        " number: " +
-        number
-    );
+  [...new Array(showPages).keys()].forEach((number, idx) => {
     if (idx === showPages - 1) {
       pageArray.push(
         <li key={nanoid()} className="disabled">
-          <a className="page-link">{"..."}</a>
+          <a href="/#" className="page-link">{"..."}</a>
         </li>
       );
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(lastPage);
             }}
@@ -152,7 +143,7 @@ const getPagesWhenCurrentIsInStart = (
     if (currentPage + 1 < 1) {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(2);
             }}
@@ -167,7 +158,7 @@ const getPagesWhenCurrentIsInStart = (
     if (currentPage < 1) {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(1);
             }}
@@ -181,7 +172,7 @@ const getPagesWhenCurrentIsInStart = (
     } else {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(number + 1);
             }}
@@ -202,23 +193,11 @@ const getPagesWhenCurrentIsInMiddle = (
   pageArray,
   props
 ) => {
-  [...new Array(showPages).keys()].map((number, idx, elements) => {
-    console.log(
-      "1. showPages: " +
-        showPages +
-        " currentPage: " +
-        currentPage +
-        " lastPage: " +
-        lastPage +
-        " idx: " +
-        idx +
-        " number: " +
-        number
-    );
+  [...new Array(showPages).keys()].forEach((number, idx) => {
     if (idx === 0) {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(1, 1);
             }}
@@ -230,7 +209,7 @@ const getPagesWhenCurrentIsInMiddle = (
       );
       pageArray.push(
         <li key={nanoid()} className="disabled">
-          <a className="page-link">{"..."}</a>
+          <a href="/#" className="page-link">{"..."}</a>
         </li>
       );
       return;
@@ -238,12 +217,12 @@ const getPagesWhenCurrentIsInMiddle = (
     if (number === showPages - 1) {
       pageArray.push(
         <li key={nanoid()} className="disabled">
-          <a className="page-link">{"..."}</a>
+          <a href="/#" className="page-link">{"..."}</a>
         </li>
       );
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(lastPage, lastPage);
             }}
@@ -256,17 +235,15 @@ const getPagesWhenCurrentIsInMiddle = (
       return;
     }
 
-    console.log("currentPage: " + currentPage + " lastPage: " + lastPage);
-
     pageArray.push(
       <li key={nanoid()} className="page-item">
-        <a
+        <a href="/#"
           onClick={() => {
-            props.paginate(number + currentPage - 2, lastPage);
+            props.paginate(number + currentPage - showPages + 3, lastPage);
           }}
           className="page-link"
         >
-          {number + currentPage - 2}
+          {number + currentPage - showPages + 3}
         </a>
       </li>
     );
@@ -275,10 +252,10 @@ const getPagesWhenCurrentIsInMiddle = (
 };
 
 const getPagesWithFewerThan10Pages = (lastPage, pageArray, props) => {
-  [...new Array(lastPage).keys()].map((number, idx, elements) => {
+  [...new Array(lastPage).keys()].forEach((number) => {
     pageArray.push(
       <li key={nanoid()} className="page-item">
-        <a
+        <a href="/#"
           onClick={() => {
             props.paginate(number + 1, lastPage);
           }}
@@ -298,23 +275,11 @@ const getPagesWhenCurrentIsInEnd = (
   pageArray,
   props
 ) => {
-  return [...new Array(showPages).keys()].map((number, idx, elements) => {
-    console.log(
-      "2. showPages: " +
-        showPages +
-        " currentPage: " +
-        currentPage +
-        " lastPage: " +
-        lastPage +
-        " idx: " +
-        idx +
-        " number: " +
-        number
-    );
+  return [...new Array(showPages).keys()].forEach((number, idx) => {
     if (idx === 0) {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(1, 1);
             }}
@@ -326,7 +291,7 @@ const getPagesWhenCurrentIsInEnd = (
       );
       pageArray.push(
         <li key={nanoid()} className="disabled">
-          <a className="page-link">{"..."}</a>
+          <a href="/#" className="page-link">{"..."}</a>
         </li>
       );
       return;
@@ -334,7 +299,7 @@ const getPagesWhenCurrentIsInEnd = (
     if (currentPage + 1 < lastPage) {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(number + currentPage - 2, lastPage);
             }}
@@ -349,7 +314,7 @@ const getPagesWhenCurrentIsInEnd = (
     if (currentPage < lastPage) {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(number + currentPage - 3, lastPage);
             }}
@@ -363,7 +328,7 @@ const getPagesWhenCurrentIsInEnd = (
     } else {
       pageArray.push(
         <li key={nanoid()} className="page-item">
-          <a
+          <a href="/#"
             onClick={() => {
               props.paginate(number + currentPage - 4, lastPage);
             }}

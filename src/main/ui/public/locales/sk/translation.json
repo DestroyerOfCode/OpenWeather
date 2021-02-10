@@ -1,0 +1,77 @@
+{
+   "common":{
+      "description":{
+         "broken clouds":"poloblačno",
+         "clear sky":"číra obloha",
+         "few clouds":"nízka oblačnost",
+         "fog":"mračno",
+         "haze":"mierna hmla",
+         "heavy intensity rain":"intenzívne pršanie",
+         "heavy snow":"intenzívne sneženie",
+         "light intensity drizzle":"mrholenie slabej intenzitz",
+         "light rain":"mierny dážď",
+         "light rain and snow":"mierne pršanie a sneženie",
+         "light shower snow":"mierne prehánky",
+         "light snow":"mierne sneženie",
+         "mist":"hmlisto",
+         "moderate rain":"stredný dážď",
+         "overcast clouds":"zatiahnute",
+         "scattered clouds":"rozptýlené oblaky",
+         "smoke":"dymenie",
+         "snow":"sneženie"
+      }
+   },
+   "current":{
+      "header":{
+         "cityName":"Názov mesta",
+         "cityId":"Kód mesta",
+         "latitude":"Zemepisná šírka",
+         "longitude":"Zemepisná dĺžka",
+         "country":"Krajina",
+         "humidity":"Vlhkosť",
+         "feelsLike":"Pocitová teplota",
+         "temperature":"Teplota",
+         "maximumTemperature":"Maximálna teplota",
+         "minimalTemperature":"Minimálna teplota",
+         "description":"Popis"
+      },
+      "filters":{
+         "cityName":"Názov mesta",
+         "latitudeFrom":"Zemepisná šírka od",
+         "latitudeTo":"Zemepisná šírka do",
+         "longitudeFrom":"Zemepisná dĺžka od",
+         "longitudeTo":"Zemepisná dĺžka do",
+         "humidityFrom":"Vlhkost od",
+         "humidityTo":"Vlhkost do",
+         "feelTemperatureFrom":"Pocitová teplota od",
+         "feelTemperatureTo":"Pocitová teplota do",
+         "temperatureFrom":"Teplota od",
+         "temperatureTo":"Teplota do",
+         "temperatureMaxFrom":"Maximálna teplota od",
+         "temperatureMaxTo":"Maximálna teplota do",
+         "temperatureMinFrom":"Minimálna teplota od",
+         "temperatureMinTo":"Minimálna teplota do",
+         "pickDescriptions":"Vyber popis",
+         "pickCountries":"Vyber krajinu"
+      }
+   },
+   "forecast":{
+      "header":{
+         "sunrise":"Úsvit",
+         "sunset":"Súmrak",
+         "temp":"Teplota",
+         "min":"Najnižšia teplota",
+         "max":"Najvyššia teplota",
+         "night":"Nočná teplota",
+         "evening":"Večerná teplota",
+         "morning":"Ranná Teplota",
+         "feelsLikeDay":"Pocitová teplota deň",
+         "feelsLikeNight":"Nočná pocitová teplota",
+         "feelsLikeEvening":"Večerná pocitová teplota",
+         "feelsLikeMorning":"Ranná pocitová teplota",
+         "windSpeed":"Rýchlosť vetra",
+         "windDeg":"Stupne vetra",
+         "description":"Popis"
+      }
+   }
+}

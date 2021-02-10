@@ -1,9 +1,9 @@
+import i18n from 'i18next'
 export const getWeatherDescription = (weather) => {
     var weatherItemReduce = (prevVal, currVal, idx) => {
-        return idx === 0 ? currVal.description : prevVal + ", " + currVal.description;
+        return idx === 0 ? i18n.t(currVal.description) : prevVal + ", " + i18n.t(currVal.description);
     }
-
-    return weather.weather.reduce(weatherItemReduce, '')
+    return weather.weather.map((item) => ({"description" : "common.description." + i18n.t(item.description)})).reduce(weatherItemReduce, '')
 }
 
 export const displayDateTime = (dateTime) => {

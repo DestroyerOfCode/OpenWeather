@@ -4,7 +4,6 @@ import {getFirstAndPrevious, getPageNumbers, getLastAndNext, calculateLastPageNu
 
 class Pagination extends Component {
   render(){
-    console.log("som v render pagination")
     const { itemsPerPage, currentPage, totalItems, showPages } = this.props;
     const lastPage = calculateLastPageNumber(itemsPerPage, totalItems)
     let pageArray = [];

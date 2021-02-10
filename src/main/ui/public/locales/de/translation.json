@@ -1,0 +1,79 @@
+{
+    "common": {
+        "description": {
+            "broken clouds": "broken clouds",
+            "clear sky": "clear sky",
+            "few clouds": "few clouds",
+            "fog": "fog",
+            "haze": "haze",
+            "heavy intensity rain": "heavy intensity rain",
+            "heavy snow": "heavy snow",
+            "light intensity drizzle": "light intensity drizzle",
+            "light rain": "light rain",
+            "light rain and snow": "light rain and snow",
+            "light shower snow": "light shower snow",
+            "light snow": "light snow",
+            "mist": "mist",
+            "moderate rain": "moderate rain",
+            "overcast clouds": "overcast clouds",
+            "scattered clouds": "scattered clouds",
+            "smoke": "smoke",
+            "snow": "snow"
+        }
+    },
+    "current" : {
+        "header": {
+            "cityName": "Stadtname",
+            "cityId": "Stadt Id",
+            "latitude": "Breite",
+            "longitude": "Länge",
+            "country": "Land",
+            "humidity": "Feuchte",
+            "feelsLike": "Gefühltemperatur",
+            "temperature": "Temperatur",
+            "maximumTemperature": "Hochste Temperatur",
+            "minimalTemperature": "Niedriche Temperatur",
+            "description": "Beschriftung"
+        },
+        
+        "filters": {
+            "cityName": "Stadtname",
+            "latitudeFrom": "Breite aus",
+            "latitudeTo": "Breite zu",
+            "longitudeFrom": "Länge aus",
+            "longitudeTo": "Länge zu",
+            "humidityFrom": "Feuchte aus",
+            "humidityTo": "Feuchte zu",
+            "feelTemperatureFrom": "Gefühltemperatur aus",
+            "feelTemperatureTo": "Gefühltemperatur zu",
+            "temperatureFrom": "Temperatur aus",
+            "temperatureTo": "Temperatur zu",
+            "temperatureMaxFrom": "Hochste Temperatur aus",
+            "temperatureMaxTo": "Hochste Temperatur zu",
+            "temperatureMinFrom": "Niedriche Temperature aus",
+            "temperatureMinTo": "Niedriche Temperature zu",
+            "pickDescriptions": "Erwählen Beschriftung",
+            "pickCountries": "Erwählen Land"
+        }
+    },
+
+    "forecast": {
+        "header": {
+            "sunrise": "Tagesanbruch",
+            "sunset": "Dämmerung",
+            "temp": "Temperatur",
+            "min": "Niedriche Temperatur",
+            "max": "Hochste Temperature",
+            "night": "Nacht Temperatur",
+            "evening": "Abend Temperatur",
+            "morning": "Morgen Temperatur",
+            "feelsLikeDay": "Morgengefühltemperatur",
+            "feelsLikeNight": "Nachtgefühltemperatur",
+            "feelsLikeEvening": "Abendgefühltemperatur",
+            "feelsLikeMorning": "Morgengefühltemperatur",
+            "windSpeed": "Windgeschwindigkeit",
+            "windDeg": "Wind Grad",
+            "description": "Beschriftung"
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import WeatherCurrentService from '../../adapters/WeatherCurrentService';
 import Pagination from '../current/Pagination'
 import FiltersComponent from './Filters'
@@ -8,8 +8,10 @@ import {temperatureDropdownList} from '../../buildingBlocks/commonBuildingBlocks
 import '../../styles/common/Header.scss';
 import '../../styles/current/Filters.scss'
 import { nanoid } from "nanoid";
+import { withTranslation } from 'react-i18next';
+import i18n from 'i18next'
 
-class WeatherCurrent extends Component {
+class WeatherCurrent extends React.PureComponent {
     constructor(props) {
         super(props)
         this.state = {
@@ -25,18 +27,40 @@ class WeatherCurrent extends Component {
             countries : [],
             descriptions: [],
             showPages: 5,
+            filterComponent: null,
+            languageButtons: <div>                               
+                <button onClick={async () => await this.changeLanguage("en", i18n)}>EN</button>
+                <button onClick={async () => await this.changeLanguage("sk", i18n)}>SK</button>   
+                <button onClick={async () => await this.changeLanguage("de", i18n)}>DE</button>   
+            </div>,
+            temperatureDropdownList: temperatureDropdownList( (units, abbreviation ) => {
+                this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
+            }),
             temperature: {units: 'celsius', abbreviation: '°C'},            
         }
     }
 
+    //I added temperatureDropdownList, filterscomponent and header here because I do not want to rerender them
+    //on every update. I cant use shouldComponentUpdate because they either are not components or are functional
+    //meaning they are stateless
     async componentDidMount() {
-        console.log("som v componentDidMOunt weather list")
         const countries = await WeatherCurrentService.retrieveAllCountries()
         const descriptions = await WeatherCurrentService.retrieveAllDescriptions()
-        this.setState({countries : countries.data, descriptions : descriptions.data}, function() {this.refreshWeathers()})
+        this.setState({countries : countries.data, descriptions : (descriptions.data)
+        },
+            function() {this.refreshWeathers()}
+        )
         
     }
 
+    // componentDidUpdate(){
+    //     this.setState({description = {this.internationalizeDescriptions}})
+    // }
+    internationalizeDescriptions = (descriptions) => {
+        return descriptions.map( (description) => (
+            {"name" : i18n.t("common.description." + description.name), "id": description.id, "originalValue" : description.name}
+        ))
+    }
     refreshWeathers(sortBy, weathers) {
 
         WeatherCurrentService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, this.state.isAdditionalFilter, weathers)
@@ -50,7 +74,6 @@ class WeatherCurrent extends Component {
 
     keyExistsInArr(arr, key){
         let exists = false
-        console.log("arr inside keyExists: " + JSON.stringify(arr))
         if (!Array.isArray(key)){
             arr?.some(item => {
                 if(item.hasOwnProperty([key])) {
@@ -87,7 +110,6 @@ class WeatherCurrent extends Component {
 
     changeFilters(index, filterName, filterOperator) {
         let arr = this.state.filters
-        console.log("arr inside changefilters: " + JSON.stringify(arr))
 
         if (arr[index][filterName][filterOperator])
             delete arr[index][filterName][filterOperator]  
@@ -107,12 +129,9 @@ class WeatherCurrent extends Component {
     }
 
     onChangeFilter = (event, filterName, filterOperator) => {
-        // console.log("event: " + JSON.stringify(event))
-        // console.log("filters: " + JSON.stringify(this.state.filters))
         var index;
 
         if (event === "" && this.keyExistsInArr(this.state.filters,filterName))  {
-            console.log("inside 1")
 
             index = this.findIndexInFilters(this.state.filters, filterName)
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : false, filters : this.changeFilters(index, filterName, filterOperator)}, function () {
@@ -121,11 +140,9 @@ class WeatherCurrent extends Component {
         }
 
         else if (event !== "" && !(this.keyExistsInArr(this.state.filters, filterName))){
-            console.log("inside 2")
 
             this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true,
                  filters: this.state.filters.concat([{[filterName]: {[filterOperator] : event}}])}, function () {
-                // console.log("filters inside: " + this.state.filters)
                 this.refreshWeathers(this.state.sortBy, this.state.weathers)
             })
 
@@ -133,7 +150,6 @@ class WeatherCurrent extends Component {
 
         else if (event !== "" && (this.keyExistsInArr(this.state.filters, filterName))){
            
-            console.log("inside 3")
             index = this.findIndexInFilters(this.state.filters, filterName)
 
             
@@ -144,7 +160,6 @@ class WeatherCurrent extends Component {
            
         }
         else {
-            console.log("inside 4")
 
         }
     }
@@ -152,7 +167,6 @@ class WeatherCurrent extends Component {
     isAdditionalFilterCheck(event, index, filterName, filterOperator){
         if (this.isNotAdditionalFilterWithContains(event) === false)
             return false
-        console.log("this.state.filters[index][filterName][filterOperator]: " + this.state.filters[index][filterName][filterOperator])
         if (this.isSameFilterChanged(event, index, filterName, filterOperator) === false)
             return false
         return true
@@ -170,30 +184,27 @@ class WeatherCurrent extends Component {
     // times in a row and the filter is same. If it is the same I cant filter
     // from memory because I could not load some weathers
     isSameFilterChanged(event, index, filterName, filterOperator){
-        console.log("event: " + event)
-        console.log("this.state.filters[index][filterName][filterOperator]: " + this.state.filters[index][filterName][filterOperator])
        return filterName === this.state.filters[index][filterName]
     }
     header(){
        return (<thead className="header">
        <tr>
-           <th onClick={() =>this.refreshWeathers("_id", this.state.weathers) }>cityId</th>
-           <th onClick={() =>this.refreshWeathers("name", this.state.weathers) }>city Name</th>
-           <th onClick={() =>this.refreshWeathers("coord.lat", this.state.weathers) }>latitude</th>
-           <th onClick={() =>this.refreshWeathers("coord.lon", this.state.weathers) }>longitude</th>
-           <th onClick={() =>this.refreshWeathers("sys.country", this.state.weathers) }>country</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.humidity", this.state.weathers) }>humidity</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.feels_like", this.state.weathers) }>feels like</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp", this.state.weathers) }>temperature</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp_max", this.state.weathers) }>maximum temperature</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp_min", this.state.weathers) }>minimal temperature</th>
-           <th onClick={() =>this.refreshWeathers("weather.description", this.state.weathers) }>description</th>                                
+           <th onClick={() =>this.refreshWeathers("_id", this.state.weathers) }>{i18n.t("current.header.cityId")}</th>
+           <th onClick={() =>this.refreshWeathers("name", this.state.weathers) }>{ i18n.t('current.header.cityName')}</th>
+           <th onClick={() =>this.refreshWeathers("coord.lat", this.state.weathers) }>{i18n.t("current.header.latitude")}</th>
+           <th onClick={() =>this.refreshWeathers("coord.lon", this.state.weathers) }>{i18n.t("current.header.longitude")}</th>
+           <th onClick={() =>this.refreshWeathers("sys.country", this.state.weathers) }>{i18n.t("current.header.country")}</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.humidity", this.state.weathers) }>{i18n.t("current.header.humidity")}</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.feels_like", this.state.weathers) }>{i18n.t("current.header.feelsLike")}</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp", this.state.weathers) }>{i18n.t("current.header.temperature")}</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp_max", this.state.weathers) }>{i18n.t("current.header.maximumTemperature")}</th>
+           <th onClick={() =>this.refreshWeathers("weatherMain.temp_min", this.state.weathers) }>{i18n.t("current.header.minimalTemperature")}</th>
+           <th onClick={() =>this.refreshWeathers("weather.description", this.state.weathers) }>{i18n.t("current.header.description")}</th>                                
        </tr>
    </thead>)
    }
 
 createForecast = ()=>{
-    console.log("dfs")
     return (
         <Link  to= '/forecast'></Link>
     );
@@ -228,34 +239,30 @@ createForecast = ()=>{
     paginate = (page) => {
         // if(currentPage !== 0 && currentPage <= lastPage)
        this.setState({currentPage : page}, function(){
-           console.log("currPage: " + this.state.currentPage)
        })
 
     }
 
     getWeathersOnSpecificPage = () => {
-        console.log('after pagination creation')
         const indexOfLastPost = this.state.currentPage * this.state.itemsPerPage;
         const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
         return this.state.weathers.slice(indexOfFirstPost, indexOfLastPost);
     }
-
+    changeLanguage = (language, i18n) => {
+        i18n.changeLanguage(language);
+    };
     render() {
-        console.log("som v render weather list")
-
-
         const currentWeathers = this.getWeathersOnSpecificPage()
-        const filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
-        descriptions = {this.state.descriptions} onChangeMethod={this.onChangeFilter} />
+        const filters =  <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
+        descriptions = {this.internationalizeDescriptions(this.state.descriptions)} onChangeMethod={this.onChangeFilter} />
 
         const pagination = <Pagination key={nanoid()} currentPage={this.state.currentPage} showPages={this.state.showPages}
         itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate}/>
 
-        const temperatureDropdown = temperatureDropdownList( (units, abbreviation ) => {
-            this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
-        })
+        const temperatureDropdown = this.state.temperatureDropdownList
+        const languageButtons = this.state.languageButtons
 
-        let container= [temperatureDropdown, filters, pagination]
+        let container= [languageButtons, temperatureDropdown, filters, pagination]
 
         if (this.state.weathers)
             container.push(<table key={nanoid()} className="weatherTable">
@@ -266,10 +273,11 @@ createForecast = ()=>{
 
         return (
             <div className="container">
-             {container}
+
+                {container}
             </div>
         )
          
     }
 }
-export default WeatherCurrent
+export default withTranslation()(WeatherCurrent)
