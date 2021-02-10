@@ -40,10 +40,10 @@ function FiltersComponent(props) {
                 {<input placeholder= {i18n.t("current.filters.temperatureMinFrom")} onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "gte")}}></input>}
                 {<input placeholder= {i18n.t("current.filters.temperatureMinTo")} onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "lte")}}></input>}
                 <br></br>
-                {<Multiselect placeholder={i18n.t("current.filters.pickDescriptions")} options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}
-                onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "weather.description", "in")}}/>}
-                    {<Multiselect placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromSelectedItems(event), "sys.country", "in")}}
-                onRemove={event =>{buildFilter(makeStringFromSelectedItems(event), "sys.country", "in")}}/>}
+                {<Multiselect placeholder={i18n.t("current.filters.pickDescriptions")} options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
+                onRemove={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}/>}
+                    {<Multiselect placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}
+                onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}/>}
         </form>
         )
 }
@@ -69,12 +69,18 @@ const isNumber = (item) => {
 
 // this closure's purpose is to create strings to be sent to query params, as no 
 // other way to send arrays exists
-const makeStringFromSelectedItems= (items) => {
+const makeStringFromDescriptions= (items) => {
     console.log("description filter: " + JSON.stringify(items))
     var selectedItemsIntoString = (prevVal, currVal, idx) => {
         return idx === 0 ? currVal.originalValue : prevVal + "," + currVal.originalValue
     }
     return items.reduce(selectedItemsIntoString, '')
 }
-
+const makeStringFromCountries= (items) => {
+    console.log("description filter: " + JSON.stringify(items))
+    var selectedItemsIntoString = (prevVal, currVal, idx) => {
+        return idx === 0 ? currVal.name : prevVal + "," + currVal.name
+    }
+    return items.reduce(selectedItemsIntoString, '')
+}
 export default FiltersComponent

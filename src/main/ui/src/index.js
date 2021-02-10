@@ -3,18 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom'
-import './i18n'
-import { Suspense } from 'react'
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Suspense fallback={<div>Loading ...</div>}>
-      <BrowserRouter key="browserRouter">
-        <App />
-    </BrowserRouter>
-    </Suspense>
-  </React.StrictMode>,
+  <App />,
   document.getElementById('root')
 );
 
