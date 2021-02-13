@@ -9,23 +9,28 @@ function FiltersComponent(props) {
     const [filterKey, setFilterKey] = useState("")
     const [filtervalue, setFilterValue] = useState("");
     const [filterOperator, setFilterOperator] = useState("");
+    const [coordLatFrom, setCoordLatFrom] = useState(props.filters["coord.lat"]["lte"]);
+    const [language, setLanguage] = useState(props.language);
 
     useEffect(() => {
         const timeOutId = setTimeout(() => props.onChangeMethod(filtervalue, filterKey, filterOperator), 500);
         return () => clearTimeout(timeOutId);
-    }, [filterKey, filtervalue, filterOperator, props]);
+    }, [filterKey, filtervalue, filterOperator, language, props]);
 
     var buildFilter = (filterValue, filterKey, filterOperator) => {
         setFilterValue(filterValue); setFilterKey(filterKey); setFilterOperator(filterOperator)
     }
 
+    const getPlaceholder = (filter, translationKey, defaultCompareValue) => {
+        if (filter === defaultCompareValue) {
+            // setFunc()
+            return i18n.t(`current.filters.${translationKey}`);} 
+        else return filter;
+    }
     return (
         <form className="currentFiltersWrappes">
-
-                {/* <p>Latitude</p> */}
                 {<input placeholder= {i18n.t("current.filters.cityName")} onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}></input>}
-
-                {<input placeholder= {i18n.t("current.filters.latitudeFrom")} onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "gte")}}></input>}
+                {<input placeholder= {getPlaceholder(coordLatFrom, "latitudeFrom", 0)} onChange= {event =>{if (isNumber(event.target.value)) {setCoordLatFrom(event.target.value); buildFilter(event.target.value, "coord.lat", "gte")}}}></input>}
                 {<input placeholder= {i18n.t("current.filters.latitudeTo")} onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "lte")}}></input>}
                 {<input placeholder= {i18n.t("current.filters.longitudeFrom")} onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "gte")}}></input>}
                 {<input placeholder= {i18n.t("current.filters.longitudeTo")} onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "lte")}}></input>}
@@ -70,14 +75,12 @@ const isNumber = (item) => {
 // this closure's purpose is to create strings to be sent to query params, as no 
 // other way to send arrays exists
 const makeStringFromDescriptions= (items) => {
-    console.log("description filter: " + JSON.stringify(items))
     var selectedItemsIntoString = (prevVal, currVal, idx) => {
         return idx === 0 ? currVal.originalValue : prevVal + "," + currVal.originalValue
     }
     return items.reduce(selectedItemsIntoString, '')
 }
 const makeStringFromCountries= (items) => {
-    console.log("description filter: " + JSON.stringify(items))
     var selectedItemsIntoString = (prevVal, currVal, idx) => {
         return idx === 0 ? currVal.name : prevVal + "," + currVal.name
     }

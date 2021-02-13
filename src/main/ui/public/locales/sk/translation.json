@@ -8,7 +8,7 @@
          "haze":"mierna hmla",
          "heavy intensity rain":"intenzívne pršanie",
          "heavy snow":"intenzívne sneženie",
-         "light intensity drizzle":"mrholenie slabej intenzitz",
+         "light intensity drizzle":"mrholenie slabej intenzity",
          "light rain":"mierny dážď",
          "light rain and snow":"mierne pršanie a sneženie",
          "light shower snow":"mierne prehánky",
@@ -19,7 +19,10 @@
          "scattered clouds":"rozptýlené oblaky",
          "smoke":"dymenie",
          "snow":"sneženie"
-      }
+      },
+      "temperatureDropdown": {
+         "title": "Zmeň teplotné jednotky"
+     }
    },
    "current":{
       "header":{

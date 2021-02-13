@@ -19,6 +19,10 @@
             "scattered clouds": "scattered clouds",
             "smoke": "smoke",
             "snow": "snow"
+        },
+        
+        "temperatureDropdown": {
+            "title": "Change Temperature Units"
         }
     },
     "current" : {

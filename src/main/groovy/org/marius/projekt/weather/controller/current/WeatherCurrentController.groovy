@@ -104,19 +104,16 @@ class WeatherCurrentController {
     @GetMapping("/countries")
     @ResponseBody
     def getDistinctCountries(){
-//        Query query = new Query();
-//        query.fields().include("sys.country").exclude("_id");
         mongoTemplate.query(WeatherCurrentModel.class).distinct("sys.country").as(String.class).all().
                 withIndex().collect{ country, index -> ['name': country, 'id': index]}
     }
 
+    //originalValue is here beca because Of translations. Need the orignal english value
     @Cacheable(value = "descriptions")
     @GetMapping("/descriptions")
     @ResponseBody
     def getDistinctDescriptions(){
-//        Query query = new Query();
-//        query.fields().include("sys.country").exclude("_id");
         mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
-                withIndex().collect{ country, index -> ['name': country, 'id': index]}
+                withIndex().collect{ country, index -> ['name': country, 'id': index, 'originalValue': country]}
     }
 }

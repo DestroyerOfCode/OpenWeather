@@ -1,9 +1,10 @@
 import i18n from 'i18next'
 export const getWeatherDescription = (weather) => {
     var weatherItemReduce = (prevVal, currVal, idx) => {
-        return idx === 0 ? i18n.t(currVal.description) : prevVal + ", " + i18n.t(currVal.description);
+        // console.log("currVal.description: " + currVal.description)
+        return idx === 0 ? i18n.t(`common.description.${currVal.description}`) : (`${prevVal}`) + ", " + i18n.t(`common.description.${currVal.description}`);
     }
-    return weather.weather.map((item) => ({"description" : "common.description." + i18n.t(item.description)})).reduce(weatherItemReduce, '')
+    return weather.weather.reduce(weatherItemReduce, '')
 }
 
 export const displayDateTime = (dateTime) => {
@@ -11,7 +12,6 @@ export const displayDateTime = (dateTime) => {
 }
 
 export const convertTemperature = (convertTo, temp) => {
-    // console.log("convertTo: " + convertTo)
     if (convertTo === "celsius")
         return temp - 273.15
     else if (convertTo === "fahrenheit")

@@ -11,7 +11,7 @@ import { nanoid } from "nanoid";
 import { withTranslation } from 'react-i18next';
 import i18n from 'i18next'
 
-class WeatherCurrent extends React.PureComponent {
+class WeatherCurrent extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -27,15 +27,16 @@ class WeatherCurrent extends React.PureComponent {
             countries : [],
             descriptions: [],
             showPages: 5,
+            language: i18n.language,
             filterComponent: null,
             languageButtons: <div>                               
-                <button onClick={async () => await this.changeLanguage("en", i18n)}>EN</button>
-                <button onClick={async () => await this.changeLanguage("sk", i18n)}>SK</button>   
-                <button onClick={async () => await this.changeLanguage("de", i18n)}>DE</button>   
+                <button onClick={() => this.changeLanguage("en", i18n)}>EN</button>
+                <button onClick={() => this.changeLanguage("sk", i18n)}>SK</button>   
+                <button onClick={() => this.changeLanguage("de", i18n)}>DE</button>   
             </div>,
-            temperatureDropdownList: temperatureDropdownList( (units, abbreviation ) => {
-                this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
-            }),
+           
+           
+           
             temperature: {units: 'celsius', abbreviation: '°C'},            
         }
     }
@@ -44,21 +45,33 @@ class WeatherCurrent extends React.PureComponent {
     //on every update. I cant use shouldComponentUpdate because they either are not components or are functional
     //meaning they are stateless
     async componentDidMount() {
+        console.log("componentDidMount")
         const countries = await WeatherCurrentService.retrieveAllCountries()
         const descriptions = await WeatherCurrentService.retrieveAllDescriptions()
-        this.setState({countries : countries.data, descriptions : (descriptions.data)
+        this.setState({countries : countries.data, descriptions : (descriptions.data),
+            filterComponent: <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {countries.data}
+            descriptions = {this.internationalizeDescriptions(descriptions.data)} language= {this.state.language} onChangeMethod={this.onChangeFilter} />
         },
             function() {this.refreshWeathers()}
         )
         
     }
-
+    
+    // shouldComponentUpdate(nextProps, nextState) {
+        // console.log("this.state.filters" + JSON.stringify(this.state.filters) + " nextState.filters: " + JSON.stringify(nextState.filters))
+        // console.log(JSON.stringify(this.state.filters) === JSON.stringify(nextState.filters))
+        // if (JSON.stringify(this.state.filters) === JSON.stringify(nextState.filters)) {
+            // 
+        //   return false;
+        // }
+        // return true;
+    //   }
     // componentDidUpdate(){
     //     this.setState({description = {this.internationalizeDescriptions}})
     // }
     internationalizeDescriptions = (descriptions) => {
         return descriptions.map( (description) => (
-            {"name" : i18n.t("common.description." + description.name), "id": description.id, "originalValue" : description.name}
+            {"name" : i18n.t("common.description." + description.originalValue), "id": description.id, "originalValue" : description.originalValue}
         ))
     }
     refreshWeathers(sortBy, weathers) {
@@ -248,21 +261,34 @@ createForecast = ()=>{
         const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
         return this.state.weathers.slice(indexOfFirstPost, indexOfLastPost);
     }
+
     changeLanguage = (language, i18n) => {
         i18n.changeLanguage(language);
+        this.setState({}, () =>{
+            this.setState({language: language})
+        })
     };
+
     render() {
+        console.log("som v render")
         const currentWeathers = this.getWeathersOnSpecificPage()
-        const filters =  <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
-        descriptions = {this.internationalizeDescriptions(this.state.descriptions)} onChangeMethod={this.onChangeFilter} />
+        const descriptions = this.internationalizeDescriptions(this.state.descriptions)
+        // let filters =     (
+            // this.state.filterComponent)
+        
+        // if(i18n.language !== this.state.language)
+        let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
+            descriptions = {this.internationalizeDescriptions(descriptions)} language= {this.state.language} onChangeMethod={this.onChangeFilter} />
 
         const pagination = <Pagination key={nanoid()} currentPage={this.state.currentPage} showPages={this.state.showPages}
         itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate}/>
 
-        const temperatureDropdown = this.state.temperatureDropdownList
+        const temperatureDropdownListComponent = temperatureDropdownList( (units, abbreviation ) => {
+            this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
+        })
         const languageButtons = this.state.languageButtons
 
-        let container= [languageButtons, temperatureDropdown, filters, pagination]
+        let container= [languageButtons, temperatureDropdownListComponent, filters, pagination]
 
         if (this.state.weathers)
             container.push(<table key={nanoid()} className="weatherTable">

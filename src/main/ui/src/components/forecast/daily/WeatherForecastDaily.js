@@ -7,15 +7,11 @@ import i18n from 'i18next'
 import '../../../i18n'
  function WeatherForecastComponent(props){
 
-    console.log("som vo forecast component")
-    console.log("props: " + JSON.stringify(props.history.location.state))
-
     const [dailyWeatherForecast, setDailyWeatherForecast] = useState({} )
     const [temperature, setTemperature] = useState({units : "celsius", abbreviation : "°C"})
     
     useEffect(() =>{
        
-        console.log("som v useEffect forecast component")
         WeatherForecastService.getDailyForecastByCityName(props.history.location.state.lat,props.history.location.state.lon, "Current,Hourly,Minutely")
         .then( response => setDailyWeatherForecast(response.data)) 
         }, [props.history.location.state.lat, props.history.location.state.lon])
