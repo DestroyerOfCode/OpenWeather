@@ -278,7 +278,7 @@ createForecast = ()=>{
         
         // if(i18n.language !== this.state.language)
         let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
-            descriptions = {this.internationalizeDescriptions(descriptions)} language= {this.state.language} onChangeMethod={this.onChangeFilter} />
+            descriptions = {this.internationalizeDescriptions(descriptions)} language= {this.state.language} filters = {this.state.filters} onChangeMethod={this.onChangeFilter} />
 
         const pagination = <Pagination key={nanoid()} currentPage={this.state.currentPage} showPages={this.state.showPages}
         itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate}/>
