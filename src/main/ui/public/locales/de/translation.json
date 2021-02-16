@@ -18,7 +18,8 @@
             "overcast clouds": "overcast clouds",
             "scattered clouds": "scattered clouds",
             "smoke": "smoke",
-            "snow": "snow"
+            "snow": "snow",
+            "rain and snow": "rain and snow"
         },
         
         "temperatureDropdown": {
@@ -62,6 +63,7 @@
     },
 
     "forecast": {
+        "currentWeather": "Current Weather",
         "header": {
             "sunrise": "Tagesanbruch",
             "sunset": "Dämmerung",

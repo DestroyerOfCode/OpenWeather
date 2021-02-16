@@ -8,11 +8,11 @@ import {temperatureDropdownList} from '../../buildingBlocks/commonBuildingBlocks
 import '../../styles/common/Header.scss';
 import '../../styles/current/Filters.scss'
 import { nanoid } from "nanoid";
-import { withTranslation } from 'react-i18next';
 import i18n from 'i18next'
 
 class WeatherCurrent extends React.Component {
     constructor(props) {
+        console.log(props.temperature)
         super(props)
         this.state = {
             weathers: [],
@@ -29,15 +29,7 @@ class WeatherCurrent extends React.Component {
             showPages: 5,
             language: i18n.language,
             filterComponent: null,
-            languageButtons: <div>                               
-                <button onClick={() => this.changeLanguage("en", i18n)}>EN</button>
-                <button onClick={() => this.changeLanguage("sk", i18n)}>SK</button>   
-                <button onClick={() => this.changeLanguage("de", i18n)}>DE</button>   
-            </div>,
-           
-           
-           
-            temperature: {units: 'celsius', abbreviation: '°C'},            
+            temperature: props.temperature
         }
     }
 
@@ -46,11 +38,12 @@ class WeatherCurrent extends React.Component {
     //meaning they are stateless
     async componentDidMount() {
         console.log("componentDidMount")
+        console.log(this.state.temperature)
         const countries = await WeatherCurrentService.retrieveAllCountries()
         const descriptions = await WeatherCurrentService.retrieveAllDescriptions()
         this.setState({countries : countries.data, descriptions : (descriptions.data),
             filterComponent: <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {countries.data}
-            descriptions = {this.internationalizeDescriptions(descriptions.data)} language= {this.state.language} onChangeMethod={this.onChangeFilter} />
+            descriptions = {this.internationalizeDescriptions(descriptions.data)} onChangeMethod={this.onChangeFilter} />
         },
             function() {this.refreshWeathers()}
         )
@@ -224,12 +217,14 @@ createForecast = ()=>{
 }
 
    mainBody(currentPosts, temperature){
+       console.log(temperature.units)
     return (
 
     <tbody>
         {
             currentPosts.map(
                 weather =>{
+                    // console.log(weather.weatherMain.feels_like)
                     return (<tr key={nanoid()}>
                         <td>{weather._id}</td>
                         <td> <Link to={{pathname: "/forecast", state: {"lat": weather.coord.lat, "lon": weather.coord.lon} }}>{weather.name}</Link></td>
@@ -237,10 +232,10 @@ createForecast = ()=>{
                         <td>{weather.coord.lon}</td>
                         <td>{weather.sys.country}</td>
                         <td>{weather.weatherMain.humidity}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.feels_like).toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp).toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_max).toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_min).toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.feels_like))?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.temp))?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.temp_max))?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.temp_min))?.toFixed(2)}${temperature.abbreviation}`}</td>
                         <td>{getWeatherDescription(weather)}</td>
                     </tr>)}
             )
@@ -271,29 +266,28 @@ createForecast = ()=>{
 
     render() {
         console.log("som v render")
+        console.log(this.props.temperature)
         const currentWeathers = this.getWeathersOnSpecificPage()
         const descriptions = this.internationalizeDescriptions(this.state.descriptions)
         // let filters =     (
             // this.state.filterComponent)
         
-        // if(i18n.language !== this.state.language)
-        let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.state.countries}
-            descriptions = {this.internationalizeDescriptions(descriptions)} language= {this.state.language} filters = {this.state.filters} onChangeMethod={this.onChangeFilter} />
+        let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.props.temperature.units} countries = {this.state.countries}
+            descriptions = {this.internationalizeDescriptions(descriptions)}
+            filters = {this.state.filters} onChangeMethod={this.onChangeFilter} temperature={this.props.temperature} />
 
         const pagination = <Pagination key={nanoid()} currentPage={this.state.currentPage} showPages={this.state.showPages}
         itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.weathers.length} paginate={this.paginate}/>
 
-        const temperatureDropdownListComponent = temperatureDropdownList( (units, abbreviation ) => {
-            this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
-        })
-        const languageButtons = this.state.languageButtons
-
-        let container= [languageButtons, temperatureDropdownListComponent, filters, pagination]
+        // const temperatureDropdownListComponent = temperatureDropdownList( (units, abbreviation ) => {
+            // this.setState({"temperature": {"units" : units, "abbreviation" : abbreviation}})
+        // })
+        let container= [filters, pagination]
 
         if (this.state.weathers)
             container.push(<table key={nanoid()} className="weatherTable">
                 {this.header()}
-                {this.mainBody(currentWeathers, this.state.temperature)}
+                {this.mainBody(currentWeathers, this.props.temperature)}
             </table>
             )
 
@@ -306,4 +300,4 @@ createForecast = ()=>{
          
     }
 }
-export default withTranslation()(WeatherCurrent)
+export default WeatherCurrent

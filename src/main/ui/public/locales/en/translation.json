@@ -18,7 +18,8 @@
             "overcast clouds": "overcast clouds",
             "scattered clouds": "scattered clouds",
             "smoke": "smoke",
-            "snow": "snow"
+            "snow": "snow",
+            "rain and snow": "rain and snow"
         },
         "temperatureDropdown": {
             "title": "Change Temperature Units"
@@ -59,6 +60,7 @@
         }
     },
     "forecast": {
+        "currentWeather": "Current Weather",
         "header": {
             "sunrise": "Sunrise",
             "sunset": "Sunset",

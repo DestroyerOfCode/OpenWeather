@@ -8,9 +8,9 @@ export const temperatureDropdownList =(changeTemperatureUnitsState) => {
         <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">{i18n.t("common.temperatureDropdown.title")}</Dropdown.Toggle>
             <Dropdown.Menu>
-                <Dropdown.Item onClick={() => {changeTemperatureUnitsState('kelvin', 'K');} }>Kelvin</Dropdown.Item>
-                <Dropdown.Item onClick={() => {changeTemperatureUnitsState('celsius', '°C');}}>Celsius</Dropdown.Item>
-                <Dropdown.Item onClick={() => {changeTemperatureUnitsState('fahrenheit', '°F');}}>Fahrenheit</Dropdown.Item>
+                <Dropdown.Item onClick={async () => {await Promise.resolve().then(() => {changeTemperatureUnitsState('kelvin', 'K')})} }>Kelvin</Dropdown.Item>
+                <Dropdown.Item onClick={async () => {await Promise.resolve().then(() => {changeTemperatureUnitsState('celsius', '°C')})}}>Celsius</Dropdown.Item>
+                <Dropdown.Item onClick={async () => {await Promise.resolve().then(() => {changeTemperatureUnitsState('fahrenheit', '°F')})}}>Fahrenheit</Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>
     </div>

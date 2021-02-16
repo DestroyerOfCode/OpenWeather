@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from "react";
 import { Multiselect } from 'multiselect-react-dropdown';
 import '../../styles/current/Filters.scss'
+import {convertTemperature} from '../../businessLogic/WeatherBusinessLogic'
 import i18n from 'i18next'
 
 function FiltersComponent(props) {
@@ -18,97 +19,105 @@ function FiltersComponent(props) {
     var buildFilter = (filterValue, filterKey, filterOperator) => {
         setFilterValue(filterValue); setFilterKey(filterKey); setFilterOperator(filterOperator)
     }
-
-    const getPlaceholder = (filter, translationKey, filterKey, filterOperator, defaultCompareValue) => {
-        // console.log("filterStringify: " + JSON.stringify(filter))
-        // console.log("filter[filterKey]: " + filter[filterKey] + " defaultCompareValue: " + defaultCompareValue)
-        let ret = ""
-        // if (translationKey !== "pickDescriptions" && translationKey !== "pickCountries")
-            ret = i18n.t(`current.filters.${translationKey}`);
-        filter.some((item) => {
-            // console.log( filterKey in item)
-            if ( filterKey in item && filterOperator in item[filterKey]) {
-                console.log("item[filterKey]: " + JSON.stringify(item[filterKey]))
-
-                // setFunc(props.filters[filterKey][filterOperator])
-                ret += " " + item[filterKey][filterOperator];
-                return true;
-            }
-            else return false
-        })
-        return ret;
-    }
-
-    const getSelectedDescriptions= (filters, filterKey, filterOperator, descriptions) =>{
-
-        let retArr= []
-        console.log(filters)
-        filters.some((item) => {
-            if (filterKey in item && filterOperator in item[filterKey]){
-                console.log("item[filterKey][filterOperator]: " + item[filterKey][filterOperator])
-                item[filterKey][filterOperator].split(",").forEach((description) => {
-                    let originalValue = ""
-                    descriptions.some((item) => {
-                        console.log(item)
-                        if(description === item.originalValue){
-                            originalValue = item.originalValue
-                            return true;
-                        } return false
-                    })
-                    console.log(description)
-                    retArr.push({"name": i18n.t(`common.description.${description}`), "originalValue": originalValue})
-                })
-                return true;
-            }
-            return false;
-        })
-        console.log(retArr)
-        return retArr
-    }
-
-    const getSelectedCountries= (filters, filterKey, filterOperator) =>{
-
-        let retArr = []
-        filters.some((item) =>{
-            if (filterKey in item && filterOperator in item[filterKey]){
-
-                item[filterKey][filterOperator].split(",").forEach((country) => {
-                    retArr.push({"name": country})
-                })
-                return true;
-            }
-            return false;
-        })
-        return retArr
-    }
-
-    console.log(props.descriptions)
-    return (
+        return (
         <form className="currentFiltersWrappes">
-                {<input placeholder= {getPlaceholder(props.filters, "cityName", "name", "eq") } onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "latitudeFrom", "coord.lat", "gte")} onChange= {event =>{if (isNumber(event.target.value)) {buildFilter(event.target.value, "coord.lat", "gte")}}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "latitudeTo", "coord.lat", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "lte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "longitudeFrom", "coord.lon", "gte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "gte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "longitudeTo", "coord.lon", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "lte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "humidityFrom", "weatherMain.humidity", "gte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "humidityTo", "weatherMain.humidity", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "feelTemperatureFrom", "weatherMain.feels_like", "gte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "gte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "feelTemperatureTo", "weatherMain.feels_like", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "lte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "temperatureFrom", "weatherMain.temp", "gte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "gte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "temperatureTo", "weatherMain.temp", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "lte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "temperatureMaxFrom", "weatherMain.temp_max", "gte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "gte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "temperatureMaxTo", "weatherMain.temp_max", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "lte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "temperatureMinFrom", "weatherMain.temp_min", "gte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "gte")}}></input>}
-                {<input placeholder= {getPlaceholder(props.filters, "temperatureMinTo", "weatherMain.temp_min", "lte") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "lte")}}></input>}
-                <br></br>
-                {<Multiselect selectedValues={getSelectedDescriptions(props.filters, "weather.description", "in", props.descriptions)} placeholder={i18n.t("current.filters.pickDescriptions")} options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{console.log(event);buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
-                onRemove={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}/>}
-                    {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.country", "in")} placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}
-                onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}/>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "name", "eq")} placeholder= {i18n.t("current.filters.cityName") } onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lat", "gte")} placeholder= {i18n.t("current.filters.latitudeFrom")} onChange= {event =>{if (isNumber(event.target.value)) {buildFilter(event.target.value, "coord.lat", "gte")}}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lat", "lte")} placeholder= {i18n.t("current.filters.latitudeTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lat", "lte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lon", "gte")} placeholder= {i18n.t("current.filters.longitudeFrom") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "gte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lon", "lte")} placeholder= {i18n.t("current.filters.longitudeTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "coord.lon", "lte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.humidity", "gte")} placeholder= {i18n.t("current.filters.humidityFrom") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.humidity", "lte")} placeholder= {i18n.t("current.filters.humidityTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.feels_like", "gte")} placeholder= {i18n.t("current.filters.feelTemperatureFrom") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "gte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.feels_like", "lte")} placeholder= {i18n.t("current.filters.feelTemperatureTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "lte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp", "gte")} placeholder= {i18n.t("current.filters.temperatureFrom") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "gte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp", "lte")} placeholder= {i18n.t("current.filters.temperatureTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "lte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_max", "gte")} placeholder= {i18n.t("current.filters.temperatureMaxFrom") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "gte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_max", "lte")} placeholder= {i18n.t("current.filters.temperatureMaxTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "lte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_min", "gte")} placeholder= {i18n.t("current.filters.temperatureMinFrom") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "gte")}}></input>}
+            {<input defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_min", "lte")} placeholder= {i18n.t("current.filters.temperatureMinTo") } onChange= {event =>{if (isNumber(event.target.value)) buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "lte")}}></input>}
+            <br></br>
+            {<Multiselect selectedValues={getSelectedDescriptions(props.filters, "weather.description", "in", props.descriptions)} placeholder={i18n.t("current.filters.pickDescriptions")} options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
+            onRemove={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}/>}
+                {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.country", "in")} placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}
+            onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}/>}
         </form>
         )
 }
 
+const getPlaceholder = (filter, translationKey, filterKey, filterOperator) => {
+    // console.log("filterStringify: " + JSON.stringify(filter))
+    // console.log("filter[filterKey]: " + filter[filterKey] + " defaultCompareValue: " + defaultCompareValue)
+    let ret = ""
+    // if (translationKey !== "pickDescriptions" && translationKey !== "pickCountries")
+        ret = i18n.t(`current.filters.${translationKey}`);
+    filter.some((item) => {
+        // console.log( filterKey in item)
+        if ( filterKey in item && filterOperator in item[filterKey]) {
+            // setFunc(props.filters[filterKey][filterOperator])
+            ret += " " + item[filterKey][filterOperator];
+            return true;
+        }
+        else return false
+    })
+    return ret;
+}
+const getSelectedDescriptions= (filters, filterKey, filterOperator, descriptions) =>{
+    let retArr= []
+    filters.some((item) => {
+        if (filterKey in item && filterOperator in item[filterKey]){
+            item[filterKey][filterOperator].split(",").forEach((description) => {
+                let originalValue = ""
+                descriptions.some((item) => {
+                    if(description === item.originalValue){
+                        originalValue = item.originalValue
+                        return true;
+                    } return false
+                })
+                retArr.push({"name": i18n.t(`common.description.${description}`), "originalValue": originalValue})
+            })
+            return true;
+        }
+        return false;
+    })
+    return retArr
+}
+const getSelectedCountries= (filters, filterKey, filterOperator) =>{
+    let retArr = []
+    filters.some((item) =>{
+        if (filterKey in item && filterOperator in item[filterKey]){
+            item[filterKey][filterOperator].split(",").forEach((country) => {
+                retArr.push({"name": country})
+            })
+            return true;
+        }
+        return false;
+    })
+    return retArr
+}
+const getOriginalValue =    (filter, temperature, filterKey, filterOperator) => {
+    let ret = ""
+    const temperatureKeys= ["weatherMain.humidity",
+    "weatherMain.humidity",
+    "weatherMain.feels_like",
+    "weatherMain.temp",
+    "weatherMain.temp_max",
+    "weatherMain.temp_min"]
+    // if (translationKey !== "pickDescriptions" && translationKey !== "pickCountries")
+    filter.some((item) => {
+        // console.log( filterKey in item)
+        if ( filterKey in item && filterOperator in item[filterKey]) {
+            if (temperatureKeys.includes(Object.keys(item)[0]))
+                ret = Number(convertTemperature(temperature.units, item[filterKey][filterOperator])).toFixed(2)
+            else ret = item[filterKey][filterOperator]
+            return true;
+        }
+        else return false
+    })
+    if(ret !== "")
+        return ret;
+    return;
+}
 // In db values are in kelvin. The user can change it on the UI.
 // I must convert to same units
 const calculateKelvins = (temperatureUnits, temperatureValue) => {
@@ -123,7 +132,7 @@ const calculateKelvins = (temperatureUnits, temperatureValue) => {
 
 
 const isNumber = (item) => {
-    var isNumber = !isNaN(item)
+    var isNumber = !isNaN(item) || item.includes('-')
     if (!isNumber) alert('You must pick a number in this field')
     return isNumber
 }
@@ -134,8 +143,6 @@ const makeStringFromDescriptions= (items) => {
     var selectedItemsIntoString = (prevVal, currVal, idx) => {
         return idx === 0 ? currVal.originalValue : prevVal + "," + currVal.originalValue
     }
-    console.log(items)
-    console.log(items.reduce(selectedItemsIntoString, ''))
     return items.reduce(selectedItemsIntoString, '')
 }
 const makeStringFromCountries= (items) => {

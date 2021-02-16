@@ -12,6 +12,7 @@ export const displayDateTime = (dateTime) => {
 }
 
 export const convertTemperature = (convertTo, temp) => {
+    // console.log(convertTo)
     if (convertTo === "celsius")
         return temp - 273.15
     else if (convertTo === "fahrenheit")

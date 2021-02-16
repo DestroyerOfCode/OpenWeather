@@ -18,7 +18,8 @@
          "overcast clouds":"zatiahnute",
          "scattered clouds":"rozptýlené oblaky",
          "smoke":"dymenie",
-         "snow":"sneženie"
+         "snow":"sneženie",
+         "rain and snow": "dážď a sneženie"
       },
       "temperatureDropdown": {
          "title": "Zmeň teplotné jednotky"
@@ -59,6 +60,7 @@
       }
    },
    "forecast":{
+      "currentWeather": "Aktuálne počasie",
       "header":{
          "sunrise":"Úsvit",
          "sunset":"Súmrak",
