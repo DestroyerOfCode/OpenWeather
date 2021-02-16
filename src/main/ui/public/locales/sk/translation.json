@@ -1,5 +1,7 @@
 {
    "common":{
+      "from": "od",
+      "to": "do",
       "description":{
          "broken clouds":"poloblačno",
          "clear sky":"číra obloha",
@@ -41,20 +43,13 @@
       },
       "filters":{
          "cityName":"Názov mesta",
-         "latitudeFrom":"Zemepisná šírka od",
-         "latitudeTo":"Zemepisná šírka do",
-         "longitudeFrom":"Zemepisná dĺžka od",
-         "longitudeTo":"Zemepisná dĺžka do",
-         "humidityFrom":"Vlhkost od",
-         "humidityTo":"Vlhkost do",
-         "feelTemperatureFrom":"Pocitová teplota od",
-         "feelTemperatureTo":"Pocitová teplota do",
-         "temperatureFrom":"Teplota od",
-         "temperatureTo":"Teplota do",
-         "temperatureMaxFrom":"Maximálna teplota od",
-         "temperatureMaxTo":"Maximálna teplota do",
-         "temperatureMinFrom":"Minimálna teplota od",
-         "temperatureMinTo":"Minimálna teplota do",
+         "latitude":"Zemepisná šírka",
+         "longitude":"Zemepisná dĺžka",
+         "humidity":"Vlhkost",
+         "feelTemperature":"Pocitová teplota",
+         "temperature":"Teplota",
+         "temperatureMax":"Maximálna teplota",
+         "temperatureMin":"Minimálna teplota",
          "pickDescriptions":"Vyber popis",
          "pickCountries":"Vyber krajinu"
       }

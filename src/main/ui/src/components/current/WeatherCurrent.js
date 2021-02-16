@@ -1,12 +1,10 @@
-import React, { Component, PureComponent } from 'react'
+import React from 'react'
 import WeatherCurrentService from '../../adapters/WeatherCurrentService';
 import Pagination from '../current/Pagination'
 import FiltersComponent from './Filters'
 import { Link } from "react-router-dom";
 import {getWeatherDescription, convertTemperature} from '../../businessLogic/WeatherBusinessLogic';
-import {temperatureDropdownList} from '../../buildingBlocks/commonBuildingBlocks'
 import '../../styles/common/Header.scss';
-import '../../styles/current/Filters.scss'
 import { nanoid } from "nanoid";
 import i18n from 'i18next'
 
@@ -232,10 +230,10 @@ createForecast = ()=>{
                         <td>{weather.coord.lon}</td>
                         <td>{weather.sys.country}</td>
                         <td>{weather.weatherMain.humidity}</td>
-                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.feels_like))?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.temp))?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.temp_max))?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${parseFloat(convertTemperature(temperature.units, weather.weatherMain.temp_min))?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.feels_like)?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp)?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_max)?.toFixed(2)}${temperature.abbreviation}`}</td>
+                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_min)?.toFixed(2)}${temperature.abbreviation}`}</td>
                         <td>{getWeatherDescription(weather)}</td>
                     </tr>)}
             )

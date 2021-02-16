@@ -10,7 +10,7 @@ import '../i18n'
 
 function WeatherApp (props) {
 
-    const [temperature, setTemperature] = useState({"units": "kelvin", "abbreviation": "K"})
+    const [temperature, setTemperature] = useState({"units": "celsius", "abbreviation": "°C"})
     console.log(temperature)
 
     useEffect(() =>{

@@ -1,5 +1,7 @@
 {
     "common": {
+        "from": "From",
+        "to": "To",
         "description": {
             "broken clouds": "broken clouds",
             "clear sky": "clear sky",
@@ -41,20 +43,13 @@
         },
         "filters": {
             "cityName": "city Name",
-            "latitudeFrom": "latitude From",
-            "latitudeTo": "Latitude To",
-            "longitudeFrom": "Longitude From",
-            "longitudeTo": "Longitude To",
-            "humidityFrom": "Humidity From",
-            "humidityTo": "Humidity to",
-            "feelTemperatureFrom": "Feel Temperature From",
-            "feelTemperatureTo": "Feel Temperature To",
-            "temperatureFrom": "Temperature From",
-            "temperatureTo": "Temperature To",
-            "temperatureMaxFrom": "Temperature Max From",
-            "temperatureMaxTo": "Temperature Max To",
-            "temperatureMinFrom": "Temperature Min From",
-            "temperatureMinTo": "Temperature Min To",
+            "latitude": "Latitude",
+            "longitude": "Longitude",
+            "humidity": "Humidity",
+            "feelTemperature": "Feel Temperature",
+            "temperature": "Temperature",
+            "temperatureMax": "Temperature Max",
+            "temperatureMin": "Temperature Min",
             "pickDescriptions": "Pick Descriptions",
             "pickCountries": "Pick Countries"
         }

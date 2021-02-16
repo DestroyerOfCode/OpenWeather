@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-// import '../../styles/current/Pagination.scss'
 import {getFirstAndPrevious, getPageNumbers, getLastAndNext, calculateLastPageNumber } from "../../businessLogic/PaginationLogic";
 
 class Pagination extends Component {

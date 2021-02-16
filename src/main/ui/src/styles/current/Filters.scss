@@ -1,18 +1,11 @@
-
-.right{
-       float:right;
-
-}
-.left{
-       float:left;
-
-}
-.center{
-       float:center;
-
-}
-.gridContainer {
-    display: grid;
-    width: 100%;
-    grid-template-columns: 1fr 1fr;
-  }
+.currentFiltersWrapper{
+       label{
+              width: 120px;
+              margin: 5px;
+       }
+       input{
+              border-radius: 10px;
+              width: 120px;
+              // background-color: black;
+       }
+}      
