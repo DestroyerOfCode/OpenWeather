@@ -105,7 +105,7 @@ class WeatherInternalLogic {
     void findIndicesOfArrayFilters(ArrayList indicesOfArrayFilters, ArrayList<Map> filterList){
         filterList.eachWithIndex { it, index ->
 
-            if (it.containsKey('sys.country') || it.containsKey('weather.description'))
+            if (it.containsKey('sys.countryName') || it.containsKey('weather.description'))
                 indicesOfArrayFilters.add(index)
         }
 

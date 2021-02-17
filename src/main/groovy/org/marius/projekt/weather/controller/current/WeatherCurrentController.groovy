@@ -1,6 +1,8 @@
 package org.marius.projekt.weather.controller.current
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.bson.BsonDocument
+import org.bson.Document
 import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.service.current.WeatherService
@@ -93,8 +95,25 @@ class WeatherCurrentController {
     @GetMapping("/countries")
     @ResponseBody
     def getDistinctCountries(){
-        mongoTemplate.query(WeatherCurrentModel.class).distinct("sys.country").as(String.class).all().
-                withIndex().collect{ country, index -> ['name': country, 'id': index]}
+        def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class));
+        weatherCurrentModelCollection.aggregate([
+                new Document([
+                    "\$group": [
+                        "_id": "\$sys.country", "countryName": ["\$first" : "\$sys.countryName"]
+                    ]
+                ]),
+                new Document([
+                        "\$addFields": [
+                            "countryCode": "\$_id", "_id": null, "originalCountryName": "\$countryName"
+                        ]
+                ]),
+                BsonDocument.parse('''
+                {
+                    "\$sort": {"countryName" : 1}
+                }
+                ''')
+
+        ]) as List
     }
 
     //originalValue is here because Of translations. Need the original english value
@@ -103,7 +122,7 @@ class WeatherCurrentController {
     @ResponseBody
     def getDistinctDescriptions(){
         mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
-                withIndex().collect{ country, index -> ['name': country, 'id': index, 'originalValue': country]}
+                withIndex().collect{ description, index -> ['name': description, 'id': index, 'originalValue': description]}
     }
 
     private static void writeToFile(def executionTime){

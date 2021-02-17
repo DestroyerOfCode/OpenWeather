@@ -54,6 +54,7 @@ class WeatherCurrentModel implements Mappable {
         String sunset
         Integer type
         String country
+        String countryName
         String id
         String sunrise
     }

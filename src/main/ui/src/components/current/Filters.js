@@ -15,7 +15,7 @@ function FiltersComponent(props) {
         const timeOutId = setTimeout(() => props.onChangeMethod(filtervalue, filterKey, filterOperator), 500);
         return () => clearTimeout(timeOutId);
     }, [filterKey, filtervalue, filterOperator, props]);
-
+    console.log(props.countries)
     var buildFilter = (filterValue, filterKey, filterOperator) => {
         setFilterValue(filterValue); setFilterKey(filterKey); setFilterOperator(filterOperator)
     }
@@ -64,17 +64,17 @@ function FiltersComponent(props) {
             </div>
             {<Multiselect selectedValues={getSelectedDescriptions(props.filters, "weather.description", "in", props.descriptions)} placeholder={i18n.t("current.filters.pickDescriptions")} options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
             onRemove={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}/>}
-                {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.country", "in")} placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='name'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}
-            onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.country", "in")}}/>}
+                {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.countryName", "in", props.countries)} placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='countryName'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}
+            onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}/>}
         </form>
         )
 }
 
 const getSelectedDescriptions= (filters, filterKey, filterOperator, descriptions) =>{
     let retArr= []
-    filters.some((item) => {
-        if (filterKey in item && filterOperator in item[filterKey]){
-            item[filterKey][filterOperator].split(",").forEach((description) => {
+    filters.some((filter) => {
+        if (filterKey in filter && filterOperator in filter[filterKey]){
+            filter[filterKey][filterOperator].split(",").forEach((description) => {
                 let originalValue = ""
                 descriptions.some((item) => {
                     if(description === item.originalValue){
@@ -90,17 +90,28 @@ const getSelectedDescriptions= (filters, filterKey, filterOperator, descriptions
     })
     return retArr
 }
-const getSelectedCountries= (filters, filterKey, filterOperator) =>{
+const getSelectedCountries= (filters, filterKey, filterOperator, countries) =>{
     let retArr = []
-    filters.some((item) =>{
-        if (filterKey in item && filterOperator in item[filterKey]){
-            item[filterKey][filterOperator].split(",").forEach((country) => {
-                retArr.push({"name": country})
+    filters.some((filter) =>{
+        if (filterKey in filter && filterOperator in filter[filterKey]){
+            filter[filterKey][filterOperator].split(",").forEach((countryName) => {
+                let originalValue = ""
+                countries.some((item) => {
+                    console.log(countryName)
+                    console.log(item.originalCountryName)
+                    if (countryName === item.originalCountryName){
+                        originalValue = item.originalCountryName
+                        return true;
+                    } return false;
+                })
+                console.log(originalValue)
+                retArr.push({"countryName": i18n.t(`common.countryName.${originalValue}`), "originalCountryName": originalValue})
             })
             return true;
         }
         return false;
     })
+    console.log(retArr)
     return retArr
 }
 const getOriginalValue =    (filter, temperature, filterKey, filterOperator) => {
@@ -151,7 +162,7 @@ const makeStringFromDescriptions= (items) => {
 }
 const makeStringFromCountries= (items) => {
     var selectedItemsIntoString = (prevVal, currVal, idx) => {
-        return idx === 0 ? currVal.name : prevVal + "," + currVal.name
+        return idx === 0 ? currVal.originalCountryName : prevVal + "," + currVal.originalCountryName
     }
     return items.reduce(selectedItemsIntoString, '')
 }

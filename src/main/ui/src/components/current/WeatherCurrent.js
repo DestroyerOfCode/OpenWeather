@@ -40,7 +40,7 @@ class WeatherCurrent extends React.Component {
         const countries = await WeatherCurrentService.retrieveAllCountries()
         const descriptions = await WeatherCurrentService.retrieveAllDescriptions()
         this.setState({countries : countries.data, descriptions : (descriptions.data),
-            filterComponent: <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {countries.data}
+            filterComponent: <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {this.internationalizeCountries(countries.data)}
             descriptions = {this.internationalizeDescriptions(descriptions.data)} onChangeMethod={this.onChangeFilter} />
         },
             function() {this.refreshWeathers()}
@@ -64,6 +64,13 @@ class WeatherCurrent extends React.Component {
         return descriptions.map( (description) => (
             {"name" : i18n.t("common.description." + description.originalValue), "id": description.id, "originalValue" : description.originalValue}
         ))
+    }
+
+    internationalizeCountries = (descriptions) => {
+        return descriptions.map( (country) => {
+            // console.log(country)
+         return {"countryName" : i18n.t("common.countryName." + country.originalCountryName), "id": country.code, "originalCountryName" : country.originalCountryName}
+        })
     }
     refreshWeathers(sortBy, weathers) {
 
@@ -197,7 +204,7 @@ class WeatherCurrent extends React.Component {
            <th onClick={() =>this.refreshWeathers("name", this.state.weathers) }>{ i18n.t('current.header.cityName')}</th>
            <th onClick={() =>this.refreshWeathers("coord.lat", this.state.weathers) }>{i18n.t("current.header.latitude")}</th>
            <th onClick={() =>this.refreshWeathers("coord.lon", this.state.weathers) }>{i18n.t("current.header.longitude")}</th>
-           <th onClick={() =>this.refreshWeathers("sys.country", this.state.weathers) }>{i18n.t("current.header.country")}</th>
+           <th onClick={() =>this.refreshWeathers("sys.countryName", this.state.weathers) }>{i18n.t("current.header.country")}</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.humidity", this.state.weathers) }>{i18n.t("current.header.humidity")}</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.feels_like", this.state.weathers) }>{i18n.t("current.header.feelsLike")}</th>
            <th onClick={() =>this.refreshWeathers("weatherMain.temp", this.state.weathers) }>{i18n.t("current.header.temperature")}</th>
@@ -222,13 +229,12 @@ createForecast = ()=>{
         {
             currentPosts.map(
                 weather =>{
-                    // console.log(weather.weatherMain.feels_like)
                     return (<tr key={nanoid()}>
                         <td>{weather._id}</td>
                         <td> <Link to={{pathname: "/forecast", state: {"lat": weather.coord.lat, "lon": weather.coord.lon} }}>{weather.name}</Link></td>
                         <td>{weather.coord.lat}</td>
                         <td>{weather.coord.lon}</td>
-                        <td>{weather.sys.country}</td>
+                        <td>{i18n.t(`common.countryName.${weather.sys.countryName}`)}</td>
                         <td>{weather.weatherMain.humidity}</td>
                         <td>{`${convertTemperature(temperature.units, weather.weatherMain.feels_like)?.toFixed(2)}${temperature.abbreviation}`}</td>
                         <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp)?.toFixed(2)}${temperature.abbreviation}`}</td>
@@ -264,13 +270,13 @@ createForecast = ()=>{
 
     render() {
         console.log("som v render")
-        console.log(this.props.temperature)
         const currentWeathers = this.getWeathersOnSpecificPage()
         const descriptions = this.internationalizeDescriptions(this.state.descriptions)
+        const countries = this.internationalizeCountries(this.state.countries)
         // let filters =     (
             // this.state.filterComponent)
         
-        let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.props.temperature.units} countries = {this.state.countries}
+        let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.props.temperature.units} countries = {countries}
             descriptions = {this.internationalizeDescriptions(descriptions)}
             filters = {this.state.filters} onChangeMethod={this.onChangeFilter} temperature={this.props.temperature} />
 
