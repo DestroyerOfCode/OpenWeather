@@ -6,16 +6,20 @@ import i18n from 'i18next'
 
 function FiltersComponent(props) {
    
-    //TODO find out how to call setMethod in buildFilter function
     const [filterKey, setFilterKey] = useState("")
     const [filtervalue, setFilterValue] = useState("");
     const [filterOperator, setFilterOperator] = useState("");
+    const [countries, setCountries] = useState([])
+    const [descriptions, setDescriptions] = useState([])
 
     useEffect(() => {
         const timeOutId = setTimeout(() => props.onChangeMethod(filtervalue, filterKey, filterOperator), 500);
         return () => clearTimeout(timeOutId);
     }, [filterKey, filtervalue, filterOperator, props]);
-    console.log(props.countries)
+   
+    props.countries.then((res) => setCountries(res))
+    props.descriptions.then((res) => setDescriptions(res))
+
     var buildFilter = (filterValue, filterKey, filterOperator) => {
         setFilterValue(filterValue); setFilterKey(filterKey); setFilterOperator(filterOperator)
     }
@@ -62,9 +66,9 @@ function FiltersComponent(props) {
                     <input type="text" defaultValue={getOriginalValue(props.filters, props.temperature, "name", "eq")} placeholder= {i18n.t("current.filters.cityName") } onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}/>
                 </label>
             </div>
-            {<Multiselect selectedValues={getSelectedDescriptions(props.filters, "weather.description", "in", props.descriptions)} placeholder={i18n.t("current.filters.pickDescriptions")} options = {props.descriptions} displayValue='name' showCheckbox={true} onSelect={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
+            {<Multiselect selectedValues={getSelectedDescriptions(props.filters, "weather.description", "in", descriptions)} placeholder={i18n.t("current.filters.pickDescriptions")} options = {descriptions} displayValue='name' onSelect={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
             onRemove={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}/>}
-                {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.countryName", "in", props.countries)} placeholder={i18n.t("current.filters.pickCountries")} options ={props.countries} displayValue='countryName'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}
+                {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.countryName", "in", countries)} placeholder={i18n.t("current.filters.pickCountries")} options ={countries} displayValue='countryName'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}
             onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}/>}
         </form>
         )
@@ -114,11 +118,9 @@ const getSelectedCountries= (filters, filterKey, filterOperator, countries) =>{
     console.log(retArr)
     return retArr
 }
-const getOriginalValue =    (filter, temperature, filterKey, filterOperator) => {
+const getOriginalValue = (filter, temperature, filterKey, filterOperator) => {
     let ret = ""
     const temperatureKeys= [
-        "weatherMain.humidity",
-        "weatherMain.humidity",
         "weatherMain.feels_like",
         "weatherMain.temp",
         "weatherMain.temp_max",

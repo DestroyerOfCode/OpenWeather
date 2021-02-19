@@ -27,8 +27,8 @@ class WeatherService {
         return filterString
     }
 
-    retrieveAllCountries = () =>  axios.get(`${WEATHER_CURRENT_API_URL}/countries`)
-    retrieveAllDescriptions = () => axios.get(`${WEATHER_CURRENT_API_URL}/descriptions`)
+    retrieveAllCountries =async  () => await  axios.get(`${WEATHER_CURRENT_API_URL}/countries`)
+    retrieveAllDescriptions = async () => await axios.get(`${WEATHER_CURRENT_API_URL}/descriptions`)
 
 
 }

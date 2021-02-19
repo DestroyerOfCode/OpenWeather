@@ -10,15 +10,16 @@ import { Link } from "react-router-dom";
     const [dailyWeatherForecast, setDailyWeatherForecast] = useState({})
     const temperature = props.temperature
     console.log(temperature)
+    console.log(props)
     useEffect(() =>{
        
         WeatherForecastService.getDailyForecastByCityName(props.history.location.state.lat,props.history.location.state.lon, "Current,Hourly,Minutely")
         .then( response => setDailyWeatherForecast(response.data)) 
         }, [props.history.location.state.lat, props.history.location.state.lon])
-
+        console.log(props.location.state.filters !== undefined)
     return (
     <div>
-         <Link to= {{pathname: "/"}}>
+         <Link to= {{pathname: "/", state: {"filters": props.location.state.filters, "isFromForecast": true, "isFilter": props.location.state.filters !== undefined, "currentWeathers": props.location.state.currentWeathers}}}>
             <button>{i18n.t("forecast.currentWeather")}</button>
         </Link>
             <table className="weatherTable">
