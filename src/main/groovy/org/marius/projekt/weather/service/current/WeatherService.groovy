@@ -1,33 +1,58 @@
 package org.marius.projekt.weather.service.current
-
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
 import org.apache.groovy.json.internal.LazyMap
-import org.bson.Document
-import org.marius.projekt.weather.businessLogic.FilterOperatorOverload
+import org.bson.BsonDocument
 import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.client.ResourceAccessException;
 
+@EnableScheduling
 @Service
 class WeatherService {
 
     @Autowired WeatherInternalLogic weatherInternalLogic
     @Autowired WeatherCurrentModelRepository weatherCurrentModelRepository
+    @Autowired MongoTemplate mongoTemplate
 
     WeatherCurrentModel findWeather(Map<String, Object> opts ){
 
         Object weatherMap = (LazyMap) weatherInternalLogic.parseWeatherEntityToJson(weatherInternalLogic.setOpenWeatherApiHeaders(),opts)
+        def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class));
+
         ObjectMapper mapper = new ObjectMapper()
 
+        //noinspection GroovyAssignabilityCheck
+        def countryNamesArr = weatherCurrentModelCollection.aggregate([BsonDocument.parse('''
+            {
+                "\$match": {
+                    "sys.country":"'''+weatherMap.sys.country+'''"
+                }
+            },
+            {
+                "\$lookup": {
+                    "from": "countries",
+                    "localField": "sys.country",
+                    "foreignField": "code",
+                    "as": "countries"
+                }
+            },
+            {
+                "\$project": {
+                    "countries.name": 1
+                }
+            }
+        ''')]) as List
+
+        weatherMap.sys << ["countryName" : countryNamesArr.first().sys.countryName]
 //       I already have a Main class and the beans were intersecting each other so i named it weatherMain
         Object o = weatherMap.remove('main')
         weatherMap.put('weatherMain', o)
@@ -49,6 +74,13 @@ class WeatherService {
             weatherMap.snow.put('threeh', o)
         }
 
+        weatherMap.coord.lat = new Double(weatherMap.coord.lat)
+        weatherMap.coord.lon = new Double(weatherMap.coord.lon)
+        weatherMap.weatherMain.temp = new Double(weatherMap.weatherMain.temp)
+        weatherMap.weatherMain.feels_like = new Double(weatherMap.weatherMain.feels_like)
+        weatherMap.weatherMain.temp_max = new Double(weatherMap.weatherMain.temp_max)
+        weatherMap.weatherMain.temp_min = new Double(weatherMap.weatherMain.temp_min)
+
         WeatherCurrentModel weatherCurrentModel = mapper.convertValue(weatherMap, WeatherCurrentModel.class)
         return weatherCurrentModel
     }
@@ -58,7 +90,7 @@ class WeatherService {
     }
 
     ArrayList findCityIds(){
-        BufferedReader idStream = new BufferedReader(new InputStreamReader(new FileInputStream('src/main/resources/cityList.json'), 'UTF-8'))
+        BufferedReader idStream = new BufferedReader(new InputStreamReader(new FileInputStream('src/main/resources/SlovakCitiesList.json'), 'UTF-8'))
         new JsonSlurper().parse(idStream) as ArrayList ?: null
 
     }
@@ -75,6 +107,7 @@ class WeatherService {
     }
 
 //    @CompileStatic
+    @Scheduled(cron = "* 0 * * * ?")
     ArrayList<WeatherCurrentModel> saveAllWeatherCurrentData(){
         def cityIds = findCityIds()
         ArrayList<WeatherCurrentModel> weathers = new ArrayList<WeatherCurrentModel>()
@@ -83,7 +116,7 @@ class WeatherService {
                 try {
 
                     // this is to not overpass the minute limit for FREE API calls
-                    if (index != 0 && index % 59 == 0)
+                        if (index != 0 && index % 40 == 0)
                         sleep(65_000L)
                     weathers.add(findWeather(['cityId': cityId.id]))
                     saveWeatherCurrent(weathers[index])
@@ -111,7 +144,7 @@ class WeatherService {
 
         //this is used during the start
         if (!weathers && !new Boolean((String) opts.isFilter))
-            return (ArrayList<WeatherCurrentModel>) weatherCurrentModelRepository.findAll()
+            return (ArrayList<WeatherCurrentModel>) weatherCurrentModelRepository.findAll().findAll {item-> item.sys.country == 'SK'}
 
         weathers
     }

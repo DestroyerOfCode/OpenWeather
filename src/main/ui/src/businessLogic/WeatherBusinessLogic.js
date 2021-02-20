@@ -14,10 +14,10 @@ export const displayDateTime = (dateTime) => {
 export const convertTemperature = (convertTo, temp) => {
     // console.log(convertTo)
     if (convertTo === "celsius")
-        return temp - 273.15
+        return typeof temp === 'string' ? parseFloat(temp - 273.15) : temp - 273.15
     else if (convertTo === "fahrenheit")
-        return (temp -273.15) * 1.8 + 32
-    else return temp
+        return typeof temp === 'string' ? parseFloat((temp -273.15) * 1.8 + 32) : (temp -273.15) * 1.8 + 32
+    else return typeof temp === 'string' ? parseFloat(temp ) : temp
 }
 
 

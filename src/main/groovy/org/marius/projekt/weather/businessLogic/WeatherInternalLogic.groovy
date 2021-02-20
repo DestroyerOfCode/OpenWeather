@@ -182,7 +182,7 @@ class WeatherInternalLogic {
         weatherCurrentModelCollection.aggregate([
                 new Document([$match: [
                         $and : [
-
+                            ["sys.country": "SK"]
                         ] << buildFilters.call(filterList)
                 ]]),
                 new Document([$project : [

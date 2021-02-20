@@ -1,6 +1,8 @@
 package org.marius.projekt.weather.controller.current
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import groovy.json.JsonGenerator
 import org.bson.BsonDocument
 import org.bson.Document
 import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
@@ -13,6 +15,8 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,6 +28,10 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.client.RestTemplate
+
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
 
 @Controller
 @CrossOrigin(origins = ["http://localhost:3000"])
