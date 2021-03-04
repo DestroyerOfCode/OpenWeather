@@ -16,6 +16,8 @@ function WeatherApp (props) {
     useEffect(() =>{
 
     },[props])
+    console.log(process.env.MONGO_URI)
+    console.log(process.env.REACT_APP_MONGO_URI)
     return <main> 
         <div>                               
             <button onClick={() => i18n.changeLanguage("en")}>EN</button>
