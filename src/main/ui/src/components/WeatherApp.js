@@ -30,7 +30,7 @@ function WeatherApp (props) {
             }
         </div>,   
         <Switch>
-            <Route exact path ='/' render={(props) => {console.log(props);return <WeatherCurrentComponent {...props} temperature={temperature}/>}}/>
+            <Route exact path ='https://tvoje-pocasie.herokuapp.com' render={(props) => {console.log(props);return <WeatherCurrentComponent {...props} temperature={temperature}/>}}/>
             <Route path ='/forecast' render={(props) => <WeatherForecastComponent {...props} temperature={temperature}/>}/>
 
         </Switch>
