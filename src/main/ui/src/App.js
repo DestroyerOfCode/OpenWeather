@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './App.css'
 import WeatherApp from './components/WeatherApp';
 import {nanoid} from 'nanoid'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import './i18n'
 import { Suspense } from 'react'
 
@@ -11,9 +11,9 @@ class App extends Component {
     return (
       <React.StrictMode>
         <Suspense fallback={<div>Loading ...</div>}>
-          <BrowserRouter key="browserRouter">
+          <HashRouter key="hashRouter">
             <WeatherApp />
-          </BrowserRouter>
+          </HashRouter>
         </Suspense>
       </React.StrictMode>
     );
