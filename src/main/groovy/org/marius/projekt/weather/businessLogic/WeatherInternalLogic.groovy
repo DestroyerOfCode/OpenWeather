@@ -7,6 +7,7 @@ import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -28,6 +29,8 @@ class WeatherInternalLogic {
     @Autowired FilterOperatorOverload filterOperatorOverload
     @Autowired MongoTemplate mongoTemplate
 
+    @Value("\${openweather.api.key.one}")
+    private String openweather_api_key_one
     /***
      *
      * @param entity
@@ -65,7 +68,7 @@ class WeatherInternalLogic {
         }
 
         url.append("&units=${opts.get('units')}" as String)
-        url.append("&appid=${openWeatherSecurityRepository.findAll().first().apiKey}" as String)
+        url.append("&appid=${openweather_api_key_one}" as String)
         new String (url)
     }
 
