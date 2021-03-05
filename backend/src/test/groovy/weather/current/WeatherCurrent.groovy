@@ -1,13 +1,10 @@
 package weather.current
 
 import groovy.json.JsonBuilder
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.RepeatedTest
 import org.junit.runner.RunWith
 import org.marius.projekt.Main
 import org.marius.projekt.weather.model.current.WeatherCurrentModel

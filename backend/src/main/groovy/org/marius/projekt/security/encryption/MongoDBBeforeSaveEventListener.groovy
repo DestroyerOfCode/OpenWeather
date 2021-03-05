@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @CompileStatic

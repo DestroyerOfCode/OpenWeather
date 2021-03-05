@@ -2,7 +2,6 @@ package org.marius.projekt.weather.service.forecast
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
 import org.marius.projekt.weather.model.forecast.WeatherForecastModel
