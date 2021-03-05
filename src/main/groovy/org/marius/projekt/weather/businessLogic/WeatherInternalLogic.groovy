@@ -29,8 +29,8 @@ class WeatherInternalLogic {
     @Autowired FilterOperatorOverload filterOperatorOverload
     @Autowired MongoTemplate mongoTemplate
 
-    @Value("\${openweather.api.key.one}")
-    private String openweather_api_key_one
+//    @Value("\${openweather.api.key.one}")
+//    private String openweather_api_key_one
     /***
      *
      * @param entity
@@ -68,7 +68,7 @@ class WeatherInternalLogic {
         }
 
         url.append("&units=${opts.get('units')}" as String)
-        url.append("&appid=${openweather_api_key_one}" as String)
+        url.append("&appid=${System.getenv("openweather.api.key.one") }" as String)
         new String (url)
     }
 
