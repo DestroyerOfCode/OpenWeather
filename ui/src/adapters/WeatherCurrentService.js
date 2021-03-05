@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const COURSE_API_URL = 'http://localhost:8080'
+const COURSE_API_URL = process.env.REACT_APP_API_URL || process.env.API_URL || 'http://localhost:8080'
 const WEATHER_CURRENT_API_URL = `${COURSE_API_URL}/weather/current`
 
 class WeatherService {
@@ -8,6 +8,7 @@ class WeatherService {
     retrieveAllWeathers(sortBy, isAscending, filters, isFilter, isAdditionalFilter, weathers) {
         console.log("filters: ")
         console.log(filters)
+        console.log(process.env)
         var filterString = this.buildFilterString(filters)
         if(!weathers)
             weathers = []
