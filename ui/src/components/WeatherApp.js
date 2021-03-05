@@ -7,6 +7,7 @@ import {temperatureDropdownList} from '../buildingBlocks/commonBuildingBlocks'
 
 import i18n from 'i18next'
 import '../i18n'
+// require('dotenv').config()
 
 function WeatherApp (props) {
 
