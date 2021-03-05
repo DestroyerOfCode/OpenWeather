@@ -12,7 +12,6 @@ public class DatabaseConfig {
 
 //    @Value("${mongo.uri}")
 //    private String mongo_uri;
-
     @Bean
     MongoClient mongoClient() {
         return System.getenv("mongo_uri") == null ? MongoClients.create("mongodb://localhost:27017") : MongoClients.create( System.getenv("mongo_uri"));
