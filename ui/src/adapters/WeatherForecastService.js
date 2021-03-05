@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 const COURSE_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080'
-
 const WEATHER_FORECAST_API_URL = `${COURSE_API_URL}/weather/forecast`
 
 class WeatherForecastService{
