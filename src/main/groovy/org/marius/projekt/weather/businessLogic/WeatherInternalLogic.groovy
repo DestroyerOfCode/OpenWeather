@@ -68,7 +68,7 @@ class WeatherInternalLogic {
         }
 
         url.append("&units=${opts.get('units')}" as String)
-        url.append("&appid=${System.getenv("openweather.api.key.one") }" as String)
+        url.append("&appid=${System.getenv("OPENWEATHER_API_KEY_ONE") }" as String)
         new String (url)
     }
 
