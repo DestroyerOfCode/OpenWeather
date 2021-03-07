@@ -23,7 +23,7 @@ class WeatherForecastService {
     WeatherForecastModel getWeatherForecastByCoordinates(Number lat, Number lon, String excludedForecasts){
 
         try {
-            def uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${openWeatherSecurityRepository.findAll().first().apiKey}"
+            def uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${System.getenv("OPENWEATHER_API_KEY_ONE")}"
             ResponseEntity<String> weatherDailyJson = restTemplate.exchange(uriString, HttpMethod.GET, weatherInternalLogic.setOpenWeatherApiHeaders(), String.class)
 
             Map<String, Object> weatherDailyMap = (HashMap<String, Object>) new JsonSlurper().parseText(weatherDailyJson.body.toString())
