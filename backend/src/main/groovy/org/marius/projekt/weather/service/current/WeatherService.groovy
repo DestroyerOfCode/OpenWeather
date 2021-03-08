@@ -107,7 +107,6 @@ class WeatherService {
     }
 
 //    @CompileStatic
-    @Scheduled(cron = "* 0 * * * ?")
     ArrayList<WeatherCurrentModel> saveAllWeatherCurrentData(){
         def cityIds = findCityIds()
         ArrayList<WeatherCurrentModel> weathers = new ArrayList<WeatherCurrentModel>()

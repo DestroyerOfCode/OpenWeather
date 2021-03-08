@@ -27,7 +27,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "publishToHeroku": "cd ../ && git subtree push --prefix backend tvoje-pocasie-api master && git subtree push --prefix ui tvoje-pocasie master || true"
   },
   "eslintConfig": {
     "extends": [
