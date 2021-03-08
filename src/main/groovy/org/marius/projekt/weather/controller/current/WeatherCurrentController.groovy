@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -66,12 +67,10 @@ class WeatherCurrentController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
+    @Scheduled(cron = "* 0 * * * ?")
     @ResponseBody
     def saveAllWeatherCurrentData() {
-        def weathers = weatherService.saveAllWeatherCurrentData()
-        if ( weathers )
-            return new ResponseEntity<ArrayList<WeatherCurrentModel>>(weathers, HttpStatus.CREATED)
-        return new ResponseEntity<ArrayList<WeatherCurrentModel>>(weathers, HttpStatus.NO_CONTENT)
+        weatherService.saveAllWeatherCurrentData()
     }
 
     @PostMapping("/all")
@@ -119,6 +118,14 @@ class WeatherCurrentController {
     def getDistinctDescriptions(){
         mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
                 withIndex().collect{ description, index -> ['name': description, 'id': index, 'originalValue': description]}
+    }
+
+    //heroku disables server after 30 mins of inactivity
+    //this is to prevent it from happening
+    @Scheduled(cron = "* /20 * * * ?")
+    @GetMapping("/ping")
+    def pingServer(){
+        println("pinging server")
     }
 
     private static void writeToFile(def executionTime){
