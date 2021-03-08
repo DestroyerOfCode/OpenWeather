@@ -124,6 +124,7 @@ class WeatherCurrentController {
     //this is to prevent it from happening
     @Scheduled(cron = "* /20 * * * ?")
     @GetMapping("/ping")
+    @ResponseBody
     def pingServer(){
         println("pinging server")
     }
