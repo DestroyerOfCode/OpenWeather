@@ -122,7 +122,7 @@ class WeatherCurrentController {
 
     //heroku disables server after 30 mins of inactivity
     //this is to prevent it from happening
-    @Scheduled(cron = "* /20 * * * ?")
+    @Scheduled(cron = "* */20 * * * ?")
     @GetMapping("/ping")
     @ResponseBody
     def pingServer(){
