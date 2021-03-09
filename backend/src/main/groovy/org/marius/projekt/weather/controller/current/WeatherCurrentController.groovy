@@ -126,7 +126,7 @@ class WeatherCurrentController {
     @GetMapping("/ping")
     @ResponseBody
     def pingServer(){
-        println("pinging server")
+        println("pinging server wee")
     }
 
     private static void writeToFile(def executionTime){
