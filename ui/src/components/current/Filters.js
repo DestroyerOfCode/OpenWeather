@@ -1,145 +1,209 @@
 import React, { useState, useEffect} from "react";
+import { useDispatch, useSelector } from 'react-redux'
 import { Multiselect } from 'multiselect-react-dropdown';
 import '../../styles/current/Filters.scss'
-import {convertTemperature} from '../../businessLogic/WeatherBusinessLogic'
 import i18n from 'i18next'
+import { makeStyles } from '@material-ui/core/styles';
+import FormControl from '@material-ui/core/FormControl';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import { nanoid } from 'nanoid'
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+      '& > *': {
+        margin: theme.spacing(1),
+      },
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    margin: {
+        margin: theme.spacing(1),
+      },
+  }));
 
 function FiltersComponent(props) {
    
-    const [filterKey, setFilterKey] = useState("")
-    const [filtervalue, setFilterValue] = useState("");
-    const [filterOperator, setFilterOperator] = useState("");
     const [countries, setCountries] = useState([])
     const [descriptions, setDescriptions] = useState([])
-
-    useEffect(() => {
-        const timeOutId = setTimeout(() => props.onChangeMethod(filtervalue, filterKey, filterOperator), 500);
-        return () => clearTimeout(timeOutId);
-    }, [filterKey, filtervalue, filterOperator, props]);
-   
+    const filters = useSelector(filters => filters)
+    const dispatch = useDispatch()
+    const classes = useStyles()
     props.countries.then((res) => setCountries(res))
     props.descriptions.then((res) => setDescriptions(res))
 
-    var buildFilter = (filterValue, filterKey, filterOperator) => {
-        setFilterValue(filterValue); setFilterKey(filterKey); setFilterOperator(filterOperator)
+    const onBlurEvent = (event, filterName, filterOperator) => {
+        console.log(filterName)
+        console.log(event)
+        // console.log(event.target.value)
+        dispatch({type: 'UPDATE_FILTERS', value: event, filterName: [filterName], filterOperator: [filterOperator]})
     }
         return (
-        <form className="currentFiltersWrapper">
-            <div >
-                <label>
-                    {i18n.t("current.filters.latitude")}
-                    <input type="number" defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lat", "gte")} placeholder= {i18n.t("common.from")} onChange= {event =>{buildFilter(event.target.value, "coord.lat", "gte")}}/>
-                    <input type="number" defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lat", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(event.target.value, "coord.lat", "lte")}}></input>
-                </label>
-                <label>
-                    {i18n.t("current.filters.longitude")}
-                    <input type="number" defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lon", "gte")} placeholder= {i18n.t("common.from") } onChange= {event =>{buildFilter(event.target.value, "coord.lon", "gte")}}></input>
-                    <input type="number" defaultValue={getOriginalValue(props.filters, props.temperature, "coord.lon", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(event.target.value, "coord.lon", "lte")}}></input>
-                </label>
-                <label>
-                    {i18n.t("current.filters.humidity")}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.humidity", "gte")} placeholder= {i18n.t("common.from") } onChange= {event =>{buildFilter(event.target.value, "weatherMain.humidity", "gte")}}></input>}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.humidity", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(event.target.value, "weatherMain.humidity", "lte")}}></input>}
-                </label>
-                <label>
-                    {i18n.t("current.filters.feelTemperature")}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.feels_like", "gte")} placeholder= {i18n.t("common.from") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "gte")}}></input>}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.feels_like", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.feels_like", "lte")}}></input>}
-                </label>
-                <label>
-                    {i18n.t("current.filters.temperatureMax")}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_max", "gte")} placeholder= {i18n.t("common.from") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "gte")}}></input>}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_max", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_max", "lte")}}></input>}
-                </label>
-                <label>
-                    {i18n.t("current.filters.temperatureMin")}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_min", "gte")} placeholder= {i18n.t("common.from") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "gte")}}></input>}
-                    {<input type="number"defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp_min", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp_min", "lte")}}></input>}
-                </label>
-                <label>
-                    {i18n.t("current.filters.temperature")}
-                    {<input type="number"style={{width: "90px"}} defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp", "gte")} placeholder= {i18n.t("common.from") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "gte")}}></input>}
-                    {<input type="number"style={{width: "90px"}} defaultValue={getOriginalValue(props.filters, props.temperature, "weatherMain.temp", "lte")} placeholder= {i18n.t("common.to") } onChange= {event =>{buildFilter(calculateKelvins(props.temperatureUnits, event.target.value), "weatherMain.temp", "lte")}}></input>}
-                </label>
-                <label> 
-                    {i18n.t("current.filters.cityName")}
-                    <input type="text" defaultValue={getOriginalValue(props.filters, props.temperature, "name", "eq")} placeholder= {i18n.t("current.filters.cityName") } onChange= {event =>{buildFilter(event.target.value, "name", "eq")}}/>
-                </label>
-            </div>
-            {<Multiselect selectedValues={getSelectedDescriptions(props.filters, "weather.description", "in", descriptions)} placeholder={i18n.t("current.filters.pickDescriptions")} options = {descriptions} displayValue='name' onSelect={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}
-            onRemove={event =>{buildFilter(makeStringFromDescriptions(event), "weather.description", "in")}}/>}
-                {<Multiselect selectedValues={getSelectedCountries(props.filters, "sys.countryName", "in", countries)} placeholder={i18n.t("current.filters.pickCountries")} options ={countries} displayValue='countryName'  onSelect={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}
-            onRemove={event =>{buildFilter(makeStringFromCountries(event), "sys.countryName", "in")}}/>}
+        <form form className={classes.root} noValidate autoComplete="off">
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={String} htmlFor="component-simple">{i18n.t("current.filters.cityName")}</InputLabel>
+                <Input id={nanoid()} defaultValue={filters['name']?.$eq} onBlur={(event) => onBlurEvent(event.target.value, "name", "$eq")} />
+            </FormControl>
+            <FormControl>
+                <InputLabel variant="standard" type={String} htmlFor="component-simple">{i18n.t("current.filters.latitude")} {i18n.t("common.from")}</InputLabel>
+                <Input fullWidth={false} placeholder={i18n.t("common.from")} id={nanoid()} defaultValue={filters['coord.lat']?.$gte} 
+                onBlur={(event) => onBlurEvent(event.target.value, "coord.lat", "$gte")} />
+            </FormControl>
+            <FormControl>
+                <InputLabel type={String} htmlFor="component-simple">{i18n.t("current.filters.latitude")} {i18n.t("common.to")}</InputLabel>
+                <Input placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['coord.lat']?.$lte} 
+                onBlur={(event) => onBlurEvent(event.target.value, "coord.lat", "$lte")} />
+            </FormControl>
+            <FormControl>
+                <InputLabel type={String} htmlFor="component-simple">{i18n.t("current.filters.longitude")} {i18n.t("common.from")}</InputLabel>
+                <Input placeholder={i18n.t("common.from")} id={nanoid()} defaultValue={filters['coord.lon']?.$gte} 
+                onBlur={(event) => onBlurEvent(event.target.value, "coord.lon", "$gte")} />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={String} htmlFor="component-simple">{i18n.t("current.filters.longitude")} {i18n.t("common.to")}</InputLabel>
+                <Input placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['coord.lon']?.$lte} 
+                onBlur={(event) => onBlurEvent(event.target.value, "coord.lon", "$lte")} />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small" fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.humidity")} {i18n.t("common.from")}</InputLabel>
+                <Input type={Number} placeholder={i18n.t("common.from")} id={nanoid()} defaultValue={filters['weatherMain.humidity']?.$gte} 
+                onBlur={(event) => {
+                    if (event && event.target.value !== '') 
+                        return onBlurEvent(parseFloat(event.target.value), "weatherMain.humidity", "$gte");
+                    else 
+                        return onBlurEvent('', "weatherMain.humidity", "$gte")}
+                    } 
+            />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.humidity")} {i18n.t("common.to")}</InputLabel>
+                <Input type={Number} placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['weatherMain.humidity']?.$lte} 
+                onBlur={(event) => {
+                    if (event && event.target.value !== '') 
+                        return onBlurEvent( parseFloat(event.target.value), "weatherMain.humidity", "$lte");
+                    else 
+                        return onBlurEvent('', "weatherMain.humidity", "$lte")}
+                    } 
+                />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.feelTemperature")} {i18n.t("common.from")}</InputLabel>
+                <Input placeholder={i18n.t("common.from")} id={nanoid()} defaultValue={filters['weatherMain.feels_like']?.$gte} 
+                onBlur={(event) => {
+                    if (event && event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.feels_like", "$gte");
+                    else 
+                        return onBlurEvent('', "weatherMain.feels_like", "$gte")}
+                    } 
+            />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.feelTemperature")} {i18n.t("common.to")}</InputLabel>
+                <Input placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['weatherMain.feels_like']?.$lte} 
+                onBlur={(event) => {
+                    if (event && event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.feels_like", "$lte");
+                    else 
+                        return onBlurEvent('', "weatherMain.feels_like", "$lte")}
+                    } 
+            />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={String} htmlFor="component-simple">{i18n.t("current.filters.temperatureMax")} {i18n.t("common.from")}</InputLabel>
+                <Input placeholder={i18n.t("common.from")} id="component-simple" defaultValue={filters['weatherMain.temp_max']?.$gte} 
+                onBlur={(event) => {
+                    if (event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.temp_max", "$gte");
+                    else 
+                        return onBlurEvent('', "weatherMain.temp_max", "$gte")}
+                    } 
+                />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.temperatureMax")} {i18n.t("common.to")}</InputLabel>
+                <Input placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['weatherMain.temp_max']?.$lte} 
+                onBlur={(event) => {
+                    if (event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.temp_max", "$lte");
+                    else 
+                        return onBlurEvent('', "weatherMain.temp_max", "$lte")}
+                    } 
+                />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.temperatureMin")} {i18n.t("common.from")}</InputLabel>
+                <Input placeholder={i18n.t("common.from")} id={nanoid()} defaultValue={filters['weatherMain.temp_min']?.$gte} 
+                onBlur={(event) => {
+                    if (event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.temp_min", "$gte");
+                    else 
+                        return onBlurEvent('', "weatherMain.temp_min", "$gte")}
+                    } 
+                />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.temperatureMin")} {i18n.t("common.to")}</InputLabel>
+                <Input placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['weatherMain.temp_min']?.$lte} 
+                onBlur={(event) => {
+                    if (event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.temp_min", "$lte");
+                    else 
+                        return onBlurEvent('', "weatherMain.temp_min", "$lte")}
+                    } 
+                />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.temperature")} {i18n.t("common.from")}</InputLabel>
+                <Input placeholder={i18n.t("common.from")} id={nanoid()} defaultValue={filters['weatherMain.temp']?.$gte} 
+                onBlur={(event) => {
+                    if (event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.temp", "$gte");
+                    else 
+                        return onBlurEvent('', "weatherMain.temp", "$gte")}
+                    } 
+                />
+            </FormControl>
+            <FormControl fullWidth={false} variant = "filled" size="small">
+                <InputLabel type={Number} htmlFor="component-simple">{i18n.t("current.filters.temperature")} {i18n.t("common.to")}</InputLabel>
+                <Input placeholder={i18n.t("common.to")} id={nanoid()} defaultValue={filters['weatherMain.temp']?.$lte} 
+                onBlur={(event) => {
+                    if (event.target.value !== '') 
+                        return onBlurEvent(parseFloat(calculateKelvins(props.temperatureUnits, event.target.value)), "weatherMain.temp", "$lte");
+                    else 
+                        return onBlurEvent('', "weatherMain.temp", "$lte")}
+                    } 
+                />
+            </FormControl>
+            <Multiselect 
+            selectedValues={getSelectedDescriptions(filters['weather.description']?.$in, descriptions)}
+                          placeholder={i18n.t("current.filters.pickDescriptions")} 
+                          options = {descriptions} 
+                          displayValue='name' 
+                          onSelect={event =>{dispatch({type: 'UPDATE_FILTERS', value: event.map((desc) => desc.originalValue), filterName: "weather.description", filterOperator: "$in"})}}
+                          onRemove={event =>{dispatch({type: 'UPDATE_FILTERS', value: event.map((desc) => desc.originalValue), filterName: "weather.description", filterOperator: "$in"})}}/>
+            <Multiselect 
+            selectedValues={getSelectedCountries(filters['sys.countryName']?.$in, countries)}
+                          placeholder={i18n.t("current.filters.pickCountries")} 
+                          options ={countries} 
+                          displayValue='countryName' 
+                          onSelect={event =>{console.log(event);dispatch({type: 'UPDATE_FILTERS', value: event.map((country) => country.originalCountryName), filterName: "sys.countryName", filterOperator: "$in"})}}
+                          onRemove={event =>{dispatch({type: 'UPDATE_FILTERS', value: event.map((country) => country.originalCountryName), filterName: "sys.countryName", filterOperator: "$in"})}}/>
         </form>
         )
 }
 
-const getSelectedDescriptions= (filters, filterKey, filterOperator, descriptions) =>{
-    let retArr= []
-    filters.some((filter) => {
-        if (filterKey in filter && filterOperator in filter[filterKey]){
-            filter[filterKey][filterOperator].split(",").forEach((description) => {
-                let originalValue = ""
-                descriptions.some((item) => {
-                    if(description === item.originalValue){
-                        originalValue = item.originalValue
-                        return true;
-                    } return false
-                })
-                retArr.push({"name": i18n.t(`common.description.${description}`), "originalValue": originalValue})
-            })
-            return true;
-        }
-        return false;
-    })
-    return retArr
+const getSelectedDescriptions = (descriptionValues, descriptions) => {
+
+    if(Array.isArray(descriptionValues)){
+        return descriptions.filter((d) => descriptionValues.includes(d.originalValue))
+    }
+    return {}
 }
-const getSelectedCountries= (filters, filterKey, filterOperator, countries) =>{
-    let retArr = []
-    filters.some((filter) =>{
-        if (filterKey in filter && filterOperator in filter[filterKey]){
-            filter[filterKey][filterOperator].split(",").forEach((countryName) => {
-                let originalValue = ""
-                countries.some((item) => {
-                    console.log(countryName)
-                    console.log(item.originalCountryName)
-                    if (countryName === item.originalCountryName){
-                        originalValue = item.originalCountryName
-                        return true;
-                    } return false;
-                })
-                console.log(originalValue)
-                retArr.push({"countryName": i18n.t(`common.countryName.${originalValue}`), "originalCountryName": originalValue})
-            })
-            return true;
-        }
-        return false;
-    })
-    console.log(retArr)
-    return retArr
-}
-const getOriginalValue = (filter, temperature, filterKey, filterOperator) => {
-    let ret = ""
-    const temperatureKeys= [
-        "weatherMain.feels_like",
-        "weatherMain.temp",
-        "weatherMain.temp_max",
-        "weatherMain.temp_min"
-    ]
-    // if (translationKey !== "pickDescriptions" && translationKey !== "pickCountries")
-    filter.some((item) => {
-        // console.log( filterKey in item)
-        if ( filterKey in item && filterOperator in item[filterKey]) {
-            if (temperatureKeys.includes(Object.keys(item)[0]))
-                ret = Number(convertTemperature(temperature.units, item[filterKey][filterOperator])).toFixed(2)
-            else ret = item[filterKey][filterOperator]
-            return true;
-        }
-        else return false
-    })
-    if(ret !== "")
-        return ret;
-    return;
+
+const getSelectedCountries = (countryValues, countries) => { 
+    if (countryValues !== undefined && Array.isArray(countryValues))
+        return countries.filter((c) => countryValues.includes(c.originalCountryName))
+    return {}
 }
 
 // In db values are in kelvin. The user can change it on the UI.
@@ -154,18 +218,4 @@ const calculateKelvins = (temperatureUnits, temperatureValue) => {
     return temperatureValue
 }
 
-// this closure's purpose is to create strings to be sent to query params, as no 
-// other way to send arrays exists
-const makeStringFromDescriptions= (items) => {
-    var selectedItemsIntoString = (prevVal, currVal, idx) => {
-        return idx === 0 ? currVal.originalValue : prevVal + "," + currVal.originalValue
-    }
-    return items.reduce(selectedItemsIntoString, '')
-}
-const makeStringFromCountries= (items) => {
-    var selectedItemsIntoString = (prevVal, currVal, idx) => {
-        return idx === 0 ? currVal.originalCountryName : prevVal + "," + currVal.originalCountryName
-    }
-    return items.reduce(selectedItemsIntoString, '')
-}
 export default FiltersComponent

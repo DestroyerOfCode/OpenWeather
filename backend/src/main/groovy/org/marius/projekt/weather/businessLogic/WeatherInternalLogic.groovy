@@ -2,12 +2,17 @@ package org.marius.projekt.weather.businessLogic
 
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
+import org.bson.BsonDocument
 import org.bson.Document
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -68,7 +73,9 @@ class WeatherInternalLogic {
         }
 
         url.append("&units=${opts.get('units')}" as String)
-        url.append("&appid=${System.getenv("OPENWEATHER_API_KEY_ONE")}" as String)
+//        if (System.getenv("OPENWEATHER_API_KEY_ONE"))
+            url.append("&appid=${System.getenv("OPENWEATHER_API_KEY_ONE")}" as String)
+//        url.append("&appid=${openWeatherSecurityRepository.findAll().first().apiKey}" as String)
         new String (url)
     }
 
@@ -120,50 +127,66 @@ class WeatherInternalLogic {
         }
     }
 
-    def sortWeather(ArrayList<WeatherCurrentModel> weathers, opts){
-        String sortString = opts.sortBy
-        String[] path = sortString.split(/\./)
-        if (!weathers) weatherCurrentModelRepository.findAll()
-        weathers =  weathers.sort() {
-            Object a, Object b ->
-                a = buildCompareParam(a, path)
-                b = buildCompareParam(b, path)
-                new Boolean((String) opts.isAscending) ? a <=> b : b <=> a
+    def createFilterMap = { ArrayList<Map<String, Object>> filters ->
+        def retMap = [:]
+        filters.forEach{ Map<String, Object> item ->
+            retMap << item
         }
-        weathers
+        return retMap
     }
 
-    def filterWeather(weathers, opts) {
-        ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList = (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("[" + opts.filterString + "]")
+    def sortWeather(opts){
+        /*
+            opts.filters = [
+                ["name": [
+                    "eq" : "surany"
+                    ]
+                ],
+                [
+                 "temperature": [
+                    "\$gte": 100,
+                    "\$lte": 110
+                    ]
+                ]
+            ]
+         */
 
-        // I need index because I cant get map element of array without one
-        // I need to change it from string to array of strings because in query parameters of URI it
-        // is impossible to send arrays and I am sending it as string in format 'in=AO, AE, RU'
-        // in cases where multiple filters containing multiple values I must get indices of all those filters
-        // to change the filter values from strings to array
-        ArrayList<Integer> indicesOfArrayFilters = new ArrayList()
-        findIndicesOfArrayFilters(indicesOfArrayFilters, filterList)
+        def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class))
+        def isTrue = { item -> item == true ? 1 : -1}
+        ArrayList<WeatherCurrentModel> currentWeathers = weatherCurrentModelCollection.aggregate([
+               new Document([
+                       $match: [
+                            $and: [
+                                    ["sys.country": "SK"]
+                            ] << (opts.filters ?: [:])
+                       ],
+                       ]),
+                       new Document([$sort: [
+                               ((String) opts.sortBy) : (isTrue.call(opts.isAscending))
+                       ]]),
+//                       new Document([$skip: (opts.pageNumber - 1) * opts.itemsPerPage]),
+//                       new Document([$limit: opts.itemsPerPage]),
+                       new Document([$project: ["creationDate": 0]])
+               ]) as List
+        Pageable pageable = PageRequest.of(opts.pageNumber, opts.itemsPerPage);
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), currentWeathers.size());
 
-        if (!new Boolean((String) opts.isAdditionalFilter))
-            weathers = buildAggregationQuery(filterList)
-        else {
-            filterList.forEach { filterItem ->
+        Page<WeatherCurrentModel> pages = new PageImpl<WeatherCurrentModel>(currentWeathers.subList(start, end), pageable,currentWeathers.size())
+        pages
+    }
 
-                String filterName = filterItem.entrySet().stream().findFirst().get().getKey()
-                LinkedHashMap<String, String> filterOperatorsMap = (LinkedHashMap<String, String>) filterItem.entrySet().stream().findFirst().get().getValue()
+    def filterWeather(opts) {
+//        ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList = (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("[" + opts.filterString + "]")
 
-                if (filterName) {
-                    filterOperatorsMap.forEach { filterOperator, filterValue ->
-                        String[] path = filterName.split(/\./)
-                        weathers = (ArrayList<WeatherCurrentModel>) weathers.findAll { it ->
-                            def OverloadedFilterOperator = getCorrectFilterOperator(filterOperator)
-                            filterOperatorOverload."${OverloadedFilterOperator}"(buildCompareParam(it.asMap(), path), filterValue)
-                        }
-                    }
-                }
-            }
-        }
-        weathers
+        ArrayList<WeatherCurrentModel> currentWeathers = buildAggregationQuery(opts.filters, opts.itemsPerPage, opts.pageNumber)
+
+        Pageable pageable = PageRequest.of(opts.pageNumber, opts.itemsPerPage);
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), currentWeathers.size());
+
+        Page<WeatherCurrentModel> pages = new PageImpl<WeatherCurrentModel>(currentWeathers.subList(start, end), pageable,currentWeathers.size())
+        pages
     }
     @CompileStatic
     private static Object buildCompareParam(Object paramToChange, String[] path){
@@ -178,7 +201,7 @@ class WeatherInternalLogic {
         return filterOperator == 'in' ? 'contains' : filterOperator
     }
 
-    def buildAggregationQuery(def filterList){
+    def buildAggregationQuery(Map<String, Object> filters, Integer itemsPerPage, Integer pageNumber){
 
         def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class));
 
@@ -186,8 +209,10 @@ class WeatherInternalLogic {
                 new Document([$match: [
                         $and : [
                             ["sys.country": "SK"]
-                        ] << buildFilters.call(filterList)
+                        ] << filters
                 ]]),
+                new Document([$skip: (pageNumber) * itemsPerPage]),
+                new Document([$limit: itemsPerPage]),
                 new Document([$project : [
                         "creationDate" : 0
                 ]]),

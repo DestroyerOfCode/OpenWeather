@@ -149,7 +149,7 @@
     },
 
     "forecast": {
-        "currentWeather": "Current Weather",
+        "currentWeather": "Aktuelles Wetter",
         "header": {
             "sunrise": "Tagesanbruch",
             "sunset": "Dämmerung",

@@ -1,186 +1,198 @@
-import React from 'react'
+import React, { useState, useEffect} from "react";
 import WeatherCurrentService from '../../adapters/WeatherCurrentService';
-import Pagination from '../current/Pagination'
-import FiltersComponent from './Filters'
 import { Link } from "react-router-dom";
 import {getWeatherDescription, 
     convertTemperature,
-    keyExistsInArr,
-    findIndexInFilters,
-    changeFilters,
-    addFilterOperatorToExistingFilterName,
-    isAdditionalFilterCheck,
     displayCoords
     } from '../../businessLogic/WeatherBusinessLogic';
 import '../../styles/common/Header.scss';
 import { nanoid } from "nanoid";
+import { useSelector } from "react-redux";
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import TablePagination from '@material-ui/core/TablePagination';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Button from '@material-ui/core/Button';
+
 import i18n from 'i18next'
 
-class WeatherCurrent extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            currentWeathers:  props?.location?.state?.currentWeathers !== undefined ? props.location.state.currentWeathers : [] ,
-            isAscending: true,
-            filters: props?.location?.state?.filters !== undefined ? props.location.state.filters : [] ,
-            isFilter : props?.location?.state?.isFilter === true ,
-            currentPage : 1,
-            itemsPerPage : 100,
-            isAdditionalFilter : false,
-            pageNumbers : [],
-            showPages: 5,
-            filterComponent: null,
-            temperature: props.temperature
-        }
+const useStyles = makeStyles((theme) => ({
+    table: {
+      minWidth: 650,
+    },
+      paper: {
+        width: '100%',
+        marginBottom: theme.spacing(2),
+      },
+      visuallyHidden: {
+        border: 0,
+        clip: 'rect(0 0 0 0)',
+        height: 1,
+        margin: -1,
+        overflow: 'hidden',
+        padding: 0,
+        position: 'absolute',
+        top: 20,
+        width: 1,
+      },
+  }));
+
+  export const StyledTableCell = withStyles((theme) => ({
+    head: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    body: {
+      fontSize: 12,
+    },
+  }))(TableCell);
+  
+  export const StyledTableRow = withStyles((theme) => ({
+    root: {
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+      },
+    },
+  }))(TableRow);
+
+function WeatherCurrent(props) {
+    const [currentWeathers, setCurrentWeathers] = useState({})
+    const [isAscending, setIsAscending] = useState(true)
+    const [sortBy, setSortBy] = useState('name')
+    const [currentPage, setCurrentPage] = useState(0)
+    const [itemsPerPage, setItemsPerPage] = useState(100)
+    const filtersSelector = useSelector(filters => filters)
+    const classes = useStyles();
+
+    useEffect(() => {
+        refreshWeathers();
+    }, [currentPage, itemsPerPage, sortBy, isAscending])
+    
+    const refreshWeathers = () => {
+        WeatherCurrentService.retrieveAllWeathers(sortBy, isAscending, filtersSelector, currentPage, itemsPerPage)
+            .then(response => {
+                setCurrentWeathers(response.data)
+            })
     }
 
-    async componentDidMount() {
-        console.log("componentDidMount")
-        console.log(this.state.temperature)
-        const descriptions = async(internationalize) => {let desc =await WeatherCurrentService.retrieveAllDescriptions(); console.log(desc); return  internationalize(desc)}
-        const countries = async(internationalize) => {let countries =await WeatherCurrentService.retrieveAllCountries(); console.log(countries); return  internationalize(countries)}
-        this.setState({
-            filterComponent: <FiltersComponent key={nanoid()} temperatureUnits = {this.state.temperature.units} countries = {countries(this.internationalizeCountries)}
-            descriptions = {descriptions(this.internationalizeDescriptions)} onChangeMethod={this.onChangeFilter} />
-        },
-            function() {console.log(this.props);if (this.props?.location?.state?.isFromForecast !== true) this.refreshWeathers()}
+    const headCells = () => { return ([
+        {id: "name", label: i18n.t('current.header.cityName'), notNumeric: true, disablePadding: true},
+        {id: "coord.lat", label: i18n.t("current.header.latitude"), notNumeric: false, disablePadding: true},
+        {id: "coord.lon", label: i18n.t("current.header.longitude"), notNumeric: false, disablePadding: true},
+        {id: "sys.countryName", label: i18n.t("current.header.country"), notNumeric: true, disablePadding: false},
+        {id: "weatherMain.humidity", label: i18n.t("current.header.humidity"), notNumeric: false, disablePadding: true},
+        {id: "weatherMain.feels_like", label: i18n.t("current.header.feelsLike"), notNumeric: false, disablePadding: false},
+        {id: "weatherMain.temp", label: i18n.t("current.header.temperature"), notNumeric: false, disablePadding: true},
+        {id: "weatherMain.temp_max", label: i18n.t("current.header.maximumTemperature"), notNumeric: false, disablePadding: false},
+        {id: "weatherMain.temp_min", label: i18n.t("current.header.minimalTemperature"), notNumeric: false, disablePadding: false},
+        {id: "weather.description", label: i18n.t("current.header.description"), notNumeric: true, disablePadding: true}
+    ])
+    }
+
+    const EnhancedTableHead = (props) => {
+        const { classes, order, orderBy, headCells} = props;
+        console.log(headCells)
+        return ( 
+            <TableRow>
+                {headCells.map((headCell) => {
+                    return (<TableCell
+                        key={headCell.id}
+                        // align={headCell.notNumeric ? 'left' : 'right'}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                        padding='none'
+                        onClick={() => changeOrder(headCell.id)}
+                    >
+                        <TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={() => changeOrder(headCell.id)}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.id ? (
+                            <span className={classes.visuallyHidden}>
+                                {/* {order === 'desc' ? 'sorted descending' : 'sorted ascending'} */}
+                            </span>
+                            ) : null}
+                        </TableSortLabel>
+                    </TableCell>
+                    )
+                })}
+            </TableRow>
         )
     }
-
-    internationalizeDescriptions = (descriptions) => {
-        console.log(descriptions.data)
-        return descriptions.data.map( (description) => (
-            {"name" : i18n.t("common.description." + description.originalValue), "id": description.id, "originalValue" : description.originalValue}
-        ))
+    
+    const changeOrder = (val) => {
+        console.log(val)
+        setSortBy(val)
+        setIsAscending(!isAscending)
     }
 
-    internationalizeCountries = (countries) => {
-        console.log(countries.data)
-        return countries.data.map( (country) => {
-            return {"countryName" : i18n.t("common.countryName." + country.originalCountryName), "id": country.code, "originalCountryName" : country.originalCountryName}
-        })
-    }
-    refreshWeathers(sortBy, currentWeathers) {
-        console.log(this.state)
-        console.log("som v refresh")
-        WeatherCurrentService.retrieveAllWeathers(sortBy, this.state.isAscending, this.state.filters, this.state.isFilter, this.state.isAdditionalFilter, currentWeathers)
-            .then(
-                response => {
-                    this.setState({ currentWeathers: response.data })
-                }
-            ).then( () => {if (sortBy) this.setState({isAscending : !this.state.isAscending})}
-            ).then( () => {if (typeof this.state.filters !== 'undefined' && this.state.filters === 0) this.setState({isFilter : false})})
-    }
-
-    onChangeFilter = (event, filterName, filterOperator) => {
-        var index;
-        if (event === "" && keyExistsInArr(this.state.filters,filterName))  {
-            index = findIndexInFilters(this.state.filters, filterName)
-            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : false, filters : changeFilters(index, filterName, filterOperator, this.state.filters)}, function () {
-                this.refreshWeathers(this.state.sortBy, this.state.currentWeathers)
-            })
-        }
-
-        else if (event !== "" && !(keyExistsInArr(this.state.filters, filterName))){
-            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : true,
-                 filters: this.state.filters.concat([{[filterName]: {[filterOperator] : event}}])}, function () {
-                this.refreshWeathers(this.state.sortBy, this.state.currentWeathers)
-            })
-        }
-
-        else if (event !== "" && (keyExistsInArr(this.state.filters, filterName))){
-           
-            index = findIndexInFilters(this.state.filters, filterName)
-            this.setState({currentPage : 1, isFilter : true, isAdditionalFilter : isAdditionalFilterCheck(event, index, filterName, this.state.filters), 
-                filters : addFilterOperatorToExistingFilterName(event, filterName, filterOperator, this.state.filters)}, function() {
-                    this.refreshWeathers(this.state.sortBy, this.state.currentWeathers)
-            })
-        }
-    }
-
-    header(){
-       return (<thead className="header">
-       <tr>
-           <th onClick={() =>this.refreshWeathers("_id", this.state.currentWeathers) }>{i18n.t("current.header.cityId")}</th>
-           <th onClick={() =>this.refreshWeathers("name", this.state.currentWeathers) }>{ i18n.t('current.header.cityName')}</th>
-           <th onClick={() =>this.refreshWeathers("coord.lat", this.state.currentWeathers) }>{i18n.t("current.header.latitude")}</th>
-           <th onClick={() =>this.refreshWeathers("coord.lon", this.state.currentWeathers) }>{i18n.t("current.header.longitude")}</th>
-           <th onClick={() =>this.refreshWeathers("sys.countryName", this.state.currentWeathers) }>{i18n.t("current.header.country")}</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.humidity", this.state.currentWeathers) }>{i18n.t("current.header.humidity")}</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.feels_like", this.state.currentWeathers) }>{i18n.t("current.header.feelsLike")}</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp", this.state.currentWeathers) }>{i18n.t("current.header.temperature")}</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp_max", this.state.currentWeathers) }>{i18n.t("current.header.maximumTemperature")}</th>
-           <th onClick={() =>this.refreshWeathers("weatherMain.temp_min", this.state.currentWeathers) }>{i18n.t("current.header.minimalTemperature")}</th>
-           <th onClick={() =>this.refreshWeathers("weather.description", this.state.currentWeathers) }>{i18n.t("current.header.description")}</th>                                
-       </tr>
-   </thead>)
-   }
-
-   mainBody(currentPosts, temperature){
-       console.log(temperature.units)
-    return (
-    <tbody>
+    const mainBody = () => {
+    return currentWeathers.content?.length ? (
+    <TableBody>
         {
-            currentPosts.map(
-                weather =>{
-                    return (<tr key={nanoid()}>
-                        <td>{weather._id}</td>
-                        <td> <Link to={{pathname: "/forecast", state: {"lat": weather.coord.lat, "lon": weather.coord.lon, "filters": this.state.filters, "currentWeathers": this.state.currentWeathers} }}>{weather.name}</Link></td>
-                        <td>{displayCoords(weather.coord.lat)}</td>
-                        <td>{displayCoords(weather.coord.lon)}</td>
-                        <td>{i18n.t(`common.countryName.${weather.sys.countryName}`)}</td>
-                        <td>{weather.weatherMain.humidity}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.feels_like)?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp)?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_max)?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{`${convertTemperature(temperature.units, weather.weatherMain.temp_min)?.toFixed(2)}${temperature.abbreviation}`}</td>
-                        <td>{getWeatherDescription(weather)}</td>
-                    </tr>)}
+            currentWeathers.content.map(
+                weather => {
+                    return ( 
+                    <StyledTableRow  key={nanoid()}>
+                        <StyledTableCell > <Link to={{pathname: "/forecast", state: {"lat": weather.coord.lat, "lon": weather.coord.lon} }}>{weather.name}</Link></StyledTableCell>
+                        <StyledTableCell >{displayCoords(weather.coord.lat)}</StyledTableCell>
+                        <StyledTableCell >{displayCoords(weather.coord.lon)}</StyledTableCell>
+                        <StyledTableCell >{i18n.t(`common.countryName.${weather.sys.countryName}`)}</StyledTableCell>
+                        <StyledTableCell >{weather.weatherMain.humidity}</StyledTableCell>
+                        <StyledTableCell >{`${convertTemperature(props.temperature.units, weather.weatherMain.feels_like)?.toFixed(2)}${props.temperature.abbreviation}`}</StyledTableCell>
+                        <StyledTableCell >{`${convertTemperature(props.temperature.units, weather.weatherMain.temp)?.toFixed(2)}${props.temperature.abbreviation}`}</StyledTableCell>
+                        <StyledTableCell >{`${convertTemperature(props.temperature.units, weather.weatherMain.temp_max)?.toFixed(2)}${props.temperature.abbreviation}`}</StyledTableCell>
+                        <StyledTableCell >{`${convertTemperature(props.temperature.units, weather.weatherMain.temp_min)?.toFixed(2)}${props.temperature.abbreviation}`}</StyledTableCell>
+                        <StyledTableCell>{getWeatherDescription(weather)}</StyledTableCell>
+                    </StyledTableRow>
+                    )
+                }
             )
         }
-        </tbody>
-    )
+        </TableBody>
+    ) : <TableBody></TableBody>
    }
 
-    paginate = (page) => {
-       this.setState({currentPage : page})
-    }
+   const handleChangeRowsPerPage = (event) => {
+    setItemsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(0);
+  };
+  const handleChangePage = (event, page) =>{ setCurrentPage(page)}
+    return (
+        <div className="container">
+            <Button variant="contained" color="primary" onClick={refreshWeathers}>
+                filter
+            </Button>
+            <TablePagination
+                rowsPerPageOptions={[10, 100, 1000]}
+                component="div"
+                count={currentWeathers.totalElements}
+                rowsPerPage={itemsPerPage}
+                page={currentPage}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+            <TableContainer key = {nanoid()} component={Paper}>
+                <Table className={classes.table} size="small" aria-label="a dense table">
 
-    getWeathersOnSpecificPage = () => {
-        const indexOfLastPost = this.state.currentPage * this.state.itemsPerPage;
-        const indexOfFirstPost = indexOfLastPost - this.state.itemsPerPage;
-        return this.state.currentWeathers.slice(indexOfFirstPost, indexOfLastPost);
-    }
-
-    render() {
-        console.log("som v render")
-        console.log(this.props)
-        const currentPaginatedWeathers = this.getWeathersOnSpecificPage()
-        let descriptions = async(internationalize) => internationalize(await WeatherCurrentService.retrieveAllDescriptions())
-        let countries = async(internationalize) => internationalize(await WeatherCurrentService.retrieveAllCountries())
-
-        let filters = <FiltersComponent key={nanoid()} temperatureUnits = {this.props.temperature.units} countries = {countries(this.internationalizeCountries)}
-            descriptions = {descriptions(this.internationalizeDescriptions)}
-            filters = {this.state.filters} onChangeMethod={this.onChangeFilter} temperature={this.props.temperature} />
-
-        const pagination = <Pagination key={nanoid()} currentPage={this.state.currentPage} showPages={this.state.showPages}
-        itemsPerPage = {this.state.itemsPerPage} totalItems = {this.state.currentWeathers.length} paginate={this.paginate}/>
-        let container= [filters, pagination]
-
-        if (this.state.currentWeathers)
-            container.push(<table key={nanoid()} className="weatherTable">
-                {this.header()}
-                {this.mainBody(currentPaginatedWeathers, this.props.temperature)}
-            </table>
-            )
-
-        return (
-            <div className="container">
-
-                {container}
-            </div>
-        )
-         
-    }
+                <EnhancedTableHead 
+                    classes={classes}
+                    order={isAscending ? 'asc' : 'desc'}
+                    orderBy={sortBy}
+                    headCells={headCells.call()}
+                />
+                {mainBody()}
+                </Table>
+            </TableContainer>            
+            
+            
+        </div>
+    )
 }
 export default WeatherCurrent

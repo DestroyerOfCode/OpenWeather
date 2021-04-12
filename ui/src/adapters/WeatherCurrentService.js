@@ -5,30 +5,17 @@ const WEATHER_CURRENT_API_URL = `${COURSE_API_URL}/weather/current`
 
 class WeatherService {
 
-    retrieveAllWeathers(sortBy, isAscending, filters, isFilter, isAdditionalFilter, weathers) {
-        console.log("filters: ")
-        console.log(filters)
-        console.log(process.env)
-        var filterString = this.buildFilterString(filters)
-        if(!weathers)
-            weathers = []
-        const params = {
-            sortBy, isAscending, filterString, isFilter, isAdditionalFilter
-        }
-        return axios.post(`${WEATHER_CURRENT_API_URL}/retrieve/fromDb`, weathers,{params});
+    retrieveAllWeathers(sortBy, isAscending, filters, currentPage, itemsPerPage,) {
+        return axios.post(`${WEATHER_CURRENT_API_URL}/retrieve/fromDb`, {
+            'sortBy': sortBy,
+            'isAscending': isAscending,
+            'filters': filters,
+            'itemsPerPage': itemsPerPage,
+            'pageNumber': currentPage
+        });
     }
 
-    buildFilterString(filters){
-        var filterString = ""
-        for(var i = 0; i <= filters?.length-1; ++i){
-            filterString+= JSON.stringify(filters[i]);
-            if (filters[i+1])
-                filterString += ","
-        }
-        return filterString
-    }
-
-    retrieveAllCountries =async  () => await  axios.get(`${WEATHER_CURRENT_API_URL}/countries`)
+    retrieveAllCountries = async  () => await  axios.get(`${WEATHER_CURRENT_API_URL}/countries`)
     retrieveAllDescriptions = async () => await axios.get(`${WEATHER_CURRENT_API_URL}/descriptions`)
 
 
