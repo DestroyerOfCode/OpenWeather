@@ -20,6 +20,7 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Button from "@material-ui/core/Button";
 import FiltersComponent from "./Filters";
 import i18n from "i18next";
+import { customCircularLoader } from '../../buildingBlocks/commonBuildingBlocks'
 
 const useStyles = makeStyles((theme) => ({
 	table: {
@@ -66,6 +67,7 @@ function WeatherCurrent(props) {
 	const [sortBy, setSortBy] = useState("name");
 	const [currentPage, setCurrentPage] = useState(0);
 	const [itemsPerPage, setItemsPerPage] = useState(100);
+	const [loading, setLoading] = useState(true);
 	const filtersSelector = useSelector((filters) => filters);
 	const classes = useStyles();
 
@@ -81,6 +83,7 @@ function WeatherCurrent(props) {
 			currentPage,
 			itemsPerPage
 		).then((response) => {
+			setLoading(false)
 			setCurrentWeathers(response.data);
 		});
 	};
@@ -283,7 +286,8 @@ function WeatherCurrent(props) {
         return internationalize(countries);
     };
     
-	return (
+	console.log(currentWeathers)
+	return loading ? customCircularLoader() : (
 		<div className="container">
 
 			<FiltersComponent

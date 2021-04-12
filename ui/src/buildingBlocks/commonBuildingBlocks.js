@@ -1,6 +1,7 @@
 import Dropdown from 'react-bootstrap/Dropdown'
 import {nanoid} from 'nanoid'
 import i18n from 'i18next'
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 export const temperatureDropdownList =(changeTemperatureUnitsState) => {
     return (
@@ -15,4 +16,8 @@ export const temperatureDropdownList =(changeTemperatureUnitsState) => {
         </Dropdown>
     </div>
     )
+}
+
+export const customCircularLoader = () => {
+    return <CircularProgress thickness={5} size={1000} />
 }

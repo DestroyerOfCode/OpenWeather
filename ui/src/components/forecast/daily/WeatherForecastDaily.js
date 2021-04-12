@@ -19,6 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { nanoid } from "nanoid";
 import Button from "@material-ui/core/Button";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
+import { customCircularLoader } from '../../../buildingBlocks/commonBuildingBlocks'
 
 const useStyles = makeStyles((theme) => ({
 	table: {
@@ -100,7 +101,7 @@ function WeatherForecastComponent(props) {
 		setIsAscending(!isAscending);
 	};
 
-	return (
+	return dailyWeatherForecast.daily === undefined ? customCircularLoader() :  (
 		<div>
 			<Link to={{ pathname: "/" }}>
 				<Button variant="contained" color="primary">
