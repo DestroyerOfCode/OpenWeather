@@ -7,6 +7,7 @@ import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.service.current.WeatherService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -57,17 +58,16 @@ class WeatherCurrentController {
 
     @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
     @ResponseBody
-    def getWeatherCurrent(@RequestBody(required = false) ArrayList<WeatherCurrentModel> weathers,
-                          @RequestParam(required = false) Map<String, Object> opts,
+    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts,
                           @PathVariable(required = false, value = "cityId") String cityId) {
-        weathers = weatherService.getWeatherCurrentService(opts, weathers, cityId )
+        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts, cityId )
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
-    @Scheduled(cron = "* 0 * * * ?")
+//    @Scheduled(cron = "* 0 * * * ?")
     @ResponseBody
     def saveAllWeatherCurrentData() {
         weatherService.saveAllWeatherCurrentData()
@@ -122,7 +122,7 @@ class WeatherCurrentController {
 
     //heroku disables server after 30 mins of inactivity
     //this is to prevent it from happening
-    @Scheduled(cron = "* */20 * * * ?")
+//    @Scheduled(cron = "* */20 * * * ?")
     @GetMapping("/ping")
     @ResponseBody
     def pingServer(){

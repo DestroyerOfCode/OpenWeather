@@ -9,6 +9,9 @@ import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
@@ -128,24 +131,23 @@ class WeatherService {
 
 
 //    @CompileStatic
-    @Cacheable(value = "weathers")
-    ArrayList<WeatherCurrentModel> getWeatherCurrentService(Map<String, Object> opts, ArrayList<WeatherCurrentModel> weathers, String cityId ){
+//    @Cacheable(value = "weathers")
+    PageImpl<WeatherCurrentModel> getWeatherCurrentService(Map<String, Object> opts, String cityId ){
+        Pageable pageable = PageRequest.of(opts.pageNumber, (int) opts.itemsPerPage);
 
-        if (cityId)
-            return Arrays.asList(weatherCurrentModelRepository.findById(cityId))
-
-        if (opts.sortBy && opts.isAscending)
-          return weatherInternalLogic.sortWeather(weathers, opts)
-
-        //example query params "{\"lat\":{\"gte\": \"55.32\", \"lte\" : \"70.02\"}}, {\"country\":{\"in\":\"IQ,GB,AE\"}}"
-        if (new Boolean((String) opts.isFilter) && !opts.sortBy)
-          return weatherInternalLogic.filterWeather(weathers, opts)
+//        if (cityId)
+//            return Arrays.asList(weatherCurrentModelRepository.findById(cityId))
+//
+        if (opts.sortBy && null != opts.isAscending)
+          return weatherInternalLogic.sortWeather(opts)
+//
+//        //example query params "{\"lat\":{\"gte\": \"55.32\", \"lte\" : \"70.02\"}}, {\"country\":{\"in\":\"IQ,GB,AE\"}}"
+        if (opts.filters)
+          return weatherInternalLogic.filterWeather(opts)
 
         //this is used during the start
-        if (!weathers && !new Boolean((String) opts.isFilter))
-            return (ArrayList<WeatherCurrentModel>) weatherCurrentModelRepository.findAll().findAll {item-> item.sys.country == 'SK'}
+            return weatherCurrentModelRepository.findAllBySysCountry(pageable, "SK")/*.findAll {item-> item.sys.country == 'SK'}*/
 
-        weathers
     }
 
 
