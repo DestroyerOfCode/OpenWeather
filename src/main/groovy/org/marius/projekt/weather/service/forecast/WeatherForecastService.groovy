@@ -24,8 +24,8 @@ class WeatherForecastService {
 
         try {
             def uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${System.getenv("OPENWEATHER_API_KEY_ONE")}"
-//            if (!System.getenv("OPENWEATHER_API_KEY_ONE"))
-//                uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${openWeatherSecurityRepository.findAll().first().apiKey}"
+            if (!System.getenv("OPENWEATHER_API_KEY_ONE"))
+                uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${openWeatherSecurityRepository.findAll().first().apiKey}"
             ResponseEntity<String> weatherDailyJson = restTemplate.exchange(uriString, HttpMethod.GET, weatherInternalLogic.setOpenWeatherApiHeaders(), String.class)
 
             Map<String, Object> weatherDailyMap = (HashMap<String, Object>) new JsonSlurper().parseText(weatherDailyJson.body.toString())
