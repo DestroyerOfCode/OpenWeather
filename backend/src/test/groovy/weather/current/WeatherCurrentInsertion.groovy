@@ -1,16 +1,10 @@
 package weather.current
 
 
-import org.junit.Assert
 import org.junit.Test
 import org.junit.jupiter.api.DisplayName
-import org.springframework.web.client.HttpClientErrorException
 
 import static io.restassured.RestAssured.given
-
-//import org.springframework.security.test.web.servlet.request.httpBasic
-
-import static org.hamcrest.Matchers.hasItem;
 
 class WeatherCurrentInsertion {
 
@@ -49,17 +43,6 @@ class WeatherCurrentInsertion {
                 then().
                 statusCode(201)
     }
-
-    //TODO How to Test throwing an exception????
-//    @Test
-//    @DisplayName("get Single Weather Data Fail")
-//    void getSingleWeatherDataFail() {
-//        Assert.assertThrows(HttpClientErrorException.class, { ->
-//            given().auth().none().and().params([:]).when().
-//                    get("/weather")
-//        })
-//    }
-
 
 }
 
