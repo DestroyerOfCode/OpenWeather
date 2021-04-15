@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 		padding: 0,
 		position: "absolute",
 		top: 20,
-		width: 1,
+		width: 1000,
 	},
 }));
 
@@ -155,6 +155,7 @@ function WeatherCurrent(props) {
 
 	const EnhancedTableHead = (props) => {
 		const { classes, order, orderBy, headCells } = props;
+		console.log(classes)
 		return (
 			<TableRow>
 				{headCells.map((headCell) => {
@@ -301,13 +302,17 @@ function WeatherCurrent(props) {
 				{i18n.t("common.filter")}
 			</Button>
 			<TablePagination
-				rowsPerPageOptions={[10, 100, 1000]}
+				rowsPerPageOptions={[{label: i18n.t("page.ten"), value: 10}, {label: i18n.t("page.hundred"), value: 100}, {label: i18n.t("page.thousand"), value: 1000}]}
 				component="div"
 				count={currentWeathers.totalElements}
 				rowsPerPage={itemsPerPage}
 				page={currentPage}
 				onChangePage={handleChangePage}
 				onChangeRowsPerPage={handleChangeRowsPerPage}
+				backIconButtonText={i18n.t("page.previous")}
+				nextIconButtonText={i18n.t("page.next")}
+				labelRowsPerPage={i18n.t("page.rows")}
+				// backIconButtonProps={color="primary"}
 			/>
 			<TableContainer key={nanoid()} component={Paper}>
 				<Table

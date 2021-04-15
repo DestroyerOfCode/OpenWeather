@@ -151,7 +151,7 @@
 		"header": {
 			"sunrise": "Sunrise",
 			"sunset": "Sunset",
-			"temp": "temp",
+			"temp": "Temp",
 			"min": "Min",
 			"max": "Max",
 			"night": "Night",
@@ -165,5 +165,13 @@
 			"windDeg": "Wind deg",
 			"description": "Description"
 		}
+	},
+	"page": {
+		"previous": "Previous page",
+		"next": "Next page",
+		"rows": "Rows per page",
+		"ten": "10 rows",
+		"hundred": "100 rows",
+		"thousand": "1 000 rows"
 	}
 }

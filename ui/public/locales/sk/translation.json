@@ -165,5 +165,13 @@
 			"windDeg": "Stupne vetra",
 			"description": "Popis"
 		}
+	},
+	"page": {
+		"previous": "Predošlá stránka",
+		"next": "Ďalšia stránka",
+		"rows": "Počet riadkov na stránke",
+		"ten": "10 riadkov",
+		"hundred": "100 riadkov",
+		"thousand": "1 000 riadkov"
 	}
 }
