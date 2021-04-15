@@ -77,6 +77,10 @@ class WeatherForecastModel implements Mappable {
         Double uvi
         Double rain
         Double snow
+        Integer moonrise
+        Integer moonset
+        BigDecimal moon_phase
+        BigDecimal wind_gust
 
         static class Feels_Like{
             Double day
