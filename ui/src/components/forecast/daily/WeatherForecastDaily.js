@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import WeatherForecastService from "../../../adapters/WeatherForecastService";
 import {
 	getWeatherDescription,
@@ -19,6 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { nanoid } from "nanoid";
 import Button from "@material-ui/core/Button";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
+import TemperatureCtx from '../../../buildingBlocks/Temperature'
 import { customCircularLoader } from '../../../buildingBlocks/commonBuildingBlocks'
 
 const useStyles = makeStyles((theme) => ({
@@ -46,9 +47,9 @@ function WeatherForecastComponent(props) {
 	const [dailyWeatherForecast, setDailyWeatherForecast] = useState({});
 	const [isAscending, setIsAscending] = useState(true);
 	const [sortBy, setSortBy] = useState("sunrise");
+	const temperature = useContext(TemperatureCtx)
 
 	const classes = useStyles();
-	const temperature = props.temperature;
 
 	useEffect(() => {
 		if (dailyWeatherForecast.daily === undefined)

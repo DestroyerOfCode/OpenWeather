@@ -5,7 +5,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 export const temperatureDropdownList =(changeTemperatureUnitsState) => {
     return (
-    <div key={nanoid()} className="temperatureDropdown">
         <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">{i18n.t("common.temperatureDropdown.title")}</Dropdown.Toggle>
             <Dropdown.Menu>
@@ -14,7 +13,6 @@ export const temperatureDropdownList =(changeTemperatureUnitsState) => {
                 <Dropdown.Item onClick={async () => {await Promise.resolve().then(() => {changeTemperatureUnitsState('fahrenheit', '°F')})}}>Fahrenheit</Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>
-    </div>
     )
 }
 

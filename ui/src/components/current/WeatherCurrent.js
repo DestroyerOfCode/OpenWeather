@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import WeatherCurrentService from "../../adapters/WeatherCurrentService";
 import { Link } from "react-router-dom";
 import {
@@ -20,11 +20,15 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Button from "@material-ui/core/Button";
 import FiltersComponent from "./Filters";
 import i18n from "i18next";
+import TemperatureCtx from '../../buildingBlocks/Temperature'
 import { customCircularLoader } from '../../buildingBlocks/commonBuildingBlocks'
 
 const useStyles = makeStyles((theme) => ({
-	table: {
+	tableContainer: {
+		maxHeight: 500,
+		position: "sticky",
 		minWidth: 650,
+
 	},
 	paper: {
 		width: "100%",
@@ -47,6 +51,7 @@ export const StyledTableCell = withStyles((theme) => ({
 	head: {
 		backgroundColor: theme.palette.common.black,
 		color: theme.palette.common.white,
+		position: "sticky"
 	},
 	body: {
 		fontSize: 12,
@@ -70,6 +75,8 @@ function WeatherCurrent(props) {
 	const [loading, setLoading] = useState(true);
 	const filtersSelector = useSelector((filters) => filters);
 	const classes = useStyles();
+	console.log(TemperatureCtx)
+	const temperature = useContext(TemperatureCtx)
 
 	useEffect(() => {
 		refreshWeathers();
@@ -155,12 +162,11 @@ function WeatherCurrent(props) {
 
 	const EnhancedTableHead = (props) => {
 		const { classes, order, orderBy, headCells } = props;
-		console.log(classes)
 		return (
 			<TableRow>
 				{headCells.map((headCell) => {
 					return (
-						<TableCell
+						<TableCell width={"1000"}
 							key={headCell.id}
 							// align={headCell.notNumeric ? 'left' : 'right'}
 							sortDirection={orderBy === headCell.id ? order : false}
@@ -216,28 +222,28 @@ function WeatherCurrent(props) {
 							</StyledTableCell>
 							<StyledTableCell>{weather.weatherMain.humidity}</StyledTableCell>
 							<StyledTableCell>{`${convertTemperature(
-								props.temperature.units,
+								temperature.units,
 								weather.weatherMain.feels_like
 							)?.toFixed(2)}${
-								props.temperature.abbreviation
+								temperature.abbreviation
 							}`}</StyledTableCell>
 							<StyledTableCell>{`${convertTemperature(
-								props.temperature.units,
+								temperature.units,
 								weather.weatherMain.temp
 							)?.toFixed(2)}${
-								props.temperature.abbreviation
+								temperature.abbreviation
 							}`}</StyledTableCell>
 							<StyledTableCell>{`${convertTemperature(
-								props.temperature.units,
+								temperature.units,
 								weather.weatherMain.temp_max
 							)?.toFixed(2)}${
-								props.temperature.abbreviation
+								temperature.abbreviation
 							}`}</StyledTableCell>
 							<StyledTableCell>{`${convertTemperature(
-								props.temperature.units,
+								temperature.units,
 								weather.weatherMain.temp_min
 							)?.toFixed(2)}${
-								props.temperature.abbreviation
+								temperature.abbreviation
 							}`}</StyledTableCell>
 							<StyledTableCell>
 								{getWeatherDescription(weather)}
@@ -293,10 +299,10 @@ function WeatherCurrent(props) {
 
 			<FiltersComponent
 				key={nanoid()}
-				temperatureUnits={props.temperature.units}
+				temperatureUnits={temperature.units}
 				countries={countries(internationalizeCountries)}
 				descriptions={descriptions(internationalizeDescriptions)}
-				temperature={props.temperature.abbreviation}
+				temperature={temperature.abbreviation}
 			/>
 			<Button variant="contained" color="primary" onClick={refreshWeathers}>
 				{i18n.t("common.filter")}
@@ -314,13 +320,13 @@ function WeatherCurrent(props) {
 				labelRowsPerPage={i18n.t("page.rows")}
 				// backIconButtonProps={color="primary"}
 			/>
-			<TableContainer key={nanoid()} component={Paper}>
-				<Table
-					className={classes.table}
+			<TableContainer key={nanoid()} component={Paper} className={classes.tableContainer}>
+				<Table stickyHeader={true}
+					// className={classes.tableContainer}
 					size="small"
 					aria-label="a dense table"
 				>
-					<EnhancedTableHead
+					<EnhancedTableHead stickyHeader
 						classes={classes}
 						order={isAscending ? "asc" : "desc"}
 						orderBy={sortBy}

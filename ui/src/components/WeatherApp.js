@@ -3,16 +3,15 @@ import { Switch, Route } from "react-router-dom";
 import WeatherCurrentComponent from "./current/WeatherCurrent";
 import { withTranslation } from "react-i18next";
 import WeatherForecastComponent from "./forecast/daily/WeatherForecastDaily";
-import { temperatureDropdownList } from "../buildingBlocks/commonBuildingBlocks";
-import WeatherCurrentService from "../adapters/WeatherCurrentService";
-import { nanoid } from "nanoid";
-
+// import { temperatureDropdownList } from "../buildingBlocks/commonBuildingBlocks";
+import { TemperatureDropdownList } from "../buildingBlocks/Temperature";
+import TemperatureCtx from '../buildingBlocks/Temperature'
 import i18n from "i18next";
 import Button from "@material-ui/core/Button";
 
 import "../i18n";
 
-function WeatherApp(props) {
+function WeatherApp() {
 	const [temperature, setTemperature] = useState({
 		units: "celsius",
 		abbreviation: "°C",
@@ -50,23 +49,27 @@ function WeatherApp(props) {
 			>
 				DE
 			</Button>
-			{temperatureDropdownList((units, abbreviation) => {
+			<TemperatureDropdownList changeTemperatureUnitsState = {(units, abbreviation) => {
 				setTemperature({ units: units, abbreviation: abbreviation });
-			})}
-
+			}}/>
+			
 			<Switch>
 				<Route
 					exact
 					path="/"
 					render={(props) => (
-						<WeatherCurrentComponent {...props} temperature={temperature} />
+							<TemperatureCtx.Provider value={temperature}>
+								<WeatherCurrentComponent {...props} />
+							</TemperatureCtx.Provider>
 					)}
 				/>
 				<Route
 					path="/forecast"
 					render={(props) => (
-						<WeatherForecastComponent {...props} temperature={temperature} />
-					)}
+						<TemperatureCtx.Provider value={temperature}>
+							<WeatherForecastComponent {...props}/>
+						</TemperatureCtx.Provider>
+						)}
 				/>
 			</Switch>
 		</main>

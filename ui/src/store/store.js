@@ -1,7 +1,6 @@
 function reducer(filters = {}, action) {
 	switch (action.type) {
 		case "UPDATE_FILTERS":
-			console.log(action);
 			if (
 				(((action.filterOperator === "$gte" ||
 					action.filterOperator === "$lte") &&
@@ -17,7 +16,6 @@ function reducer(filters = {}, action) {
 				return filters;
 			}
 			if (filters[action.filterName]) {
-				console.log("tu");
 				let temp = filters[action.filterName];
 				temp[action.filterOperator] = action.value;
 				return { ...filters, [action.filterName]: temp };
@@ -29,13 +27,11 @@ function reducer(filters = {}, action) {
 				"" !== action.value ||
 				(Array.isArray(action.value) && action.value.length !== 0)
 			) {
-				console.log("v 3tom");
 				return {
 					...filters,
 					[action.filterName]: { [action.filterOperator]: action.value },
 				};
 			}
-			console.log(filters);
 			return filters;
 		default:
 			return filters;
