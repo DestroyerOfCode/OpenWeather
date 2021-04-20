@@ -1,27 +1,19 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import WeatherCurrentService from "../../adapters/WeatherCurrentService";
-import { Link } from "react-router-dom";
-import {
-	getWeatherDescription,
-	convertTemperature,
-	displayCoords,
-} from "../../businessLogic/WeatherBusinessLogic";
 import { nanoid } from "nanoid";
 import { useSelector } from "react-redux";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
-import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import TablePagination from "@material-ui/core/TablePagination";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Button from "@material-ui/core/Button";
 import FiltersComponent from "./Filters";
 import i18n from "i18next";
 import TemperatureCtx from '../../buildingBlocks/Temperature'
 import { customCircularLoader } from '../../buildingBlocks/commonBuildingBlocks'
+import EnhancedTableHead from '../common/EnhancedTableHeader'
+import EnhancedTableBody from './WeatherCurrentTableBody'
 
 const useStyles = makeStyles((theme) => ({
 	tableContainer: {
@@ -47,24 +39,6 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-export const StyledTableCell = withStyles((theme) => ({
-	head: {
-		backgroundColor: theme.palette.common.black,
-		color: theme.palette.common.white,
-		position: "sticky"
-	},
-	body: {
-		fontSize: 12,
-	},
-}))(TableCell);
-
-export const StyledTableRow = withStyles((theme) => ({
-	root: {
-		"&:nth-of-type(odd)": {
-			backgroundColor: theme.palette.action.hover,
-		},
-	},
-}))(TableRow);
 
 function WeatherCurrent(props) {
 	const [currentWeathers, setCurrentWeathers] = useState({});
@@ -160,102 +134,11 @@ function WeatherCurrent(props) {
 		];
 	};
 
-	const EnhancedTableHead = (props) => {
-		const { classes, order, orderBy, headCells } = props;
-		return (
-			<TableRow>
-				{headCells.map((headCell) => {
-					return (
-						<TableCell width={"1000"}
-							key={headCell.id}
-							// align={headCell.notNumeric ? 'left' : 'right'}
-							sortDirection={orderBy === headCell.id ? order : false}
-							padding="none"
-							onClick={() => changeOrder(headCell.id)}
-						>
-							<TableSortLabel
-								active={orderBy === headCell.id}
-								direction={orderBy === headCell.id ? order : "asc"}
-								onClick={() => changeOrder(headCell.id)}
-							>
-								{headCell.label}
-								{orderBy === headCell.id ? (
-									<span className={classes.visuallyHidden}></span>
-								) : null}
-							</TableSortLabel>
-						</TableCell>
-					);
-				})}
-			</TableRow>
-		);
-	};
-
 	const changeOrder = (val) => {
 		setSortBy(val);
 		setIsAscending(!isAscending);
 	};
 
-	const mainBody = () => {
-		return currentWeathers.content?.length ? (
-			<TableBody>
-				{currentWeathers.content.map((weather) => {
-					return (
-						<StyledTableRow key={nanoid()}>
-							<StyledTableCell>
-								<Link
-									to={{
-										pathname: "/forecast",
-										state: { lat: weather.coord.lat, lon: weather.coord.lon },
-									}}
-								>
-									{weather.name}
-								</Link>
-							</StyledTableCell>
-							<StyledTableCell>
-								{displayCoords(weather.coord.lat)}
-							</StyledTableCell>
-							<StyledTableCell>
-								{displayCoords(weather.coord.lon)}
-							</StyledTableCell>
-							<StyledTableCell>
-								{i18n.t(`common.countryName.${weather.sys.countryName}`)}
-							</StyledTableCell>
-							<StyledTableCell>{weather.weatherMain.humidity}</StyledTableCell>
-							<StyledTableCell>{`${convertTemperature(
-								temperature.units,
-								weather.weatherMain.feels_like
-							)?.toFixed(2)}${
-								temperature.abbreviation
-							}`}</StyledTableCell>
-							<StyledTableCell>{`${convertTemperature(
-								temperature.units,
-								weather.weatherMain.temp
-							)?.toFixed(2)}${
-								temperature.abbreviation
-							}`}</StyledTableCell>
-							<StyledTableCell>{`${convertTemperature(
-								temperature.units,
-								weather.weatherMain.temp_max
-							)?.toFixed(2)}${
-								temperature.abbreviation
-							}`}</StyledTableCell>
-							<StyledTableCell>{`${convertTemperature(
-								temperature.units,
-								weather.weatherMain.temp_min
-							)?.toFixed(2)}${
-								temperature.abbreviation
-							}`}</StyledTableCell>
-							<StyledTableCell>
-								{getWeatherDescription(weather)}
-							</StyledTableCell>
-						</StyledTableRow>
-					);
-				})}
-			</TableBody>
-		) : (
-			<TableBody></TableBody>
-		);
-	};
 
 	const handleChangeRowsPerPage = (event) => {
 		setItemsPerPage(parseInt(event.target.value, 10));
@@ -330,9 +213,10 @@ function WeatherCurrent(props) {
 						classes={classes}
 						order={isAscending ? "asc" : "desc"}
 						orderBy={sortBy}
+						changeOrder={changeOrder}
 						headCells={headCells.call()}
 					/>
-					{mainBody()}
+					<EnhancedTableBody currentWeathers = {currentWeathers} temperature = {temperature}/>
 				</Table>
 			</TableContainer>
 		</div>
