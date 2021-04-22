@@ -112,74 +112,9 @@ class WeatherInternalLogic {
         }
     }
 
-    void findIndicesOfArrayFilters(ArrayList indicesOfArrayFilters, ArrayList<Map> filterList){
-        filterList.eachWithIndex { it, index ->
+    def getCurrentWeather(opts) {
 
-            if (it.containsKey('sys.countryName') || it.containsKey('weather.description'))
-                indicesOfArrayFilters.add(index)
-        }
-
-        if (indicesOfArrayFilters.size() > 0) {
-            indicesOfArrayFilters.forEach {
-                def key = filterList[it].iterator().next().getKey()
-                filterList[it][key]['in'] = filterList[it][key]['in'].tokenize(',')
-            }
-        }
-    }
-
-    def createFilterMap = { ArrayList<Map<String, Object>> filters ->
-        def retMap = [:]
-        filters.forEach{ Map<String, Object> item ->
-            retMap << item
-        }
-        return retMap
-    }
-
-    def sortWeather(opts){
-        /*
-            opts.filters = [
-                ["name": [
-                    "eq" : "surany"
-                    ]
-                ],
-                [
-                 "temperature": [
-                    "\$gte": 100,
-                    "\$lte": 110
-                    ]
-                ]
-            ]
-         */
-
-        def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class))
-        def isTrue = { item -> item == true ? 1 : -1}
-        ArrayList<WeatherCurrentModel> currentWeathers = weatherCurrentModelCollection.aggregate([
-               new Document([
-                       $match: [
-                            $and: [
-                                    ["sys.country": "SK"]
-                            ] << (opts.filters ?: [:])
-                       ],
-                       ]),
-                       new Document([$sort: [
-                               ((String) opts.sortBy) : (isTrue.call(opts.isAscending))
-                       ]]),
-//                       new Document([$skip: (opts.pageNumber - 1) * opts.itemsPerPage]),
-//                       new Document([$limit: opts.itemsPerPage]),
-                       new Document([$project: ["creationDate": 0]])
-               ]) as List
-        Pageable pageable = PageRequest.of(opts.pageNumber, opts.itemsPerPage);
-        final int start = (int)pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), currentWeathers.size());
-
-        Page<WeatherCurrentModel> pages = new PageImpl<WeatherCurrentModel>(currentWeathers.subList(start, end), pageable,currentWeathers.size())
-        pages
-    }
-
-    def filterWeather(opts) {
-//        ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>> filterList = (ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>) new JsonSlurper().parseText("[" + opts.filterString + "]")
-
-        ArrayList<WeatherCurrentModel> currentWeathers = buildAggregationQuery(opts.filters, opts.itemsPerPage, opts.pageNumber)
+        ArrayList<WeatherCurrentModel> currentWeathers = buildAggregationQuery(opts.filters, opts.sortBy, opts.isAscending)
 
         Pageable pageable = PageRequest.of(opts.pageNumber, opts.itemsPerPage);
         final int start = (int)pageable.getOffset();
@@ -188,22 +123,11 @@ class WeatherInternalLogic {
         Page<WeatherCurrentModel> pages = new PageImpl<WeatherCurrentModel>(currentWeathers.subList(start, end), pageable,currentWeathers.size())
         pages
     }
-    @CompileStatic
-    private static Object buildCompareParam(Object paramToChange, String[] path){
-        paramToChange = path.inject(paramToChange){ weather, String p -> weather?.getAt(p) }
-        if (paramToChange instanceof String && paramToChange.isNumber()) return new Double(paramToChange)
-        else if (paramToChange instanceof Collection) return paramToChange.join(', ')
-        return paramToChange
-    }
 
-    @CompileStatic
-    private static String getCorrectFilterOperator(String filterOperator) {
-        return filterOperator == 'in' ? 'contains' : filterOperator
-    }
-
-    def buildAggregationQuery(Map<String, Object> filters, Integer itemsPerPage, Integer pageNumber){
+    def buildAggregationQuery(Map<String, Object> filters, String sortBy, Boolean isAscending){
 
         def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class));
+        def isTrue = { item -> item == true ? 1 : -1}
 
         weatherCurrentModelCollection.aggregate([
                 new Document([$match: [
@@ -211,34 +135,13 @@ class WeatherInternalLogic {
                             ["sys.country": "SK"]
                         ] << filters
                 ]]),
-                new Document([$skip: (pageNumber) * itemsPerPage]),
-                new Document([$limit: itemsPerPage]),
+                new Document([$sort: [
+                        ((String) sortBy) : (isTrue.call(isAscending))
+                ]]),
                 new Document([$project : [
                         "creationDate" : 0
                 ]]),
         ]) as List
 
-    }
-
-    //It must be changed to a Number otherwise I would be comparing strings and it works improperly wit decimal because it takes length of string into account
-    def isStringNumber = { filterValue, filterOperator -> filterValue instanceof String && filterValue.isNumber() && filterOperator != "eq"  }
-
-    def buildFilters = { filterList ->
-
-        def filterMap = [:]
-        filterList.each {
-
-            item ->
-                (LinkedHashMap) item.each {
-                    filter, filterOperatorAndValue ->
-                        filterOperatorAndValue.collect {
-                            filterOperator, filterValue ->
-                                //this if is here because some nodes are the same and I only need to append a new filter operator (like Gte and lte)
-                                if (filterMap[filter]) filterMap[filter] << [("\$" + filterOperator) : ( isStringNumber.call(filterValue, filterOperator) ? new Double(filterValue) : filterValue )]
-                                else filterMap << [(filter): [("\$" + filterOperator) : ( isStringNumber.call(filterValue, filterOperator) ? new Double(filterValue) : filterValue )]]
-                        }.first()
-                }
-        }
-        filterMap
     }
 }
