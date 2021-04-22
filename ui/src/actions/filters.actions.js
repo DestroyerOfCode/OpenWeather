@@ -3,7 +3,7 @@ export const filtersActions = {
 };
 
 function update(filterName, filterOperator, value, filters){
-    return ( dispatch) => {
+    return dispatch => {
         if (
         (((filterOperator === "$gte" ||
             filterOperator === "$lte") &&

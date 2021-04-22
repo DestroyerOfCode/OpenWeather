@@ -129,25 +129,8 @@ class WeatherService {
         weathers
     }
 
-
-//    @CompileStatic
-//    @Cacheable(value = "weathers")
     PageImpl<WeatherCurrentModel> getWeatherCurrentService(Map<String, Object> opts, String cityId ){
-        Pageable pageable = PageRequest.of(opts.pageNumber, (int) opts.itemsPerPage);
-
-//        if (cityId)
-//            return Arrays.asList(weatherCurrentModelRepository.findById(cityId))
-//
-        if (opts.sortBy && null != opts.isAscending)
-          return weatherInternalLogic.sortWeather(opts)
-//
-//        //example query params "{\"lat\":{\"gte\": \"55.32\", \"lte\" : \"70.02\"}}, {\"country\":{\"in\":\"IQ,GB,AE\"}}"
-        if (opts.filters)
-          return weatherInternalLogic.filterWeather(opts)
-
-        //this is used during the start
-            return weatherCurrentModelRepository.findAllBySysCountry(pageable, "SK")/*.findAll {item-> item.sys.country == 'SK'}*/
-
+        return weatherInternalLogic.getCurrentWeather(opts)
     }
 
 

@@ -9,7 +9,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 function EnhancedTableBody (props) {
     const { currentWeathers, temperature } = props
-	return currentWeathers.content?.length ? (
+	return currentWeathers?.content?.length ? (
 		<TableBody>
 			{currentWeathers.content.map((weather) => {
 				return (

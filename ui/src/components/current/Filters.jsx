@@ -8,6 +8,7 @@ import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import { filtersActions } from "../../actions"
 import { nanoid } from "nanoid";
+import { convertTemperature } from "../../businessLogic/WeatherBusinessLogic"
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -37,7 +38,7 @@ function FiltersComponent(props) {
 	};
 	
 	return (
-		<form form className={classes.root} noValidate autoComplete="off">
+		<form className={classes.root} noValidate autoComplete="off">
 			<FormControl fullWidth={false} variant="filled" size="small">
 				<InputLabel type={String} htmlFor="component-simple">
 					{i18n.t("current.filters.cityName")}
@@ -152,7 +153,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.from")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.feels_like"]?.$gte}
+					defaultValue={(convertTemperature(props.temperatureUnits, filters["weatherMain.feels_like"]?.$gte))}
 					onBlur={(event) => {
 						if (event && event.target.value !== "")
 							return onBlurEvent(
@@ -173,7 +174,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.to")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.feels_like"]?.$lte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.feels_like"]?.$lte)}
 					onBlur={(event) => {
 						if (event && event.target.value !== "")
 							return onBlurEvent(
@@ -194,7 +195,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.from")}
 					id="component-simple"
-					defaultValue={filters["weatherMain.temp_max"]?.$gte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_max"]?.$gte)}
 					onBlur={(event) => {
 						if (event.target.value !== "")
 							return onBlurEvent(
@@ -215,7 +216,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.to")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.temp_max"]?.$lte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_max"]?.$lte)}
 					onBlur={(event) => {
 						if (event.target.value !== "")
 							return onBlurEvent(
@@ -236,7 +237,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.from")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.temp_min"]?.$gte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_min"]?.$gte)}
 					onBlur={(event) => {
 						if (event.target.value !== "")
 							return onBlurEvent(
@@ -257,7 +258,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.to")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.temp_min"]?.$lte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_min"]?.$lte)}
 					onBlur={(event) => {
 						if (event.target.value !== "")
 							return onBlurEvent(
@@ -278,7 +279,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.from")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.temp"]?.$gte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp"]?.$gte)}
 					onBlur={(event) => {
 						if (event.target.value !== "")
 							return onBlurEvent(
@@ -299,7 +300,7 @@ function FiltersComponent(props) {
 				<Input
 					placeholder={i18n.t("common.to")}
 					id={nanoid()}
-					defaultValue={filters["weatherMain.temp"]?.$lte}
+					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp"]?.$lte)}
 					onBlur={(event) => {
 						if (event.target.value !== "")
 							return onBlurEvent(

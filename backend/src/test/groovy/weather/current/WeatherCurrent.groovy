@@ -69,7 +69,7 @@ class WeatherCurrent {
     @Test
 //    @RepeatedTest(103)
     @DisplayName("Filter with multiple variables without sorting")
-    void filterWeatherDataWithCountryWithoutSort() {
+    void getCurrentWeatherDataWithCountryWithoutSort() {
         given().auth().none().contentType("application/json")
         .when().body(["pageNumber": 0, "itemsPerPage": 1000, "sortBy": "name","filters": ["sys.country": ["\$in": ["SK"]],
                                                                                           "coord.lat": ["\$gte": new BigDecimal("35"), "\$lte": new BigDecimal("55")]]
@@ -79,7 +79,7 @@ class WeatherCurrent {
 
     @Test
     @DisplayName("Filter with multiple variables without sorting with no additional filters")
-    void filterWeatherDataWithCountryWithoutSortWithNoAdditionalFilter() {
+    void getCurrentWeatherDataWithCountryWithoutSortWithNoAdditionalFilter() {
         given().auth().none().contentType("application/json")
                 .when().body(["pageNumber": 0, "itemsPerPage": 1000, "sortBy": "name","filters": ["sys.country": ["\$in": ["SK"]],
                                                                                                   "coord.lat": ["\$gte": new BigDecimal("25"), "\$lte": new BigDecimal("55")]]

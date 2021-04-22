@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import WeatherCurrentService from "../../adapters/WeatherCurrentService";
 import { nanoid } from "nanoid";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableContainer from "@material-ui/core/TableContainer";
@@ -14,7 +14,7 @@ import TemperatureCtx from '../../buildingBlocks/Temperature'
 import CustomCircularLoader from '../../buildingBlocks/CustomCircularLoader'
 import EnhancedTableHead from '../common/EnhancedTableHeader'
 import EnhancedTableBody from './WeatherCurrentTableBody'
-
+import { weatherCurrentActions } from "../../actions";
 const useStyles = makeStyles((theme) => ({
 	tableContainer: {
 		maxHeight: 500,
@@ -41,32 +41,24 @@ const useStyles = makeStyles((theme) => ({
 
 
 function WeatherCurrent(props) {
-	const [currentWeathers, setCurrentWeathers] = useState({});
 	const [isAscending, setIsAscending] = useState(true);
 	const [sortBy, setSortBy] = useState("name");
 	const [currentPage, setCurrentPage] = useState(0);
 	const [itemsPerPage, setItemsPerPage] = useState(100);
 	const [loading, setLoading] = useState(true);
 	const filtersSelector = useSelector(state => state.filters);
+	const currentWeathers = useSelector(state => state.weatherCurrent)
 	const classes = useStyles();
-	console.log(TemperatureCtx)
+	const dispatch = useDispatch()
 	const temperature = useContext(TemperatureCtx)
 
 	useEffect(() => {
-		refreshWeathers();
-	}, [currentPage, itemsPerPage, sortBy, isAscending]);
+		refreshWeathers()
+	}, [props, currentPage, itemsPerPage, sortBy, isAscending]);
 
 	const refreshWeathers = () => {
-		WeatherCurrentService.retrieveAllWeathers(
-			sortBy,
-			isAscending,
-			filtersSelector,
-			currentPage,
-			itemsPerPage
-		).then((response) => {
-			setLoading(false)
-			setCurrentWeathers(response.data);
-		});
+		dispatch(weatherCurrentActions.getCurrentWeathers(sortBy, isAscending, filtersSelector, currentPage, itemsPerPage))
+		setLoading(false);
 	};
 
 	const headCells = () => {
@@ -176,7 +168,6 @@ function WeatherCurrent(props) {
         return internationalize(countries);
     };
     
-	console.log(currentWeathers)
 	return loading ? <CustomCircularLoader/> : (
 		<div className="container">
 
@@ -193,7 +184,7 @@ function WeatherCurrent(props) {
 			<TablePagination
 				rowsPerPageOptions={[{label: i18n.t("page.ten"), value: 10}, {label: i18n.t("page.hundred"), value: 100}, {label: i18n.t("page.thousand"), value: 1000}]}
 				component="div"
-				count={currentWeathers.totalElements}
+				count={currentWeathers?.totalElements}
 				rowsPerPage={itemsPerPage}
 				page={currentPage}
 				onChangePage={handleChangePage}
