@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import WeatherCurrentService from "../../adapters/WeatherCurrentService";
 import { nanoid } from "nanoid";
 import { useSelector } from "react-redux";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableContainer from "@material-ui/core/TableContainer";
 import Paper from "@material-ui/core/Paper";
@@ -11,7 +11,7 @@ import Button from "@material-ui/core/Button";
 import FiltersComponent from "./Filters";
 import i18n from "i18next";
 import TemperatureCtx from '../../buildingBlocks/Temperature'
-import { customCircularLoader } from '../../buildingBlocks/commonBuildingBlocks'
+import CustomCircularLoader from '../../buildingBlocks/CustomCircularLoader'
 import EnhancedTableHead from '../common/EnhancedTableHeader'
 import EnhancedTableBody from './WeatherCurrentTableBody'
 
@@ -47,7 +47,7 @@ function WeatherCurrent(props) {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [itemsPerPage, setItemsPerPage] = useState(100);
 	const [loading, setLoading] = useState(true);
-	const filtersSelector = useSelector((filters) => filters);
+	const filtersSelector = useSelector(state => state.filters);
 	const classes = useStyles();
 	console.log(TemperatureCtx)
 	const temperature = useContext(TemperatureCtx)
@@ -177,7 +177,7 @@ function WeatherCurrent(props) {
     };
     
 	console.log(currentWeathers)
-	return loading ? customCircularLoader() : (
+	return loading ? <CustomCircularLoader/> : (
 		<div className="container">
 
 			<FiltersComponent

@@ -10,7 +10,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { nanoid } from "nanoid";
 import Button from "@material-ui/core/Button";
 import TemperatureCtx from '../../../buildingBlocks/Temperature'
-import { customCircularLoader } from '../../../buildingBlocks/commonBuildingBlocks'
+import CustomCircularLoader from '../../../buildingBlocks/CustomCircularLoader'
 import EnhancedTableHeader from '../../common/EnhancedTableHeader'
 import WeatherForecastTableBody from './WeatherForecastTableBody';
 
@@ -60,7 +60,7 @@ function WeatherForecastComponent(props) {
 		setIsAscending(!isAscending);
 	};
 
-	return loading ? customCircularLoader() :  (
+	return loading ? <CustomCircularLoader/> :  (
 		<>
 			<Link to={{ pathname: "/" }}>
 				<Button variant="contained" color="primary">

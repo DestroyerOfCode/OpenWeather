@@ -8,7 +8,7 @@ class WeatherService {
 		return axios.post(`${WEATHER_CURRENT_API_URL}/retrieve/fromDb`, {
 			sortBy: sortBy,
 			isAscending: isAscending,
-			filters: filters,
+			filters,
 			itemsPerPage: itemsPerPage,
 			pageNumber: currentPage,
 		});

@@ -3,15 +3,24 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import reducer from "./store/store.js";
+import {store} from "./storage/configureStore";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
-
-const store = createStore(reducer);
+import { HashRouter } from "react-router-dom";
+import { Suspense } from "react";
+import CustomCircularLoader from './buildingBlocks/CustomCircularLoader'
+import "./i18n";
+// const store = createStore(store);
 
 ReactDOM.render(
 	<Provider store={store}>
-		<App />
+		<React.StrictMode>
+			<Suspense fallback={<CustomCircularLoader/>}>
+				<HashRouter key="hashRouter">
+					<App />
+				</HashRouter>
+			</Suspense>
+		</React.StrictMode>
 	</Provider>,
 	document.getElementById("root")
 );

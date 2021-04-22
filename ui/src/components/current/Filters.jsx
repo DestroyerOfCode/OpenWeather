@@ -6,6 +6,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
+import { filtersActions } from "../../actions"
 import { nanoid } from "nanoid";
 
 const useStyles = makeStyles((theme) => ({
@@ -24,20 +25,17 @@ const useStyles = makeStyles((theme) => ({
 function FiltersComponent(props) {
 	const [countries, setCountries] = useState([]);
 	const [descriptions, setDescriptions] = useState([]);
-	const filters = useSelector((filters) => filters);
+	const filters = useSelector((state) => state.filters);
+
 	const dispatch = useDispatch();
 	const classes = useStyles();
 	props.countries.then((res) => setCountries(res));
 	props.descriptions.then((res) => setDescriptions(res));
 
 	const onBlurEvent = (event, filterName, filterOperator) => {
-		dispatch({
-			type: "UPDATE_FILTERS",
-			value: event,
-			filterName: [filterName],
-			filterOperator: [filterOperator],
-		});
+		dispatch( filtersActions.update(filterName, filterOperator, event, filters));
 	};
+	
 	return (
 		<form form className={classes.root} noValidate autoComplete="off">
 			<FormControl fullWidth={false} variant="filled" size="small">
@@ -46,7 +44,7 @@ function FiltersComponent(props) {
 				</InputLabel>
 				<Input
 					id={nanoid()}
-					defaultValue={filters["name"]?.$eq}
+					defaultValue={filters?.name?.$eq}
 					onBlur={(event) => onBlurEvent(event.target.value, "name", "$eq")}
 				/>
 			</FormControl>
@@ -104,9 +102,6 @@ function FiltersComponent(props) {
 				/>
 			</FormControl>
 			<FormControl
-				fullWidth={false}
-				variant="filled"
-				size="small"
 				fullWidth={false}
 				variant="filled"
 				size="small"
