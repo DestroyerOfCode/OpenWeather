@@ -321,22 +321,22 @@ function FiltersComponent(props) {
 				placeholder={i18n.t("current.filters.pickDescriptions")}
 				options={descriptions}
 				displayValue="name"
-				onSelect={(event) => {
-					dispatch({
-						type: "UPDATE_FILTERS",
-						value: event.map((desc) => desc.originalValue),
-						filterName: "weather.description",
-						filterOperator: "$in",
-					});
-				}}
-				onRemove={(event) => {
-					dispatch({
-						type: "UPDATE_FILTERS",
-						value: event.map((desc) => desc.originalValue),
-						filterName: "weather.description",
-						filterOperator: "$in",
-					});
-				}}
+				onSelect={(event) => 
+						dispatch( filtersActions.update(
+						"weather.description",
+						 "$in",
+						 event.map((desc) => desc.originalValue),
+						 filters)
+					 )
+				}
+				onRemove={(event) => 
+					dispatch( filtersActions.update(
+						"weather.description",
+						 "$in",
+						 event.map((desc) => desc.originalValue),
+						 filters)
+					)
+				}
 			/>
 			<Multiselect
 				selectedValues={getSelectedCountries(
@@ -346,22 +346,22 @@ function FiltersComponent(props) {
 				placeholder={i18n.t("current.filters.pickCountries")}
 				options={countries}
 				displayValue="countryName"
-				onSelect={(event) => {
-					dispatch({
-						type: "UPDATE_FILTERS",
-						value: event.map((country) => country.originalCountryName),
-						filterName: "sys.countryName",
-						filterOperator: "$in",
-					});
-				}}
-				onRemove={(event) => {
-					dispatch({
-						type: "UPDATE_FILTERS",
-						value: event.map((country) => country.originalCountryName),
-						filterName: "sys.countryName",
-						filterOperator: "$in",
-					});
-				}}
+				onSelect={(event) => 
+					dispatch( filtersActions.update(
+						"sys.countryName",
+					 	"$in",
+					 	event.map((country) => country.originalCountryName),
+					 	filters)
+					 )
+				}
+				onRemove={(event) => 
+					dispatch( filtersActions.update(
+						"sys.countryName",
+					 	"$in",
+					 	event.map((country) => country.originalCountryName),
+					 	filters)
+					 )
+				}
 			/>
 		</form>
 	);

@@ -1,11 +1,9 @@
-import { filtersConstants } from '../_constants'
 export const filtersActions = {
     update
 };
 
 function update(filterName, filterOperator, value, filters){
     return ( dispatch) => {
-        let a =3;
         if (
         (((filterOperator === "$gte" ||
             filterOperator === "$lte") &&
