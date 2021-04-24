@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component
 @Component
 class WeatherForecastModel implements Mappable {
 
-    BigDecimal lon
-    BigDecimal lat
+    Double lon
+    Double lat
     String timezone
     BigInteger timezone_offset
     Current current
@@ -79,8 +79,8 @@ class WeatherForecastModel implements Mappable {
         Double snow
         Integer moonrise
         Integer moonset
-        BigDecimal moon_phase
-        BigDecimal wind_gust
+        Double moon_phase
+        Double wind_gust
 
         static class Feels_Like{
             Double day
