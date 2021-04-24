@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import WeatherCurrentService from "../../adapters/WeatherCurrentService";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
@@ -20,7 +19,6 @@ const useStyles = makeStyles((theme) => ({
 		maxHeight: 500,
 		position: "sticky",
 		minWidth: 650,
-
 	},
 	paper: {
 		width: "100%",
@@ -140,42 +138,12 @@ function WeatherCurrent(props) {
 		setCurrentPage(page);
 	};
 
-    const internationalizeDescriptions = (descriptions) => {
-        return descriptions.data.map((description) => ({
-            name: i18n.t("common.description." + description.originalValue),
-            id: description.id,
-            originalValue: description.originalValue,
-        }));
-    };
-    const internationalizeCountries = (countries) => {
-        return countries.data.map((country) => {
-            return {
-                countryName: i18n.t(
-                    "common.countryName." + country.originalCountryName
-                ),
-                id: country.code,
-                originalCountryName: country.originalCountryName,
-            };
-        });
-    };
-    
-    const descriptions = async (internationalize) => {
-        let desc = await WeatherCurrentService.retrieveAllDescriptions();
-        return internationalize(desc);
-    };
-    const countries = async (internationalize) => {
-        let countries = await WeatherCurrentService.retrieveAllCountries();
-        return internationalize(countries);
-    };
-    
 	return loading ? <CustomCircularLoader/> : (
 		<div className="container">
 
 			<FiltersComponent
 				key={nanoid()}
 				temperatureUnits={temperature.units}
-				countries={countries(internationalizeCountries)}
-				descriptions={descriptions(internationalizeDescriptions)}
 				temperature={temperature.abbreviation}
 			/>
 			<Button variant="contained" color="primary" onClick={refreshWeathers}>

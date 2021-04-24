@@ -16,7 +16,6 @@ function update(filterName, filterOperator, value, filters){
             console.log(Object.keys(filters[filterName]).length);
             if (Object.keys(filters[filterName]).length === 0)
                 delete filters[filterName];
-            filters= filters;
         }
 
         else if (filters[filterName]) {
@@ -39,5 +38,4 @@ function update(filterName, filterOperator, value, filters){
         }
         dispatch({type: "UPDATE_FILTERS", filters});
     }
-    
 }

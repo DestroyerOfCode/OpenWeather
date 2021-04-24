@@ -34,8 +34,6 @@ class WeatherInternalLogic {
     @Autowired FilterOperatorOverload filterOperatorOverload
     @Autowired MongoTemplate mongoTemplate
 
-//    @Value("\${openweather.api.key.one}")
-//    private String openweather_api_key_one
     /***
      *
      * @param entity
@@ -84,32 +82,6 @@ class WeatherInternalLogic {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         return entity
-    }
-
-
-    //depth first algorithm to find path in mongo given the most nested key
-    def findNestedKey(def m, String key) {
-        if (!m)
-            return
-        if (m instanceof Collection) {
-            m.forEach { item ->
-                if (!item)
-                    return
-                if (item.asMap().containsKey(key)) return item.asMap()[key]
-                item.asMap().findResult {
-                    k, v ->
-                        v && v instanceof Map ? findNestedKey(v, key) : null
-                }
-            }
-        }
-        else {
-            if (m.containsKey(key))
-                return m[key]
-            m.findResult {
-                k, v ->
-                    v && (v instanceof Map || v instanceof Collection) ? findNestedKey(v, key) : null
-            }
-        }
     }
 
     def getCurrentWeather(opts) {
