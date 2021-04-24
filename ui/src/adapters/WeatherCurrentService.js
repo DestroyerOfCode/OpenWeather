@@ -14,9 +14,11 @@ class WeatherService {
 		});
 	}
 
-	retrieveAllCountries = async () =>
-		await axios.get(`${WEATHER_CURRENT_API_URL}/countries`);
-	retrieveAllDescriptions = async () =>
-		await axios.get(`${WEATHER_CURRENT_API_URL}/descriptions`);
+	retrieveAllCountries() {
+		return axios.get(`${WEATHER_CURRENT_API_URL}/countries`);
+	}
+	retrieveAllDescriptions() {
+		return axios.get(`${WEATHER_CURRENT_API_URL}/descriptions`);
+	}
 }
 export default new WeatherService();

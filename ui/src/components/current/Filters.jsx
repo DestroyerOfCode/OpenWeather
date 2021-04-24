@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Multiselect } from "multiselect-react-dropdown";
 import i18n from "i18next";
@@ -6,7 +6,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
-import { filtersActions } from "../../actions"
+import { filtersActions, countriesActions, descriptionsActions } from "../../actions"
 import { nanoid } from "nanoid";
 import { convertTemperature } from "../../businessLogic/WeatherBusinessLogic"
 
@@ -24,14 +24,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function FiltersComponent(props) {
-	const [countries, setCountries] = useState([]);
-	const [descriptions, setDescriptions] = useState([]);
 	const filters = useSelector((state) => state.filters);
-
+	const countries = useSelector((state) => state.countries)
+	const descriptions = useSelector((state) => state.descriptions)
 	const dispatch = useDispatch();
 	const classes = useStyles();
-	props.countries.then((res) => setCountries(res));
-	props.descriptions.then((res) => setDescriptions(res));
+	useEffect(() => {
+		dispatch(descriptionsActions.getDescriptions())
+		dispatch(countriesActions.getCountries())
+	}, []);
 
 	const onBlurEvent = (event, filterName, filterOperator) => {
 		dispatch( filtersActions.update(filterName, filterOperator, event, filters));
