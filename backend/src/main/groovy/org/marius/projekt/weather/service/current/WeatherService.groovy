@@ -77,13 +77,6 @@ class WeatherService {
             weatherMap.snow.put('threeh', o)
         }
 
-        weatherMap.coord.lat = new Double(weatherMap.coord.lat)
-        weatherMap.coord.lon = new Double(weatherMap.coord.lon)
-        weatherMap.weatherMain.temp = new Double(weatherMap.weatherMain.temp)
-        weatherMap.weatherMain.feels_like = new Double(weatherMap.weatherMain.feels_like)
-        weatherMap.weatherMain.temp_max = new Double(weatherMap.weatherMain.temp_max)
-        weatherMap.weatherMain.temp_min = new Double(weatherMap.weatherMain.temp_min)
-
         WeatherCurrentModel weatherCurrentModel = mapper.convertValue(weatherMap, WeatherCurrentModel.class)
         return weatherCurrentModel
     }
