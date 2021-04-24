@@ -57,8 +57,8 @@ class WeatherCurrent {
     @DisplayName("Filter with multiple variables without sorting")
     void filterWithMultipleVariablesWithoutSort() {
         given().auth().none().contentType("application/json")
-            .when().body(["pageNumber": 0, "itemsPerPage": 1000, "filters": ["coord.lon": ["\$gte": new BigDecimal("5.4")],
-                                                                                              "coord.lat": ["\$gte": new BigDecimal("35"), "\$lte": new BigDecimal("55")]]
+            .when().body(["pageNumber": 0, "itemsPerPage": 1000, "filters": ["coord.lon": ["\$gte": new Double("5.4")],
+                                                                                              "coord.lat": ["\$gte": new Double("35"), "\$lte": new Double("55")]]
             ])
             .when().post("/weather/current/retrieve/fromDb")
             .then().assertThat().statusCode(200)
@@ -72,7 +72,7 @@ class WeatherCurrent {
     void getCurrentWeatherDataWithCountryWithoutSort() {
         given().auth().none().contentType("application/json")
         .when().body(["pageNumber": 0, "itemsPerPage": 1000, "sortBy": "name","filters": ["sys.country": ["\$in": ["SK"]],
-                                                                                          "coord.lat": ["\$gte": new BigDecimal("35"), "\$lte": new BigDecimal("55")]]
+                                                                                          "coord.lat": ["\$gte": new Double("35"), "\$lte": new Double("55")]]
         ]).when().post("/weather/current/retrieve/fromDb")
         .then().statusCode(200)
     }
@@ -82,7 +82,7 @@ class WeatherCurrent {
     void getCurrentWeatherDataWithCountryWithoutSortWithNoAdditionalFilter() {
         given().auth().none().contentType("application/json")
                 .when().body(["pageNumber": 0, "itemsPerPage": 1000, "sortBy": "name","filters": ["sys.country": ["\$in": ["SK"]],
-                                                                                                  "coord.lat": ["\$gte": new BigDecimal("25"), "\$lte": new BigDecimal("55")]]
+                                                                                                  "coord.lat": ["\$gte": new Double("25"), "\$lte": new Double("55")]]
         ]).when().post("/weather/current/retrieve/fromDb")
         .then().statusCode(200)
     }

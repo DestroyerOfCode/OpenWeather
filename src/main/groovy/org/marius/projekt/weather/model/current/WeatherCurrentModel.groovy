@@ -19,7 +19,7 @@ class WeatherCurrentModel implements Mappable {
     Integer timezone
     Integer weatherId
     Integer cod
-    BigDecimal dt
+    Double dt
     String name
     WeatherMain weatherMain
     Coord coord
@@ -36,8 +36,8 @@ class WeatherCurrentModel implements Mappable {
     }
 
     static class Coord{
-        BigDecimal lon
-        BigDecimal lat
+        Double lon
+        Double lat
     }
 
     static class Rain{
@@ -66,11 +66,11 @@ class WeatherCurrentModel implements Mappable {
     }
 
     static class WeatherMain{
-        BigDecimal temp
-        BigDecimal feels_like
+        Double temp
+        Double feels_like
         Integer humidity
-        BigDecimal temp_max
-        BigDecimal temp_min
+        Double temp_max
+        Double temp_min
         Integer pressure
         Integer sea_level
         Integer grnd_level
