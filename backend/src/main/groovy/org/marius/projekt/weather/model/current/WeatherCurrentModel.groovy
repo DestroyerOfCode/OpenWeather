@@ -36,8 +36,8 @@ class WeatherCurrentModel implements Mappable {
     }
 
     static class Coord{
-        String lon
-        String lat
+        BigDecimal lon
+        BigDecimal lat
     }
 
     static class Rain{
