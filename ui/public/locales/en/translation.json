@@ -1,6 +1,7 @@
 {
 	"common": {
 		"filter": "Filter",
+		"clearFilters": "Clear filters",
 		"from": "From",
 		"to": "To",
 		"countryName": {

@@ -16,13 +16,14 @@ export const displayDateTime = (dateTime) => {
 
 export const convertTemperature = (convertTo, temp) => {
 	if (!temp) return ""
+	console.log(typeof temp === "string")
 	if (convertTo === "celsius")
-		return typeof temp === "string" ? parseFloat(temp - 273.15) : temp - 273.15;
+		return typeof temp === "string" ? parseFloat(temp - 273.15).toFixed(2) : parseFloat((temp - 273.15).toFixed(2));
 	else if (convertTo === "fahrenheit")
 		return typeof temp === "string"
-			? parseFloat((temp - 273.15) * 1.8 + 32)
-			: (temp - 273.15) * 1.8 + 32;
-	else return typeof temp === "string" ? parseFloat(temp) : temp;
+			? parseFloat((temp - 273.15) * 1.8 + 32).toFixed(2)
+			: parseFloat(((temp - 273.15) * 1.8 + 32).toFixed(2));
+	else return typeof temp === "string" ? parseFloat(temp).toFixed(2) : parseFloat((temp).toFixed(2));
 };
 
 export const displayCoords = (coord) => {

@@ -1,4 +1,4 @@
-import WeatherCurrentService from "../adapters/WeatherCurrentService"
+import { retrieveAllCountries } from "../adapters/WeatherCurrentService"
 import i18n from "i18next";
 
 export const countriesActions = {
@@ -7,7 +7,7 @@ export const countriesActions = {
 
 function getCountries() {
     return async (dispatch) => {
-        await WeatherCurrentService.retrieveAllCountries()
+        await retrieveAllCountries()
             .then(response => dispatch({type: "GET_COUNTRIES", countries: internationalizeCountries(response)})
             );
     }    

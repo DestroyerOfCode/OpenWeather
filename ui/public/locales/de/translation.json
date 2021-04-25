@@ -1,6 +1,7 @@
 {
     "common": {
         "filter": "filtern",
+        "clearFilters": "reinigen Filtern",
         "from": "aus",
         "to": "zu",
         "countryName": {
