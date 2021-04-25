@@ -1,5 +1,6 @@
 export const filtersActions = {
-    update
+    update,
+    clear
 };
 
 function update(filterName, filterOperator, value, filters){
@@ -12,16 +13,13 @@ function update(filterName, filterOperator, value, filters){
             (Array.isArray(value) && value.length === 0)) &&
         filters[filterName] !== undefined
         ) {
-            delete filters[filterName][filterOperator];
-            console.log(Object.keys(filters[filterName]).length);
-            if (Object.keys(filters[filterName]).length === 0)
-                delete filters[filterName];
+            dispatch({type: "REMOVE_FILTER", filters, filterName, filterOperator})
+            return;
         }
 
         else if (filters[filterName]) {
-            let temp = filters[filterName];
-            temp[filterOperator] = value;
-            filters= { ...filters, [filterName]: temp };
+            dispatch({type: "APPEND_FILTER_OPERATOR", filters, filterName, filterOperator, value})
+            return;
         }
 
         else if (
@@ -31,11 +29,15 @@ function update(filterName, filterOperator, value, filters){
             "" !== value ||
             (Array.isArray(value) && value.length !== 0)
         ) {
-            filters= {
-                ...filters,
-                [filterName]: { [filterOperator]: value },
-            };
+            dispatch({type: "APPEND_FILTER", filters, filterName, filterOperator, value})
+            return;
         }
-        dispatch({type: "UPDATE_FILTERS", filters});
+        // dispatch({type: "UPDATE_FILTERS", filters});
+    }
+}
+
+function clear() {
+    return dispatch => {
+        dispatch({ type: "CLEAR_FILTERS"})
     }
 }

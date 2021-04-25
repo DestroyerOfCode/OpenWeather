@@ -52,7 +52,7 @@ function WeatherCurrent(props) {
 
 	useEffect(() => {
 		refreshWeathers()
-	}, [props, currentPage, itemsPerPage, sortBy, isAscending]);
+	}, [props, currentPage, itemsPerPage, sortBy, isAscending, filtersSelector]);
 
 	const refreshWeathers = () => {
 		dispatch(weatherCurrentActions.getCurrentWeathers(sortBy, isAscending, filtersSelector, currentPage, itemsPerPage))
@@ -145,10 +145,13 @@ function WeatherCurrent(props) {
 				key={nanoid()}
 				temperatureUnits={temperature.units}
 				temperature={temperature.abbreviation}
+				handleChangePage={handleChangePage}
 			/>
+
 			<Button variant="contained" color="primary" onClick={refreshWeathers}>
 				{i18n.t("common.filter")}
 			</Button>
+
 			<TablePagination
 				rowsPerPageOptions={[{label: i18n.t("page.ten"), value: 10}, {label: i18n.t("page.hundred"), value: 100}, {label: i18n.t("page.thousand"), value: 1000}]}
 				component="div"
@@ -162,9 +165,9 @@ function WeatherCurrent(props) {
 				labelRowsPerPage={i18n.t("page.rows")}
 				// backIconButtonProps={color="primary"}
 			/>
+
 			<TableContainer key={nanoid()} component={Paper} className={classes.tableContainer}>
 				<Table stickyHeader={true}
-					// className={classes.tableContainer}
 					size="small"
 					aria-label="a dense table"
 				>

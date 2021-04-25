@@ -9,6 +9,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import { filtersActions, countriesActions, descriptionsActions } from "../../actions"
 import { nanoid } from "nanoid";
 import { convertTemperature } from "../../businessLogic/WeatherBusinessLogic"
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -29,343 +30,346 @@ function FiltersComponent(props) {
 	const descriptions = useSelector((state) => state.descriptions)
 	const dispatch = useDispatch();
 	const classes = useStyles();
+
 	useEffect(() => {
 		dispatch(descriptionsActions.getDescriptions())
 		dispatch(countriesActions.getCountries())
 	}, []);
 
-	const onBlurEvent = (event, filterName, filterOperator) => {
-		dispatch( filtersActions.update(filterName, filterOperator, event, filters));
+	const onChangeEvent = (event, filterName, filterOperator) => {
+		// const timeout = setTimeout(() => {
+			props.handleChangePage(null, 0)
+			dispatch(filtersActions.update(filterName, filterOperator, event, filters));
+		// }, 1500)
+		
+		// return () => clearTimeout(timeout);
 	};
 	
 	return (
-		<form className={classes.root} noValidate autoComplete="off">
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={String} htmlFor="component-simple">
-					{i18n.t("current.filters.cityName")}
-				</InputLabel>
-				<Input
-					id={nanoid()}
-					defaultValue={filters?.name?.$eq}
-					onBlur={(event) => onBlurEvent(event.target.value, "name", "$eq")}
-				/>
-			</FormControl>
-			<FormControl>
-				<InputLabel variant="standard" type={String} htmlFor="component-simple">
-					{i18n.t("current.filters.latitude")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
+		<>
+			<form className={classes.root} noValidate autoComplete="off">
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={String} htmlFor="component-simple">
+						{i18n.t("current.filters.cityName")}
+					</InputLabel>
+					<Input
+						id={nanoid()}
+						defaultValue={filters?.name?.$eq}
+						onChange={(event) => {
+							const timeout = setTimeout(() => {
+								onChangeEvent(event.target.value, "name", "$eq")
+							}, 1500)	
+							
+							return () => clearTimeout(timeout);
+						}
+						}
+					/>
+				</FormControl>
+				<FormControl>
+					<InputLabel variant="standard" type={String} htmlFor="component-simple">
+						{i18n.t("current.filters.latitude")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						fullWidth={false}
+						placeholder={i18n.t("common.from")}
+						id={nanoid()}
+						defaultValue={filters["coord.lat"]?.$gte}
+						onChange={(event) =>
+							onChangeEvent(parseFloat(event.target.value), "coord.lat", "$gte")
+						}
+					/>
+				</FormControl>
+				<FormControl>
+					<InputLabel type={String} htmlFor="component-simple">
+						{i18n.t("current.filters.latitude")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						defaultValue={filters["coord.lat"]?.$lte}
+						onChange={(event) =>
+							onChangeEvent(parseFloat(event.target.value), "coord.lat", "$lte")
+						}
+					/>
+				</FormControl>
+				<FormControl>
+					<InputLabel type={String} htmlFor="component-simple">
+						{i18n.t("current.filters.longitude")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.from")}
+						id={nanoid()}
+						defaultValue={filters["coord.lon"]?.$gte}
+						onChange={(event) =>
+							onChangeEvent(parseFloat(event.target.value), "coord.lon", "$gte")
+						}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={String} htmlFor="component-simple">
+						{i18n.t("current.filters.longitude")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						defaultValue={filters["coord.lon"]?.$lte}
+						onChange={(event) =>
+							onChangeEvent(parseFloat(event.target.value), "coord.lon", "$lte")
+						}
+					/>
+				</FormControl>
+				<FormControl
 					fullWidth={false}
-					placeholder={i18n.t("common.from")}
-					id={nanoid()}
-					defaultValue={filters["coord.lat"]?.$gte}
-					onBlur={(event) =>
-						onBlurEvent(event.target.value, "coord.lat", "$gte")
+					variant="filled"
+					size="small"
+				>
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.humidity")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						type={Number}
+						placeholder={i18n.t("common.from")}
+						id={nanoid()}
+						defaultValue={filters["weatherMain.humidity"]?.$gte}
+						onChange={(event) => 
+								onChangeEvent(
+									parseFloat(event.target.value),
+									"weatherMain.humidity",
+									"$gte"
+								)
+						}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.humidity")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						type={Number}
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						defaultValue={filters["weatherMain.humidity"]?.$lte}
+						onChange={(event) => {
+							if (event && event.target.value !== "")
+								return onChangeEvent(
+									parseFloat(event.target.value),
+									"weatherMain.humidity",
+									"$lte"
+								);
+							else return onChangeEvent("", "weatherMain.humidity", "$lte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.feelTemperature")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.from")}
+						id={nanoid()}
+						defaultValue={(convertTemperature(props.temperatureUnits, filters["weatherMain.feels_like"]?.$gte))}
+						onChange={(event) => {
+							if (event && event.target.value !== "")
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.feels_like",
+									"$gte"
+								);
+							else return onChangeEvent("", "weatherMain.feels_like", "$gte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.feelTemperature")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.feels_like"]?.$lte)}
+						onChange={(event) => {
+							if (event && event.target.value !== "")
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.feels_like",
+									"$lte"
+								);
+							else return onChangeEvent("", "weatherMain.feels_like", "$lte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={String} htmlFor="component-simple">
+						{i18n.t("current.filters.temperatureMax")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.from")}
+						id="component-simple"
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_max"]?.$gte)}
+						onChange={(event) => {
+							if (event.target.value !== "")
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.temp_max",
+									"$gte"
+								);
+							else return onChangeEvent("", "weatherMain.temp_max", "$gte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.temperatureMax")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_max"]?.$lte)}
+						onChange={(event) => {
+							if (event.target.value !== "")
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.temp_max",
+									"$lte"
+								);
+							else return onChangeEvent("", "weatherMain.temp_max", "$lte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.temperatureMin")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.from")}
+						id={nanoid()}
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_min"]?.$gte)}
+						onChange={(event) => {
+							if (event.target.value !== "")
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.temp_min",
+									"$gte"
+								);
+							else return onChangeEvent("", "weatherMain.temp_min", "$gte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.temperatureMin")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_min"]?.$lte)}
+						onChange={(event) => {
+							if (event.target.value !== "")
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.temp_min",
+									"$lte"
+								);
+							else return onChangeEvent("", "weatherMain.temp_min", "$lte");
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small">
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.temperature")} {i18n.t("common.from")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.from")}
+						id={nanoid()}
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp"]?.$gte)}
+						onChange={(event) => {
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.temp",
+									"$gte"
+								);
+						}}
+					/>
+				</FormControl>
+				<FormControl fullWidth={false} variant="filled" size="small" type={Number}>
+					<InputLabel type={Number} htmlFor="component-simple">
+						{i18n.t("current.filters.temperature")} {i18n.t("common.to")}
+					</InputLabel>
+					<Input
+						placeholder={i18n.t("common.to")}
+						id={nanoid()}
+						type={Number}
+						defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp"]?.$lte)}
+						onChange={(event) => {
+								return onChangeEvent(
+									calculateKelvins(props.temperatureUnits, event.target.value),
+									"weatherMain.temp",
+									"$lte"
+								);
+						}}
+					/>
+				</FormControl>
+				<Multiselect
+					selectedValues={getSelectedDescriptions(
+						filters["weather.description"]?.$in,
+						descriptions
+					)}
+					placeholder={i18n.t("current.filters.pickDescriptions")}
+					options={descriptions}
+					displayValue="name"
+					onSelect={(event) => 
+							dispatch( filtersActions.update(
+							"weather.description",
+							 "$in",
+							 event.map((desc) => desc.originalValue),
+							 filters)
+						 )
 					}
-				/>
-			</FormControl>
-			<FormControl>
-				<InputLabel type={String} htmlFor="component-simple">
-					{i18n.t("current.filters.latitude")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={filters["coord.lat"]?.$lte}
-					onBlur={(event) =>
-						onBlurEvent(event.target.value, "coord.lat", "$lte")
-					}
-				/>
-			</FormControl>
-			<FormControl>
-				<InputLabel type={String} htmlFor="component-simple">
-					{i18n.t("current.filters.longitude")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.from")}
-					id={nanoid()}
-					defaultValue={filters["coord.lon"]?.$gte}
-					onBlur={(event) =>
-						onBlurEvent(event.target.value, "coord.lon", "$gte")
-					}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={String} htmlFor="component-simple">
-					{i18n.t("current.filters.longitude")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={filters["coord.lon"]?.$lte}
-					onBlur={(event) =>
-						onBlurEvent(event.target.value, "coord.lon", "$lte")
-					}
-				/>
-			</FormControl>
-			<FormControl
-				fullWidth={false}
-				variant="filled"
-				size="small"
-			>
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.humidity")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
-					type={Number}
-					placeholder={i18n.t("common.from")}
-					id={nanoid()}
-					defaultValue={filters["weatherMain.humidity"]?.$gte}
-					onBlur={(event) => {
-						if (event && event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(event.target.value),
-								"weatherMain.humidity",
-								"$gte"
-							);
-						else return onBlurEvent("", "weatherMain.humidity", "$gte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.humidity")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					type={Number}
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={filters["weatherMain.humidity"]?.$lte}
-					onBlur={(event) => {
-						if (event && event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(event.target.value),
-								"weatherMain.humidity",
-								"$lte"
-							);
-						else return onBlurEvent("", "weatherMain.humidity", "$lte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.feelTemperature")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.from")}
-					id={nanoid()}
-					defaultValue={(convertTemperature(props.temperatureUnits, filters["weatherMain.feels_like"]?.$gte))}
-					onBlur={(event) => {
-						if (event && event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.feels_like",
-								"$gte"
-							);
-						else return onBlurEvent("", "weatherMain.feels_like", "$gte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.feelTemperature")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.feels_like"]?.$lte)}
-					onBlur={(event) => {
-						if (event && event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.feels_like",
-								"$lte"
-							);
-						else return onBlurEvent("", "weatherMain.feels_like", "$lte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={String} htmlFor="component-simple">
-					{i18n.t("current.filters.temperatureMax")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.from")}
-					id="component-simple"
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_max"]?.$gte)}
-					onBlur={(event) => {
-						if (event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.temp_max",
-								"$gte"
-							);
-						else return onBlurEvent("", "weatherMain.temp_max", "$gte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.temperatureMax")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_max"]?.$lte)}
-					onBlur={(event) => {
-						if (event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.temp_max",
-								"$lte"
-							);
-						else return onBlurEvent("", "weatherMain.temp_max", "$lte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.temperatureMin")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.from")}
-					id={nanoid()}
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_min"]?.$gte)}
-					onBlur={(event) => {
-						if (event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.temp_min",
-								"$gte"
-							);
-						else return onBlurEvent("", "weatherMain.temp_min", "$gte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.temperatureMin")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp_min"]?.$lte)}
-					onBlur={(event) => {
-						if (event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.temp_min",
-								"$lte"
-							);
-						else return onBlurEvent("", "weatherMain.temp_min", "$lte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.temperature")} {i18n.t("common.from")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.from")}
-					id={nanoid()}
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp"]?.$gte)}
-					onBlur={(event) => {
-						if (event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.temp",
-								"$gte"
-							);
-						else return onBlurEvent("", "weatherMain.temp", "$gte");
-					}}
-				/>
-			</FormControl>
-			<FormControl fullWidth={false} variant="filled" size="small">
-				<InputLabel type={Number} htmlFor="component-simple">
-					{i18n.t("current.filters.temperature")} {i18n.t("common.to")}
-				</InputLabel>
-				<Input
-					placeholder={i18n.t("common.to")}
-					id={nanoid()}
-					defaultValue={convertTemperature(props.temperatureUnits, filters["weatherMain.temp"]?.$lte)}
-					onBlur={(event) => {
-						if (event.target.value !== "")
-							return onBlurEvent(
-								parseFloat(
-									calculateKelvins(props.temperatureUnits, event.target.value)
-								),
-								"weatherMain.temp",
-								"$lte"
-							);
-						else return onBlurEvent("", "weatherMain.temp", "$lte");
-					}}
-				/>
-			</FormControl>
-			<Multiselect
-				selectedValues={getSelectedDescriptions(
-					filters["weather.description"]?.$in,
-					descriptions
-				)}
-				placeholder={i18n.t("current.filters.pickDescriptions")}
-				options={descriptions}
-				displayValue="name"
-				onSelect={(event) => 
+					onRemove={(event) => 
 						dispatch( filtersActions.update(
-						"weather.description",
-						 "$in",
-						 event.map((desc) => desc.originalValue),
-						 filters)
-					 )
-				}
-				onRemove={(event) => 
-					dispatch( filtersActions.update(
-						"weather.description",
-						 "$in",
-						 event.map((desc) => desc.originalValue),
-						 filters)
-					)
-				}
-			/>
-			<Multiselect
-				selectedValues={getSelectedCountries(
-					filters["sys.countryName"]?.$in,
-					countries
-				)}
-				placeholder={i18n.t("current.filters.pickCountries")}
-				options={countries}
-				displayValue="countryName"
-				onSelect={(event) => 
-					dispatch( filtersActions.update(
-						"sys.countryName",
-					 	"$in",
-					 	event.map((country) => country.originalCountryName),
-					 	filters)
-					 )
-				}
-				onRemove={(event) => 
-					dispatch( filtersActions.update(
-						"sys.countryName",
-					 	"$in",
-					 	event.map((country) => country.originalCountryName),
-					 	filters)
-					 )
-				}
-			/>
-		</form>
+							"weather.description",
+							 "$in",
+							 event.map((desc) => desc.originalValue),
+							 filters)
+						)
+					}
+				/>
+				<Multiselect
+					selectedValues={getSelectedCountries(
+						filters["sys.countryName"]?.$in,
+						countries
+					)}
+					placeholder={i18n.t("current.filters.pickCountries")}
+					options={countries}
+					displayValue="countryName"
+					onSelect={(event) => 
+						dispatch( filtersActions.update(
+							"sys.countryName",
+						 	"$in",
+						 	event.map((country) => country.originalCountryName),
+						 	filters)
+						 )
+					}
+					onRemove={(event) => 
+						dispatch( filtersActions.update(
+							"sys.countryName",
+						 	"$in",
+						 	event.map((country) => country.originalCountryName),
+						 	filters)
+						 )
+					}
+				/>
+			</form>
+
+			<Button
+				variant="contained"
+				onClick={() => dispatch(filtersActions.clear())}
+				size="medium"
+				color="primary"
+			>
+				{i18n.t("common.clearFilters")}
+			</Button>
+		</>
 	);
 }
 
@@ -391,10 +395,10 @@ const getSelectedCountries = (countryValues, countries) => {
 const calculateKelvins = (temperatureUnits, temperatureValue) => {
 	if (temperatureValue === "") return "";
 	if (temperatureUnits === "celsius")
-		return (parseFloat(temperatureValue) + 273.15).toString();
+		return (parseFloat(temperatureValue) + 273.15);
 	if (temperatureUnits === "fahrenheit")
-		return (((parseFloat(temperatureValue) + 459.67) * 5) / 9).toString();
-	return temperatureValue;
+		return (((parseFloat(temperatureValue) + 459.67) * 5) / 9);
+	return parseFloat(temperatureValue);
 };
 
 export default FiltersComponent;

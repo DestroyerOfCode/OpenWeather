@@ -56,6 +56,7 @@ class WeatherCurrentController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
+    @Cacheable(value = "currentWeathers")
     @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
     @ResponseBody
     def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts,

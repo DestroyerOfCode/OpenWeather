@@ -1,6 +1,7 @@
 {
 	"common": {
 		"filter": "Odfiltruj",
+		"clearFilters": "Vyčistiť filtre",
 		"from": "od",
 		"to": "do",
 		"countryName": {

@@ -1,19 +1,9 @@
 import axios from "axios";
+import { apiConstants } from "../_constants"
 
-const COURSE_API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
-const WEATHER_FORECAST_API_URL = `${COURSE_API_URL}/weather/forecast`;
+export function getDailyForecastByCityName(lat, lon, excludedForecasts) {
+	const coordinates = `{"lat":${lat},"lon":${lon}}`;
+	const params = { coordinates, excludedForecasts: excludedForecasts };
 
-class WeatherForecastService {
-	getDailyForecastByCityName = async (lat, lon, excludedForecasts) => {
-		const coordinates = `{"lat":${lat},"lon":${lon}}`;
-
-		const params = {
-			coordinates,
-			excludedForecasts: excludedForecasts,
-		};
-		var res = await axios.get(`${WEATHER_FORECAST_API_URL}/daily`, { params });
-		return res;
-	};
-}
-
-export default new WeatherForecastService();
+	return axios.get(`${apiConstants.WEATHER_FORECAST_API_URL}/daily`, { params });
+};

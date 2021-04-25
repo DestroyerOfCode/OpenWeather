@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import WeatherForecastService from "../../../adapters/WeatherForecastService";
+import { getDailyForecastByCityName } from "../../../adapters/WeatherForecastService";
 import i18n from "i18next";
 import "../../../i18n";
 import { Link } from "react-router-dom";
@@ -45,7 +45,7 @@ function WeatherForecastComponent(props) {
 	const classes = useStyles();
 
 	useEffect(() => {
-		WeatherForecastService.getDailyForecastByCityName(
+		getDailyForecastByCityName(
 			props.history.location.state.lat,
 			props.history.location.state.lon,
 			"Current,Hourly,Minutely")

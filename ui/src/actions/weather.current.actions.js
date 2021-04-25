@@ -1,4 +1,4 @@
-import WeatherCurrentService from "../adapters/WeatherCurrentService";
+import { retrieveAllWeathers } from "../adapters/WeatherCurrentService";
 import { weatherCurrentConstants } from "../_constants"
 export const weatherCurrentActions = {
     getCurrentWeathers
@@ -6,7 +6,7 @@ export const weatherCurrentActions = {
 
 function getCurrentWeathers(sortBy, isAscending, filtersSelector, currentPage, itemsPerPage) {
     return dispatch => { 
-        WeatherCurrentService.retrieveAllWeathers(
+        retrieveAllWeathers(
             sortBy,
             isAscending,
             filtersSelector,

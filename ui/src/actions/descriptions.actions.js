@@ -1,4 +1,4 @@
-import WeatherCurrentService from "../adapters/WeatherCurrentService"
+import { retrieveAllDescriptions } from "../adapters/WeatherCurrentService"
 import i18n from "i18next";
 
 export const descriptionsActions = {
@@ -12,9 +12,10 @@ const internationalizeDescriptions = (descriptions) => {
         originalValue: description.originalValue,
     }));
 };
+
 function getDescriptions() {
     return async (dispatch) => {
-        await WeatherCurrentService.retrieveAllDescriptions()
+        await retrieveAllDescriptions()
             .then(response => {console.log(response);
             dispatch({type: "GET_DESCRIPTIONS", descriptions: internationalizeDescriptions(response)})}
             );

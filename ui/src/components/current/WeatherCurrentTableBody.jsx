@@ -9,7 +9,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 function EnhancedTableBody (props) {
     const { currentWeathers, temperature } = props
-	return currentWeathers?.content?.length ? (
+	return currentWeathers.content?.length ? (
 		<TableBody>
 			{currentWeathers.content.map((weather) => {
 				return (
@@ -37,25 +37,25 @@ function EnhancedTableBody (props) {
 						<StyledTableCell>{`${convertTemperature(
 							temperature.units,
 							weather.weatherMain.feels_like
-						)?.toFixed(2)}${
+						)}${
 							temperature.abbreviation
 						}`}</StyledTableCell>
 						<StyledTableCell>{`${convertTemperature(
 							temperature.units,
 							weather.weatherMain.temp
-						)?.toFixed(2)}${
+						)}${
 							temperature.abbreviation
 						}`}</StyledTableCell>
 						<StyledTableCell>{`${convertTemperature(
 							temperature.units,
 							weather.weatherMain.temp_max
-						)?.toFixed(2)}${
+						)}${
 							temperature.abbreviation
 						}`}</StyledTableCell>
 						<StyledTableCell>{`${convertTemperature(
 							temperature.units,
 							weather.weatherMain.temp_min
-						)?.toFixed(2)}${
+						)}${
 							temperature.abbreviation
 						}`}</StyledTableCell>
 						<StyledTableCell>
