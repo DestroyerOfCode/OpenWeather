@@ -38,7 +38,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "publishToHeroku": "cd ../ && git subtree push --prefix backend tvoje-pocasie-api master && git subtree push --prefix ui tvoje-pocasie master || true"
+    "publishToHeroku": "cd ../ && git subtree push --prefix backend tvoje-pocasie-api master && git subtree push --prefix ui tvoje-pocasie master || true",
+    "format": "prettier --write 'src/**/*.{js,jsx}'"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
   },
   "eslintConfig": {
     "extends": [
