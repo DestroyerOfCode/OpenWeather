@@ -57,16 +57,19 @@ class WeatherCurrentController {
     }
 
     @Cacheable(value = "currentWeathers")
-    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
+    @RequestMapping(method = RequestMethod.POST, value = "/retrieve/fromDb")
     @ResponseBody
-    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts,
-                          @PathVariable(required = false, value = "cityId") String cityId) {
-        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts, cityId )
+    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts) {
+        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts)
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/test")
+    def getTest(){
+        return 0;
+    }
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @Scheduled(cron = "* 0 * * * ?")
     @ResponseBody
