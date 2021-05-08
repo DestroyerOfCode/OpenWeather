@@ -164,3 +164,4 @@ gradle-app.setting
 src/main/ui/.eslintcache
 # End of https://www.toptal.com/developers/gitignore/api/linux,intellij,gradle,groovy
 .idea
+../.idea/

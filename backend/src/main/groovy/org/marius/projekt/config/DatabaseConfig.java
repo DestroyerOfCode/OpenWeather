@@ -1,4 +1,4 @@
-package org.marius.projekt;
+package org.marius.projekt.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
