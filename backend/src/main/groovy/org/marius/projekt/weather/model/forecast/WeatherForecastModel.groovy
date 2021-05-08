@@ -1,19 +1,30 @@
 package org.marius.projekt.weather.model.forecast
 
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import org.marius.projekt.weather.model.current.WeatherCurrentModel.Weather
 import org.marius.projekt.misc.Mappable
 import org.springframework.stereotype.Component
 
+@ApiModel
 @Component
 class WeatherForecastModel implements Mappable {
 
+    @ApiModelProperty(required = false, value = "Longitude")
     Double lon
+    @ApiModelProperty(required = false, value = "Latitude")
     Double lat
+    @ApiModelProperty(required = false, value = "Timezone")
     String timezone
+    @ApiModelProperty(required = false, value = "Timezone offset")
     BigInteger timezone_offset
+    @ApiModelProperty(required = false, value = "Current Weather")
     Current current
+    @ApiModelProperty(required = false, value = "Hourly Weather Forecast")
     ArrayList<Hourly> hourly
+    @ApiModelProperty(required = false, value = "Daily Weather Forecast")
     ArrayList<Daily> daily
+    @ApiModelProperty(required = false, value = "Alerts")
     ArrayList<Alerts> alerts
 
 
