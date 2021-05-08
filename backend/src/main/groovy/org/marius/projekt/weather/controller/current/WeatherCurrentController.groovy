@@ -2,6 +2,7 @@ package org.marius.projekt.weather.controller.current
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
 import org.bson.BsonDocument
@@ -72,7 +73,9 @@ class WeatherCurrentController {
     @Cacheable(value = "currentWeathers")
     @RequestMapping(method = RequestMethod.POST, value = "/retrieve/fromDb")
     @ResponseBody
-    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts) {
+    def getWeatherCurrent(@ApiParam(value = "options", example = """{\"itemsPerPage\": 100, \"pageNumber\": 1, \"sortBy\": \"coord.lat\",
+            \"isAscending\": false, \"filters\": {}}""")
+                              @RequestBody(required = false) Map<String, Object> opts) {
         PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts)
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
