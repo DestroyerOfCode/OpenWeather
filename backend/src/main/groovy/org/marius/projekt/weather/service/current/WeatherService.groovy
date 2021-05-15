@@ -122,7 +122,7 @@ class WeatherService {
         weathers
     }
 
-    PageImpl<WeatherCurrentModel> getWeatherCurrentService(Map<String, Object> opts, String cityId ){
+    PageImpl<WeatherCurrentModel> getWeatherCurrentService(Map<String, Object> opts ){
         return weatherInternalLogic.getCurrentWeather(opts)
     }
 

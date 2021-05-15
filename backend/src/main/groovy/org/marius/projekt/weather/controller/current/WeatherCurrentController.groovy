@@ -1,6 +1,10 @@
 package org.marius.projekt.weather.controller.current
 
 import com.fasterxml.jackson.databind.JsonNode
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
 import org.bson.BsonDocument
 import org.bson.Document
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
@@ -10,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
@@ -25,7 +30,8 @@ import org.springframework.web.bind.annotation.ResponseBody
 
 @Controller
 @CrossOrigin(origins = ["http://localhost:3000", "https://tvoje-pocasie.herokuapp.com"])
-@RequestMapping("weather/current")
+@RequestMapping(value = "weather/current",
+        produces = MediaType.APPLICATION_JSON_VALUE)
 class WeatherCurrentController {
 
     @Autowired WeatherService weatherService
@@ -56,17 +62,30 @@ class WeatherCurrentController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
+    @ApiOperation(value = "Fetch current weathers",
+        notes = "Fetches at the moment all Weather from Slovakia and can sort, paginate and filter them",
+        httpMethod = "POST")
+    @ApiResponses(value = [
+        @ApiResponse(code = 500, message = "Uh oh, something went wrong fetching your weathers"),
+        @ApiResponse(code = 200, message = "Successfully fetched weathers", response = WeatherCurrentModel,
+            responseContainer = "List")
+    ])
     @Cacheable(value = "currentWeathers")
-    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
+    @RequestMapping(method = RequestMethod.POST, value = "/retrieve/fromDb")
     @ResponseBody
-    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts,
-                          @PathVariable(required = false, value = "cityId") String cityId) {
-        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts, cityId )
+    def getWeatherCurrent(@ApiParam(value = "options", example = """{\"itemsPerPage\": 100, \"pageNumber\": 1, \"sortBy\": \"coord.lat\",
+            \"isAscending\": false, \"filters\": {}}""")
+                              @RequestBody(required = false) Map<String, Object> opts) {
+        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts)
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/test")
+    def getTest(){
+        return 0;
+    }
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @Scheduled(cron = "* 0 * * * ?")
     @ResponseBody
@@ -114,20 +133,11 @@ class WeatherCurrentController {
 
     //originalValue is here because Of translations. Need the original english value
     @Cacheable(value = "descriptions")
-    @GetMapping("/descriptions")
+    @GetMapping(value = "/descriptions")
     @ResponseBody
     def getDistinctDescriptions(){
         mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
                 withIndex().collect{ description, index -> ['name': description, 'id': index, 'originalValue': description]}
-    }
-
-    //heroku disables server after 30 mins of inactivity
-    //this is to prevent it from happening
-    @Scheduled(cron = "* */20 * * * ?")
-    @GetMapping("/ping")
-    @ResponseBody
-    def pingServer(){
-        println("pinging server wee")
     }
 
     private static void writeToFile(def executionTime){

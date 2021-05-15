@@ -6,7 +6,6 @@
 # .gitignore created from Groovy contributors in https://github.com/apache/groovy/blob/master/.gitignore
 
 user.gradle
-backend/.gradle/
 target/
 build/
 out/
@@ -163,3 +162,13 @@ gradle-app.setting
 
 src/main/ui/.eslintcache
 # End of https://www.toptal.com/developers/gitignore/api/linux,intellij,gradle,groovy
+.idea
+../.idea/
+../.gradle
+gradle/
+.gradle
+backend/gradlew.bat
+backend/gradlew
+backend/gradle
+build/
+../.gradle
