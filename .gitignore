@@ -165,7 +165,6 @@ src/main/ui/.eslintcache
 .idea
 ../.idea/
 ../.gradle
-gradle/
 .gradle
 backend/gradlew.bat
 backend/gradlew
