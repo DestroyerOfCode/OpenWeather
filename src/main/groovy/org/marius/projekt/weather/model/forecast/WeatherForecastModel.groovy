@@ -1,7 +1,7 @@
 package org.marius.projekt.weather.model.forecast
 
-import org.marius.projekt.weather.model.current.WeatherCurrentModel.Weather
 import org.marius.projekt.misc.Mappable
+import org.marius.projekt.weather.model.current.WeatherCurrentModel.Weather
 import org.springframework.stereotype.Component
 
 @Component

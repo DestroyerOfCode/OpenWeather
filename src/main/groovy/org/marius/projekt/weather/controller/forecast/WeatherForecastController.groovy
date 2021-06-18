@@ -1,6 +1,5 @@
 package org.marius.projekt.weather.controller.forecast
 
-
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import org.marius.projekt.weather.model.forecast.WeatherForecastModel
@@ -10,11 +9,7 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
 
 @Controller
 @CrossOrigin(origins = ["http://localhost:3000", "https://tvoje-pocasie.herokuapp.com"])

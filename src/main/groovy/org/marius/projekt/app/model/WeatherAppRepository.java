@@ -1,7 +1,6 @@
 package org.marius.projekt.app.model;
 
 import groovy.lang.Closure;
-import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -1,8 +1,8 @@
 package org.marius.projekt
 
 import org.marius.projekt.app.model.WeatherAppRepository
-import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
+import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication

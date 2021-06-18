@@ -1,24 +1,17 @@
 package org.marius.projekt.weather.businessLogic
 
 import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
-import org.bson.BsonDocument
 import org.bson.Document
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate

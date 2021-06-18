@@ -1,4 +1,5 @@
 package org.marius.projekt.weather.service.current
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import groovy.json.JsonSlurper
@@ -8,15 +9,11 @@ import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
 import org.marius.projekt.weather.model.current.WeatherCurrentModel
 import org.marius.projekt.weather.model.current.WeatherCurrentModelRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.ResourceAccessException
 
 @EnableScheduling
 @Service

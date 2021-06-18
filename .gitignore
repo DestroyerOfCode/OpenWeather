@@ -170,4 +170,4 @@ backend/gradlew.bat
 backend/gradlew
 backend/gradle
 build/
-../.gradle
+../.gradlegradle/wrapper/gradle-wrapper.jar
