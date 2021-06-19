@@ -17,29 +17,37 @@ class WeatherForecastService {
     @Autowired WeatherInternalLogic weatherInternalLogic
     @Autowired RestTemplate restTemplate
     @Autowired OpenWeatherSecurityRepository openWeatherSecurityRepository
+    @Autowired ObjectMapper objectMapper;
     def uriBaseForecast = 'https://api.openweathermap.org/data/2.5/onecall?'
 
-//    @CompileStatic
     WeatherForecastModel getWeatherForecastByCoordinates(Number lat, Number lon, String excludedForecasts){
 
         try {
-            def uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${System.getenv("OPENWEATHER_API_KEY_ONE")}"
+            def uriString = String.format("%slat=%s&lon=%s&exclude=%s&appid=%s", uriBaseForecast,
+                    String.format("%.2f", lat),
+                    String.format("%.2f", lon),
+                    excludedForecasts,
+                    System.getenv("OPENWEATHER_API_KEY_ONE")
+            )
             if (!System.getenv("OPENWEATHER_API_KEY_ONE"))
-                uriString = "${uriBaseForecast}lat=${lat}&lon=${lon}&exclude=${excludedForecasts}&appid=${openWeatherSecurityRepository.findAll().first().apiKey}"
-            ResponseEntity<String> weatherDailyJson = restTemplate.exchange(uriString, HttpMethod.GET, weatherInternalLogic.setOpenWeatherApiHeaders(), String.class)
+                uriString = String.format("%slat=%s&lon=%s&exclude=%s&appid=%s", uriBaseForecast,
+                        String.format("%.2f", lat),
+                        String.format("%.2f", lon),
+                        excludedForecasts,
+                        openWeatherSecurityRepository.findAll().first().apiKey
+                )
+            ResponseEntity<String> weatherDailyJson = restTemplate.exchange( uriString, HttpMethod.GET,
+                    weatherInternalLogic.setOpenWeatherApiHeaders(),
+                    String.class
+            )
 
-            Map<String, Object> weatherDailyMap = (HashMap<String, Object>) new JsonSlurper().parseText(weatherDailyJson.body.toString())
-            weatherDailyMap.hourly.findAll{ it.rain}.collect {
-                it.rain << ["_1h": it.rain."1h"]
-                it.rain.remove("1h")
-            }
+            Map<String, Object> weatherDailyMap = (HashMap<String, Object>) new JsonSlurper()
+                    .parseText(weatherDailyJson.body.toString())
+            weatherInternalLogic.renameKeysStartingWithNumberForecast(weatherDailyMap)
 
-            weatherDailyMap.hourly.findAll{ it.snow}.collect {
-                it.snow << ["_1h": it.snow."1h"]
-                it.snow.remove("1h")
-            }
+            WeatherForecastModel weatherCurrentModel = objectMapper.convertValue(weatherDailyMap,
+                    WeatherForecastModel.class)
 
-            WeatherForecastModel weatherCurrentModel = new ObjectMapper().convertValue(weatherDailyMap, WeatherForecastModel.class)
             return weatherCurrentModel
         } catch(Exception e){
             e.printStackTrace()

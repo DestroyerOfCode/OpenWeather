@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class SimpleCacheCustomizer{
 
     @Autowired Caffeine<Object, Object> caffeine;
+
     @Bean
     public CacheManager customize() {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();

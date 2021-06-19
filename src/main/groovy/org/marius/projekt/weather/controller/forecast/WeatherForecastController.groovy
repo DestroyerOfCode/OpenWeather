@@ -1,6 +1,6 @@
 package org.marius.projekt.weather.controller.forecast
 
-import groovy.json.JsonSlurper
+
 import groovy.transform.CompileStatic
 import org.marius.projekt.weather.model.forecast.WeatherForecastModel
 import org.marius.projekt.weather.service.forecast.WeatherForecastService
