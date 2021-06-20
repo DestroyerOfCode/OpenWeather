@@ -47,14 +47,8 @@ class WeatherService {
 
     }
 
-    def saveWeatherCurrent( def opts ){
-        WeatherCurrentModel weatherCurrentModel
-        if (opts instanceof ObjectNode ) {
-            weatherCurrentModel = objectMapper.convertValue(opts, WeatherCurrentModel.class)
-        }
-        else
-            weatherCurrentModel = opts
-        return weatherCurrentModelRepository.save( weatherCurrentModel )
+    def saveWeatherCurrent( weatherCurrent){
+        return weatherCurrentModelRepository.save(weatherCurrent)
     }
 
     ArrayList<WeatherCurrentModel> saveAllWeatherCurrentData(){

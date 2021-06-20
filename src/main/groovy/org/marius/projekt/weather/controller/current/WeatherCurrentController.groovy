@@ -42,13 +42,13 @@ class WeatherCurrentController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    def saveWeatherCurrent(@RequestBody JsonNode opts) {
-        if (weatherService.saveWeatherCurrent( opts ) )
+    def saveWeatherCurrent(@RequestBody WeatherCurrentModel weatherCurrent) {
+        if (weatherService.saveWeatherCurrent(weatherCurrent) )
             return new ResponseEntity<>(HttpStatus.CREATED)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb"])
+    @RequestMapping(method = RequestMethod.POST, value = "/retrieve/fromDb")
     @ResponseBody
     def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts) {
         PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts)

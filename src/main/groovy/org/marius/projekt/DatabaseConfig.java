@@ -9,15 +9,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Configuration
 public class DatabaseConfig {
 
-//    @Value("${MONGO_URI}")
-//    private String mongo_uri;
     @Bean
     MongoClient mongoClient() {
-        return System.getenv("MONGO_URI") == null ? MongoClients.create("mongodb://localhost:27017") : MongoClients.create( System.getenv("MONGO_URI"));
+        return System.getenv("MONGO_URI") == null ?
+                MongoClients.create("mongodb://localhost:27017") :
+                MongoClients.create( System.getenv("MONGO_URI"));
     }
 
     @Bean
     MongoTemplate mongoTemplate() {
-        return System.getenv("MONGO_URI")  == null ? new MongoTemplate(mongoClient(), "weatherManager") : new MongoTemplate(mongoClient(), "pocasie");
+        return System.getenv("MONGO_URI") == null ?
+                new MongoTemplate(mongoClient(), "weatherManager") :
+                new MongoTemplate(mongoClient(), "pocasie");
     }
 }
