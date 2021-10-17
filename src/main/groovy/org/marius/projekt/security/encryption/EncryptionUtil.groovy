@@ -1,11 +1,8 @@
 package org.marius.projekt.security.encryption
 
-import org.springframework.security.crypto.encrypt.AesBytesEncryptor
-import org.springframework.security.crypto.encrypt.BytesEncryptor
+
 import org.springframework.security.crypto.encrypt.Encryptors
-import org.springframework.security.crypto.encrypt.HexEncodingTextEncryptor
 import org.springframework.security.crypto.encrypt.TextEncryptor
-import org.springframework.security.crypto.keygen.KeyGenerators
 import org.springframework.stereotype.Component
 
 @Component

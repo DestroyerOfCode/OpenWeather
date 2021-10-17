@@ -13,15 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
 
 @Controller
 @CrossOrigin(origins = ["http://localhost:3000", "https://tvoje-pocasie.herokuapp.com"])
@@ -50,17 +42,16 @@ class WeatherCurrentController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    def saveWeatherCurrent(@RequestBody JsonNode opts) {
-        if (weatherService.saveWeatherCurrent( opts ) )
+    def saveWeatherCurrent(@RequestBody WeatherCurrentModel weatherCurrent) {
+        if (weatherService.saveWeatherCurrent(weatherCurrent) )
             return new ResponseEntity<>(HttpStatus.CREATED)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = ["/retrieve/fromDb", "/retrieve/fromDb/{cityId}"])
+    @RequestMapping(method = RequestMethod.POST, value = "/retrieve/fromDb")
     @ResponseBody
-    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts,
-                          @PathVariable(required = false, value = "cityId") String cityId) {
-        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts, cityId )
+    def getWeatherCurrent(@RequestBody(required = false) Map<String, Object> opts) {
+        PageImpl<WeatherCurrentModel> weathers = weatherService.getWeatherCurrentService(opts)
         if (weathers)
             return new ResponseEntity<>(weathers, HttpStatus.OK)
         return new ResponseEntity<>(weathers, HttpStatus.NO_CONTENT)
