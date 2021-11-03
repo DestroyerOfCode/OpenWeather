@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("weather/current")
 class WeatherCurrentController {
 
-    @Autowired WeatherService weatherService
-    @Autowired MongoTemplate mongoTemplate
+    @Autowired
+    WeatherService weatherService
+    @Autowired
+    MongoTemplate mongoTemplate
 
     /***
      * example curls
@@ -34,7 +36,7 @@ class WeatherCurrentController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     def getWeatherData(@RequestParam Map<String, Object> opts) {
-        def weather = weatherService.findWeather( opts )
+        def weather = weatherService.findWeather(opts)
         if (!weather)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT)
         return new ResponseEntity<WeatherCurrentModel>(weather, HttpStatus.ACCEPTED)
@@ -43,7 +45,7 @@ class WeatherCurrentController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     def saveWeatherCurrent(@RequestBody WeatherCurrentModel weatherCurrent) {
-        if (weatherService.saveWeatherCurrent(weatherCurrent) )
+        if (weatherService.saveWeatherCurrent(weatherCurrent))
             return new ResponseEntity<>(HttpStatus.CREATED)
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
     }
@@ -58,7 +60,7 @@ class WeatherCurrentController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
-    @Scheduled(cron = "* 0 * * * ?")
+    @Scheduled(cron = "0 0 0 1/1 * ? *")
     @ResponseBody
     def saveAllWeatherCurrentData() {
         weatherService.saveAllWeatherCurrentData()
@@ -66,7 +68,7 @@ class WeatherCurrentController {
 
     @PostMapping("/all")
     @ResponseBody
-    ArrayList getAllWeatherData(@RequestParam Map<String, Object> opts){
+    ArrayList getAllWeatherData(@RequestParam Map<String, Object> opts) {
         ArrayList cityIds = weatherService.findCityIds()
 
         ArrayList temperaturesInCities = new ArrayList()
@@ -80,17 +82,17 @@ class WeatherCurrentController {
     @Cacheable(value = "countries")
     @GetMapping("/countries")
     @ResponseBody
-    def getDistinctCountries(){
+    def getDistinctCountries() {
         def weatherCurrentModelCollection = mongoTemplate.getCollection(mongoTemplate.getCollectionName(WeatherCurrentModel.class));
         weatherCurrentModelCollection.aggregate([
                 new Document([
-                    "\$group": [
-                        "_id": "\$sys.country", "countryName": ["\$first" : "\$sys.countryName"]
-                    ]
+                        "\$group": [
+                                "_id": "\$sys.country", "countryName": ["\$first": "\$sys.countryName"]
+                        ]
                 ]),
                 new Document([
                         "\$addFields": [
-                            "countryCode": "\$_id", "_id": null, "originalCountryName": "\$countryName"
+                                "countryCode": "\$_id", "_id": null, "originalCountryName": "\$countryName"
                         ]
                 ]),
                 BsonDocument.parse('''
@@ -106,9 +108,9 @@ class WeatherCurrentController {
     @Cacheable(value = "descriptions")
     @GetMapping("/descriptions")
     @ResponseBody
-    def getDistinctDescriptions(){
+    def getDistinctDescriptions() {
         mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
-                withIndex().collect{ description, index -> ['name': description, 'id': index, 'originalValue': description]}
+                withIndex().collect { description, index -> ['name': description, 'id': index, 'originalValue': description] }
     }
 
     //heroku disables server after 30 mins of inactivity
@@ -116,13 +118,13 @@ class WeatherCurrentController {
     @Scheduled(cron = "* */20 * * * ?")
     @GetMapping("/ping")
     @ResponseBody
-    def pingServer(){
+    def pingServer() {
         println("pinging server wee")
     }
 
-    private static void writeToFile(def executionTime){
+    private static void writeToFile(def executionTime) {
         BufferedWriter writer = new BufferedWriter(new FileWriter("file.txt", true));
-        writer.append((executionTime/1_000_000).toString() + "\n");
+        writer.append((executionTime / 1_000_000).toString() + "\n");
         writer.close()
     }
 }
