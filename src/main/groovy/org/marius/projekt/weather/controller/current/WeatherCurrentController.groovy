@@ -62,8 +62,8 @@ class WeatherCurrentController {
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
     @Scheduled(cron = "0 0 0 1/1 * ? *")
     @ResponseBody
-    def saveAllWeatherCurrentData() {
-        weatherService.saveAllWeatherCurrentData()
+    ResponseEntity<String> saveAllWeatherCurrentData() {
+        new ResponseEntity<String>(weatherService.saveAllWeatherCurrentData(), HttpStatus.OK)
     }
 
     @PostMapping("/all")
