@@ -2,6 +2,8 @@ package org.marius.projekt.weather.service.forecast
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.json.JsonSlurper
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
 import org.marius.projekt.weather.businessLogic.WeatherInternalLogic
 import org.marius.projekt.weather.model.forecast.WeatherForecastModel
@@ -14,13 +16,19 @@ import org.springframework.web.client.RestTemplate
 @Service
 class WeatherForecastService {
 
-    @Autowired WeatherInternalLogic weatherInternalLogic
-    @Autowired RestTemplate restTemplate
-    @Autowired OpenWeatherSecurityRepository openWeatherSecurityRepository
-    @Autowired ObjectMapper objectMapper;
-    def uriBaseForecast = 'https://api.openweathermap.org/data/2.5/onecall?'
+    @Autowired
+    WeatherInternalLogic weatherInternalLogic
+    @Autowired
+    RestTemplate restTemplate
+    @Autowired
+    OpenWeatherSecurityRepository openWeatherSecurityRepository
+    @Autowired
+    ObjectMapper objectMapper;
 
-    WeatherForecastModel getWeatherForecastByCoordinates(Number lat, Number lon, String excludedForecasts){
+    private static final uriBaseForecast = 'https://api.openweathermap.org/data/2.5/onecall?'
+    private static final Logger logger = LogManager.getLogger(WeatherForecastService.class);
+
+    WeatherForecastModel getWeatherForecastByCoordinates(Number lat, Number lon, String excludedForecasts) {
 
         try {
             def uriString = String.format("%slat=%s&lon=%s&exclude=%s&appid=%s", uriBaseForecast,
@@ -36,7 +44,7 @@ class WeatherForecastService {
                         excludedForecasts,
                         openWeatherSecurityRepository.findAll().first().apiKey
                 )
-            ResponseEntity<String> weatherDailyJson = restTemplate.exchange( uriString, HttpMethod.GET,
+            ResponseEntity<String> weatherDailyJson = restTemplate.exchange(uriString, HttpMethod.GET,
                     weatherInternalLogic.setOpenWeatherApiHeaders(),
                     String.class
             )
@@ -49,8 +57,9 @@ class WeatherForecastService {
                     WeatherForecastModel.class)
 
             return weatherCurrentModel
-        } catch(Exception e){
-            e.printStackTrace()
+        } catch (Exception e) {
+            logger.error("Error getting weather with latitude: ${lat}, longitude: ${lon}", e)
+            throw e;
         }
     }
 }

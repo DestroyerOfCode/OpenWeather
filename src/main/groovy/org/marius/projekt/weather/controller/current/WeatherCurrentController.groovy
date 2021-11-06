@@ -60,7 +60,7 @@ class WeatherCurrentController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save/all")
-    @Scheduled(cron = "0 0 0 1/1 * ? *")
+    @Scheduled(cron = "0 0 * * * *")
     @ResponseBody
     ResponseEntity<String> saveAllWeatherCurrentData() {
         new ResponseEntity<String>(weatherService.saveAllWeatherCurrentData(), HttpStatus.OK)
@@ -111,15 +111,6 @@ class WeatherCurrentController {
     def getDistinctDescriptions() {
         mongoTemplate.query(WeatherCurrentModel.class).distinct("weather.description").as(String.class).all().
                 withIndex().collect { description, index -> ['name': description, 'id': index, 'originalValue': description] }
-    }
-
-    //heroku disables server after 30 mins of inactivity
-    //this is to prevent it from happening
-    @Scheduled(cron = "* */20 * * * ?")
-    @GetMapping("/ping")
-    @ResponseBody
-    def pingServer() {
-        println("pinging server wee")
     }
 
     private static void writeToFile(def executionTime) {

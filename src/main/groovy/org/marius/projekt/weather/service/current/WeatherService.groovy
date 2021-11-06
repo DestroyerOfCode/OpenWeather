@@ -82,6 +82,7 @@ class WeatherService {
                         logger.error("Error saving weather ${weather.name}", ex)
                     }
             }
+            logger.info("Finished saving current weathers")
         })
         return "OK"
     }

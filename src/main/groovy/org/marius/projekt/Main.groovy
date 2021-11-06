@@ -8,16 +8,18 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.transaction.annotation.EnableTransactionManagement
 
 @EnableTransactionManagement
 @EnableAutoConfiguration
 @SpringBootApplication
-@EnableMongoRepositories(basePackageClasses =[ WeatherCurrentModelRepository.class, OpenWeatherSecurityRepository.class, WeatherAppRepository/*, org.marius.projekt.app.model.WeatherAppRepository.class*/])
+@EnableScheduling
+@EnableMongoRepositories(basePackageClasses = [WeatherCurrentModelRepository.class, OpenWeatherSecurityRepository.class, WeatherAppRepository])
 @ComponentScan('org.marius.projekt')
 class Main {
 
-    static void main(String[] args){
+    static void main(String[] args) {
         SpringApplication.run(Main.class, args);
 
     }

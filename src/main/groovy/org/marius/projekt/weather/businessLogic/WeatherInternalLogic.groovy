@@ -2,6 +2,8 @@ package org.marius.projekt.weather.businessLogic
 
 import com.mongodb.client.MongoCollection
 import groovy.json.JsonSlurper
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.bson.BsonDocument
 import org.bson.Document
 import org.marius.projekt.security.model.OpenWeatherSecurityRepository
@@ -20,11 +22,15 @@ import org.springframework.web.client.RestTemplate
 @Component
 class WeatherInternalLogic {
 
-    def uriBase ='http://api.openweathermap.org/data/2.5/weather?'
+    private static final String uriBase = 'http://api.openweathermap.org/data/2.5/weather?'
+    private static final Logger logger = LogManager.getLogger(WeatherInternalLogic.class);
 
-    @Autowired RestTemplate restTemplate
-    @Autowired OpenWeatherSecurityRepository openWeatherSecurityRepository
-    @Autowired MongoTemplate mongoTemplate
+    @Autowired
+    RestTemplate restTemplate
+    @Autowired
+    OpenWeatherSecurityRepository openWeatherSecurityRepository
+    @Autowired
+    MongoTemplate mongoTemplate
 
     /***
      *
@@ -33,7 +39,7 @@ class WeatherInternalLogic {
      * restTemplate.exchange calls the web service
      * @return
      */
-    Object parseWeatherEntityToJson(HttpEntity<String> entity, Map<String, Object> opts){
+    Object parseWeatherEntityToJson(HttpEntity<String> entity, Map<String, Object> opts) {
 
         try {
             StringBuilder url = new StringBuilder(uriBase)
@@ -42,8 +48,9 @@ class WeatherInternalLogic {
                     String.class)
                     .getBody().toString()
             )
-        } catch(HttpClientErrorException e) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.toString())
+        } catch (HttpClientErrorException e) {
+            logger.error("Error getting weather ${opts.cityName}", e)
+            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString())
         }
 
     }
@@ -54,15 +61,15 @@ class WeatherInternalLogic {
      * @param url
      * @return new String cause url cant be stringBuilder
      */
-    String buildUrl(Map<String, Object> opts, StringBuilder url){
+    String buildUrl(Map<String, Object> opts, StringBuilder url) {
 
-        opts.each{k, v ->
-            switch (k){
-                case ( 'cityId' ) : url.append("id=${v}" as String); break;
-                case ( 'cityName' ) : url.append("q=${v}" as String); break;
-                case ( 'state' ) : url.append(",${v}" as String); break;
-                case ( 'zipCode' ) : url.append("zip=${v}" as String); break;
-                case ( 'countryCode' ) : url.append(",${v}" as String); break;
+        opts.each { k, v ->
+            switch (k) {
+                case ('cityId'): url.append("id=${v}" as String); break;
+                case ('cityName'): url.append("q=${v}" as String); break;
+                case ('state'): url.append(",${v}" as String); break;
+                case ('zipCode'): url.append("zip=${v}" as String); break;
+                case ('countryCode'): url.append(",${v}" as String); break;
             }
         }
 
@@ -74,7 +81,7 @@ class WeatherInternalLogic {
         else
             url.append("&appid=${openWeatherSecurityRepository.findAll().first().apiKey}" as String)
 
-        new String (url)
+        new String(url)
     }
 
     HttpEntity setOpenWeatherApiHeaders() {
@@ -99,8 +106,7 @@ class WeatherInternalLogic {
                         v && v instanceof Map ? findNestedKey(v, key) : null
                 }
             }
-        }
-        else {
+        } else {
             if (m.containsKey(key))
                 return m[key]
             m.findResult {
@@ -115,7 +121,7 @@ class WeatherInternalLogic {
         ArrayList<WeatherCurrentModel> currentWeathers = buildAggregationQuery(opts.filters, opts.sortBy, opts.isAscending)
 
         Pageable pageable = PageRequest.of(opts.pageNumber, opts.itemsPerPage);
-        final int start = (int)pageable.getOffset();
+        final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), currentWeathers.size());
 
         Page<WeatherCurrentModel> pages = new PageImpl<WeatherCurrentModel>(currentWeathers.subList(start, end),
@@ -125,25 +131,25 @@ class WeatherInternalLogic {
         pages
     }
 
-    def buildAggregationQuery(Map<String, Object> filters, String sortBy, Boolean isAscending){
+    def buildAggregationQuery(Map<String, Object> filters, String sortBy, Boolean isAscending) {
 
         def weatherCurrentModelCollection = mongoTemplate.getCollection(
                 mongoTemplate.getCollectionName(WeatherCurrentModel.class)
         )
 
-        def isTrue = { item -> item == true ? 1 : -1}
+        def isTrue = { item -> item == true ? 1 : -1 }
 
         weatherCurrentModelCollection.aggregate([
                 new Document([$match: [
-                        $and : [
-                            ["sys.country": "SK"]
+                        $and: [
+                                ["sys.country": "SK"]
                         ] << filters
                 ]]),
                 new Document([$sort: [
-                        ((String) sortBy) : (isTrue.call(isAscending))
+                        ((String) sortBy): (isTrue.call(isAscending))
                 ]]),
-                new Document([$project : [
-                        "creationDate" : 0
+                new Document([$project: [
+                        "creationDate": 0
                 ]]),
         ]) as List
 
@@ -157,7 +163,7 @@ class WeatherInternalLogic {
         return weatherCurrentModelCollection.aggregate([BsonDocument.parse('''
             {
                 "\$match": {
-                    "sys.country":"'''+weatherMap.sys.country+'''"
+                    "sys.country":"''' + weatherMap.sys.country + '''"
                 }
             },
             {
@@ -184,14 +190,14 @@ class WeatherInternalLogic {
         weatherMap.put('_id', o)
 
         // in the jsonnode I receive there are keys starting with a numeral so I have to change it to start with literal
-        if ( weatherMap.containsKey('rain')) {
+        if (weatherMap.containsKey('rain')) {
             o = weatherMap.rain.remove('1h')
             weatherMap.rain.put('oneh', o)
             o = weatherMap.rain.remove('3h')
             weatherMap.rain.put('threeh', o)
         }
 
-        if ( weatherMap.containsKey('snow')) {
+        if (weatherMap.containsKey('snow')) {
             o = weatherMap.snow.remove('1h')
             weatherMap.snow.put('oneh', o)
             o = weatherMap.snow.remove('3h')
@@ -200,12 +206,12 @@ class WeatherInternalLogic {
     }
 
     def renameKeysStartingWithNumberForecast(weatherDailyMap) {
-        weatherDailyMap.hourly.findAll{ it.rain}.collect {
+        weatherDailyMap.hourly.findAll { it.rain }.collect {
             it.rain << ["_1h": it.rain."1h"]
             it.rain.remove("1h")
         }
 
-        weatherDailyMap.hourly.findAll{ it.snow}.collect {
+        weatherDailyMap.hourly.findAll { it.snow }.collect {
             it.snow << ["_1h": it.snow."1h"]
             it.snow.remove("1h")
         }
